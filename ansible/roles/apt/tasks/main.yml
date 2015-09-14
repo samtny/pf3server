@@ -1,0 +1,4 @@
+---
+- name: Add php apt repository
+  apt_repository: repo='ppa:ondrej/php5-5.6' update_cache=yes
+  notify: Apt update

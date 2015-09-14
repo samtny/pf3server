@@ -1,0 +1,30 @@
+---
+- name: Install php dependencies
+  apt: name={{ item }} state=present
+  with_items:
+    - python-software-properties
+
+- name: Install php
+  apt: name={{ item }} state=present
+  notify: Restart php
+  with_items:
+    - php5-fpm
+    - php5-cli
+    - php5-curl
+    - php5-mysql
+    - php5-gd
+    - php-pear
+    - php5-dev
+    - build-essential
+    - checkinstall
+
+- name: Ensure php.ini
+  template: src=php.ini.j2 dest=/etc/php5/fpm/php.ini owner=root group=root mode=0644
+  notify: Restart php
+
+- name: Ensure www.conf
+  template: src=www.conf.j2 dest=/etc/php5/fpm/pool.d/www.conf owner=root group=root mode=0644
+  notify: Restart php
+
+- name: Ensure php5-fpm state
+  service: name=php5-fpm state=started

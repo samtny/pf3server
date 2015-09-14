@@ -1,0 +1,13 @@
+- name: apply common configuration to all nodes
+  hosts: all
+  remote_user: root
+  pre_tasks:
+    - shell: sudo apt-get update
+  roles:
+    - common
+
+- name: configure and deploy pf3server
+  hosts: pf3server
+  remote_user: root
+  roles:
+    - pf3server

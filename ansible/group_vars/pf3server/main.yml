@@ -1,0 +1,11 @@
+---
+php_memory_limit: 16M
+php_upload_max_filesize: 2M
+php_post_max_size: 8M
+php_cgi_fix_pathinfo: 1
+php_realpath_cache_size: 96k
+php_opcache_enable: 1
+php_opcache_memory_consumption: 8
+php_opcache_interned_strings_buffer: 2
+php_opcache_max_accelerated_files: 16228
+php_opcache_validate_timestamps: 1

@@ -1,0 +1,6 @@
+---
+- name: Apt update
+  command: apt-get update
+
+- name: Apt upgrade
+  command: apt-get upgrade
