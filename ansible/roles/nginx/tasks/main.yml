@@ -1,0 +1,17 @@
+---
+- name: Install nginx
+  apt: name=nginx state=present
+
+- name: Remove default nginx site
+  file: path=/etc/nginx/sites-available/default state=absent
+  notify: Reload nginx
+
+- name: Set nginx mime.types
+  template: src=mime.types dest=/etc/nginx/mime.types
+  notify: Reload nginx
+
+- name: Ensure nginx service state
+  service: name=nginx state=started
+
+#- name: Create /var/www
+#  file: path=/var/www state=directory owner=root group=www-data mode=2775

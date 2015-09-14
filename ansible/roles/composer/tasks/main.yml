@@ -1,0 +1,6 @@
+---
+- name: Create composer installer script
+  template: src=install_composer.sh dest=/home/vagrant/install_composer.sh owner=vagrant group=vagrant mode=0755
+
+- name: Execute composer install script
+  shell: /home/vagrant/install_composer.sh creates=/usr/local/bin/composer
