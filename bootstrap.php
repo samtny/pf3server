@@ -12,6 +12,10 @@ $app = new \Slim\Slim(
   )
 );
 
+$app->view()->parserOptions = array(
+  'autoescape' => false,
+);
+
 $app->configureMode('development', function () use ($app) {
   $app->config(array(
     'cookies.lifetime' => 'Never',
@@ -25,6 +29,8 @@ $app->configureMode('production', function () use ($app) {
     'debug' => false,
   ));
 });
+
+$app->add(new \PF\ContentTypes());
 
 $app->container->singleton('em', function () use ($app) {
   $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/src"), $app->getMode() === 'development');

@@ -11,15 +11,18 @@ $app->get('/venue/:id', function ($id) use ($app) {
   $venues = array($venue);
 
   $res = $app->response();
-  $res['Content-Type'] = 'text/xml';
 
-  $app->render('pinfinderapp.xml', array('venues' => $venues));
+  //$res['Content-Type'] = 'text/xml';
+  //$app->render('pinfinderapp.xml', array('venues' => $venues));
+
+  $res['Content-Type'] = 'application/json';
+  $app->render('pinfinderapp.json', array('venues' => $venues));
 });
 
 $app->post('/venue', function () use ($app) {
   $newVenueName = $argv[1];
 
-  $venue = new Venue();
+  $venue = new \PF\Venue();
   $venue->setName($newVenueName);
 
   $app->em->persist($venue);
