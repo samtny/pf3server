@@ -2,31 +2,6 @@
 
 require_once 'bootstrap.php';
 
-require 'vendor/autoload.php';
-
-$app = new \Slim\Slim(
-  array(
-    'mode' => 'development',
-    'view' => new \Slim\Views\Twig(),
-  )
-);
-
-$app->configureMode('development', function () use ($app) {
-  $app->config(array(
-    'cookies.lifetime' => 'Never',
-    'debug' => true,
-  ));
-});
-
-$app->configureMode('production', function () use ($app) {
-  $app->config(array(
-    'cookies.lifetime' => '2 Hours',
-    'debug' => false,
-  ));
-});
-
-$responseFormat = $app->request->get('f');
-
 $app->get('/venue/:id', function ($id) use ($app) {
   $venue = array(
     'id' => $id,
@@ -41,16 +16,16 @@ $app->get('/venue/:id', function ($id) use ($app) {
   $app->render('pinfinderapp.xml', array('venues' => $venues));
 });
 
-$app->post('/venue', function () use ($app, $entityManager) {
+$app->post('/venue', function () use ($app) {
   $newVenueName = $argv[1];
 
   $venue = new Venue();
   $venue->setName($newVenueName);
 
-  $entityManager->persist($venue);
-  $entityManager->flush();
+  $app->em->persist($venue);
+  $app->em->flush();
 
-  echo "Created Product with ID " . $venue->getId() . "\n";
+  echo "Created Venue with ID " . $venue->getId() . "\n";
 });
 
 $app->run();
