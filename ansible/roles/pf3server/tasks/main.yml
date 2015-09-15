@@ -2,6 +2,9 @@
 - name: Install pf3server composer dependencies
   composer: command=install working_dir=/vagrant
 
+- name: Update pf3server composer dependencies
+  composer: command=update working_dir=/vagrant
+
 - name: Create pf3server vhost file
   template: src=pf3server.j2 dest=/etc/nginx/sites-available/pf3server owner=root group=root mode=0644
   notify: Reload nginx

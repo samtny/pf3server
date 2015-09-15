@@ -2,4 +2,5 @@
 dependencies:
   - { role: php }
   - { role: composer }
+  - { role: mysql }
   - { role: nginx }

@@ -1,0 +1,13 @@
+{% extends 'layout.xml' %}
+{% block content %}
+<pinfinderapp>
+<venues>
+{% for venue in venues %}
+<venue>
+<id>{{ venue.id }}</id>
+<name>{{ venue.name }}</name>
+</venue>
+{% endfor %}
+</venues>
+</pinfinderapp>
+{% endblock %}
