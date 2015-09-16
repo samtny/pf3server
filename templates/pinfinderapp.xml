@@ -3,10 +3,7 @@
 <pinfinderapp>
 <venues>
 {% for venue in venues %}
-<venue>
-<id>{{ venue.id }}</id>
-<name>{{ venue.name }}</name>
-</venue>
+{% include 'venue.xml' %}
 {% endfor %}
 </venues>
 </pinfinderapp>

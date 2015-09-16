@@ -1,0 +1,6 @@
+{% block content %}
+<venue>
+    <id>{{ venue.id }}</id>
+    <name>{{ venue.name }}</name>
+</venue>
+{% endblock %}

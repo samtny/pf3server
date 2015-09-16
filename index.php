@@ -28,4 +28,16 @@ $app->post('/venue', function () use ($app) {
   echo "Created Venue with ID " . $venue->getId() . "\n";
 });
 
+$app->get('/venues', function () use ($app) {
+  $dql = "SELECT v FROM \PF\Venue v ORDER BY v.id DESC";
+
+  $query = $app->em->createQuery($dql);
+  $query->setMaxResults(30);
+
+  $venues = $query->getArrayResult();
+
+  $res['Content-Type'] = 'application/json';
+  $app->render('venues.json', array('venues' => $venues));
+});
+
 $app->run();
