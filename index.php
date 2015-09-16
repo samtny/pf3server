@@ -3,10 +3,7 @@
 require_once 'bootstrap.php';
 
 $app->get('/venue/:id', function ($id) use ($app) {
-  $venue = array(
-    'id' => $id,
-    'name' => 'Reciprocal Skateboards',
-  );
+  $venue = $app->em->find('\PF\Venue', $id);
 
   $venues = array($venue);
 
@@ -16,7 +13,7 @@ $app->get('/venue/:id', function ($id) use ($app) {
   //$app->render('pinfinderapp.xml', array('venues' => $venues));
 
   $res['Content-Type'] = 'application/json';
-  $app->render('pinfinderapp.json', array('venues' => $venues));
+  $app->render('venue.json', array('venue' => $venue));
 });
 
 $app->post('/venue', function () use ($app) {

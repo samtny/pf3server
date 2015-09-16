@@ -1,1 +1,11 @@
+{% block content %}
+[
+{% for venue in venues %}
+{
+        "id": {{ venue.id }}
+}
+{% if not loop.last %},{% endif %}
+{% endfor %}
+]
 {{ venues|json_encode() }}
+{% endblock %}
