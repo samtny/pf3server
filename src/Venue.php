@@ -5,7 +5,8 @@ namespace PF;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @Entity @Table(name="venue")
+ * @Entity(repositoryClass="VenueRepository")
+ * @Table(name="venue")
  **/
 class Venue {
 
@@ -14,6 +15,12 @@ class Venue {
 
   /** @Column(type="string") **/
   protected $name;
+
+  /** @Column(type="string", options={"default":"NEW"}) **/
+  protected $status;
+
+  /** @Column(type="datetime") **/
+  protected $created;
 
   /**
    * @OneToMany(targetEntity="Machine", mappedBy="venue")
@@ -26,6 +33,9 @@ class Venue {
   public function __construct() {
     $this->machines = new ArrayCollection();
     $this->comments = new ArrayCollection();
+
+    $this->status = "NEW";
+    $this->created = new \DateTime("now");
   }
 
   public function getId()
@@ -43,11 +53,23 @@ class Venue {
     $this->name = $name;
   }
 
+  public function getStatus() {
+    return $this->status;
+  }
+
+  public function setStatus($status) {
+    $this->status = $status;
+  }
+
   public function addMachine($machine) {
     $this->machines[] = $machine;
   }
 
   public function addComment($comment) {
     $this->comments[] = $comment;
+  }
+
+  public function approve() {
+    $this->status = "APPROVED";
   }
 }

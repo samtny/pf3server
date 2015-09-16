@@ -1,6 +1,7 @@
 {% block content %}
 {
   "id": {{ venue.id }},
-  "name": "{{ venue.name }}"
+  "name": "{{ venue.name }}",
+  "status": "{{ venue.status }}"
 }
 {% endblock %}

@@ -29,12 +29,7 @@ $app->post('/venue', function () use ($app) {
 });
 
 $app->get('/venues', function () use ($app) {
-  $dql = "SELECT v FROM \PF\Venue v ORDER BY v.id DESC";
-
-  $query = $app->em->createQuery($dql);
-  $query->setMaxResults(30);
-
-  $venues = $query->getArrayResult();
+  $venues = $app->em->getRepository('\PF\Venue')->getRecentVenues(1, 2);
 
   $res['Content-Type'] = 'application/json';
   $app->render('venues.json', array('venues' => $venues));
