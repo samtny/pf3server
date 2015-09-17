@@ -2,4 +2,4 @@
 .vagrant
 vendor
 *.sqlite
-
+credentials.yml

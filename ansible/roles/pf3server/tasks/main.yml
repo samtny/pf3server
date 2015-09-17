@@ -5,6 +5,12 @@
 - name: Update pf3server composer dependencies
   composer: command=update working_dir=/vagrant
 
+- name: Create pf3server database
+  mysql_db: name={{ pf3server_db_name }} state=present collation="utf8_general_ci" encoding="utf8"
+
+- name: Create pf3server database user
+  mysql_user: name={{ pf3server_db_user }} password={{ pf3server_db_password }} priv="{{ pf3server_db_name }}.*:ALL" state=present
+
 - name: Create pf3server vhost file
   template: src=pf3server.j2 dest=/etc/nginx/sites-available/pf3server owner=root group=root mode=0644
   notify: Reload nginx

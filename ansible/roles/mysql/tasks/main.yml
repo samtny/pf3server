@@ -8,3 +8,6 @@
 
 - name: Ensure mysql service state
   service: name=mysql state=started
+
+- name: Install python-mysqldb
+  apt: name=python-mysqldb state=present

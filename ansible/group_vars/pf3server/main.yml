@@ -9,3 +9,5 @@ php_opcache_memory_consumption: 8
 php_opcache_interned_strings_buffer: 2
 php_opcache_max_accelerated_files: 16228
 php_opcache_validate_timestamps: 1
+
+pf3server_url: local.pf3server.com

@@ -61,6 +61,10 @@ class Venue {
     $this->status = $status;
   }
 
+  public function getCreated() {
+    return $this->created;
+  }
+
   public function addMachine($machine) {
     $this->machines[] = $machine;
   }
