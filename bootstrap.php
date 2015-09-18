@@ -5,6 +5,8 @@ use Doctrine\ORM\EntityManager;
 
 require_once "vendor/autoload.php";
 
+\Doctrine\DBAL\Types\Type::addType('point', '\CrEOF\Spatial\DBAL\Types\Geometry\PointType');
+
 $app = new \Slim\Slim(
   array(
     'mode' => 'development',

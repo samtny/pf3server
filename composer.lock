@@ -4,9 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9bdd37abee4c70c721f2166a09da7e9c",
-    "content-hash": "fd97eee082142785b5c66ab7e756ac28",
+    "hash": "558abc8a781fe91c3e0bd5811bbf9e9b",
+    "content-hash": "12bd58ac6c386b75f1aed3084501dc94",
     "packages": [
+        {
+            "name": "creof/doctrine2-spatial",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/djlambert/doctrine2-spatial.git",
+                "reference": "be4ee9aeadb7c886caab2c07ab5b1f13c8b9999e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/djlambert/doctrine2-spatial/zipball/be4ee9aeadb7c886caab2c07ab5b1f13c8b9999e",
+                "reference": "be4ee9aeadb7c886caab2c07ab5b1f13c8b9999e",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/orm": ">=2.1"
+            },
+            "require-dev": {
+                "doctrine/common": ">=2.1",
+                "doctrine/dbal": ">=2.1",
+                "phpunit/phpunit": ">=3.7",
+                "rhumsaa/array_column": "~1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "CrEOF\\Spatial": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Derek J. Lambert",
+                    "email": "dlambert@dereklambert.com"
+                }
+            ],
+            "description": "Doctrine2 multi-platform support for spatial types and functions",
+            "keywords": [
+                "database",
+                "dbal",
+                "geography",
+                "geometry",
+                "gis",
+                "mysql",
+                "opengis",
+                "orm",
+                "postgis",
+                "postgresql",
+                "spatial"
+            ],
+            "time": "2014-03-17 13:45:28"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.2.7",
@@ -770,7 +825,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "creof/doctrine2-spatial": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

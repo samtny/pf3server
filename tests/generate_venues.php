@@ -11,6 +11,12 @@ foreach ($xml->locations->loc as $loc) {
   $venue = new \PF\Venue();
 
   $venue->setName($loc->name);
+  $venue->setStreet($loc->street);
+  $venue->setCity($loc->city);
+  $venue->setState($loc->state);
+  $venue->setZipcode($loc->zipcode);
+  $venue->setPhone($loc->phone);
+  $venue->setUrl($loc->url);
 
   $app->em->persist($venue);
 

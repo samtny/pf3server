@@ -16,11 +16,38 @@ class Venue {
   /** @Column(type="string") **/
   protected $name;
 
+  /** @Column(type="string", nullable=true) **/
+  protected $street;
+
+  /** @Column(type="string", nullable=true) **/
+  protected $city;
+
+  /** @Column(type="string", nullable=true) **/
+  protected $state;
+
+  /** @Column(type="string", nullable=true) **/
+  protected $zipcode;
+
+  /** @Column(type="point", nullable=true) */
+  protected $coordinate;
+
+  /** @Column(type="string", nullable=true) **/
+  protected $phone;
+
+  /** @Column(type="string", nullable=true) **/
+  protected $url;
+
   /** @Column(type="string", options={"default":"NEW"}) **/
   protected $status;
 
+  /** @Column(type="string", nullable=true) **/
+  protected $flag_reason;
+
   /** @Column(type="datetime") **/
   protected $created;
+
+  /** @Column(type="datetime") **/
+  protected $updated;
 
   /**
    * @OneToMany(targetEntity="Machine", mappedBy="venue")
@@ -31,11 +58,12 @@ class Venue {
   protected $comments;
 
   public function __construct() {
-    $this->machines = new ArrayCollection();
-    $this->comments = new ArrayCollection();
-
     $this->status = "NEW";
     $this->created = new \DateTime("now");
+    $this->updated = new \DateTime("now");
+
+    $this->machines = new ArrayCollection();
+    $this->comments = new ArrayCollection();
   }
 
   public function getId()
@@ -53,6 +81,16 @@ class Venue {
     $this->name = $name;
   }
 
+  public function getStreet()
+  {
+    return $this->street;
+  }
+
+  public function setStreet($street)
+  {
+    $this->street = $street;
+  }
+
   public function getStatus() {
     return $this->status;
   }
@@ -63,6 +101,104 @@ class Venue {
 
   public function getCreated() {
     return $this->created;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getCity() {
+    return $this->city;
+  }
+
+  /**
+   * @param mixed $city
+   */
+  public function setCity($city) {
+    $this->city = $city;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getState() {
+    return $this->state;
+  }
+
+  /**
+   * @param mixed $state
+   */
+  public function setState($state) {
+    $this->state = $state;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getZipcode() {
+    return $this->zipcode;
+  }
+
+  /**
+   * @param mixed $zipcode
+   */
+  public function setZipcode($zipcode) {
+    $this->zipcode = $zipcode;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getCoordinate() {
+    return $this->coordinate;
+  }
+
+  /**
+   * @param mixed $coordinate
+   */
+  public function setCoordinate($coordinate) {
+    $this->coordinate = $coordinate;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getPhone() {
+    return $this->phone;
+  }
+
+  /**
+   * @param mixed $phone
+   */
+  public function setPhone($phone) {
+    $this->phone = $phone;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUrl() {
+    return $this->url;
+  }
+
+  /**
+   * @param mixed $url
+   */
+  public function setUrl($url) {
+    $this->url = $url;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getFlagReason() {
+    return $this->flag_reason;
+  }
+
+  /**
+   * @param mixed $flag_reason
+   */
+  public function setFlagReason($flag_reason) {
+    $this->flag_reason = $flag_reason;
   }
 
   public function addMachine($machine) {
