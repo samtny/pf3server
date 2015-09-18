@@ -2,26 +2,21 @@
 
 require '../bootstrap.php';
 
-$venues = array(
-  array(
-    'name' => 'Reciprocal Skateboards',
-  ),
-  array(
-    'name' => 'High Dive',
-  ),
-  array(
-    'name' => 'Pioneers Bar',
-  ),
-);
+$pf2data = file_get_contents("http://pinballfinder.org/pf2/pf");
 
-foreach ($venues as $newVenue) {
+$xml = simplexml_load_string($pf2data);
+
+$num = 0;
+foreach ($xml->locations->loc as $loc) {
   $venue = new \PF\Venue();
 
-  $venue->setName($newVenue['name']);
+  $venue->setName($loc->name);
 
   $app->em->persist($venue);
+
+  $num++;
 }
 
 $app->em->flush();
 
-echo "Generated " . count($venues) . ' venues' . "\n";
+echo "Generated " . $num . ' venues' . "\n";
