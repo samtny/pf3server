@@ -36,18 +36,14 @@ $app->configureMode('production', function () use ($app) {
   ));
 });
 
-$app->add(new \PF\ContentTypes());
+$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/src"), $app->getMode() === 'development');
 
-$app->container->singleton('em', function () use ($app) {
-  $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/src"), $app->getMode() === 'development');
+$conn = array(
+  'driver' => 'pdo_mysql',
+  'dbname' => 'pf3server',
+  'user' => 'pf3server',
+  'password' => 'pf3server',
+  'host' => 'localhost',
+);
 
-  $conn = array(
-    'driver' => 'pdo_mysql',
-    'dbname' => 'pf3server',
-    'user' => 'pf3server',
-    'password' => 'pf3server',
-    'host' => 'localhost',
-  );
-
-  return EntityManager::create($conn, $config);
-});
+$entityManager = EntityManager::create($conn, $config);
