@@ -57,13 +57,34 @@ class Venue {
   /** @OneToMany(targetEntity="Comment", mappedBy="venue") */
   protected $comments;
 
-  public function __construct() {
-    $this->status = "NEW";
+  public function __construct($data = array()) {
+    $this->status  = "NEW";
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
 
     $this->machines = new ArrayCollection();
     $this->comments = new ArrayCollection();
+
+    foreach ($data as $key => $val) {
+      if (property_exists($this, $key)) {
+        switch ($key) {
+          case 'machines':
+            $this->machines->add(new Machine($val));
+
+            break;
+
+          case 'comments':
+            $this->machines->add(new Comment($val));
+
+            break;
+
+          default:
+            $this->{$key} = $val;
+
+            break;
+        }
+      }
+    }
   }
 
   public function getId()

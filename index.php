@@ -11,9 +11,6 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager) {
 
   $res = $app->response();
 
-  //$res['Content-Type'] = 'text/xml';
-  //$app->render('pinfinderapp.xml', array('venues' => $venues));
-
   $res['Content-Type'] = 'application/json';
   $app->render('venue.json', array('venue' => $venue));
 });
@@ -21,8 +18,7 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager) {
 $app->post('/venue', function () use ($app, $entityManager) {
   $data = json_decode($app->request->getBody(), true);
 
-  $venue = new \PF\Venue();
-  $venue->setName($data['name']);
+  $venue = new \PF\Venue($data);
 
   $entityManager->persist($venue);
   $entityManager->flush();
