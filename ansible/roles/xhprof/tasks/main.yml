@@ -7,8 +7,12 @@
   template: src=xhprof.ini.j2 dest=/etc/php5/mods-available/xhprof.ini
   notify: Restart php
 
-- name: Enable xhprof.ini
+- name: Enable fpm xhprof.ini
   file: src=/etc/php5/mods-available/xhprof.ini dest=/etc/php5/fpm/conf.d/30-xhprof.ini owner=root group=root state=link
+  notify: Restart php
+
+- name: Enable cli xhprof.ini
+  file: src=/etc/php5/mods-available/xhprof.ini dest=/etc/php5/cli/conf.d/30-xhprof.ini owner=root group=root state=link
   notify: Restart php
 
 - name: Copy xhprof_html
