@@ -1,6 +1,6 @@
 <?php
 
-require '../bootstrap.php';
+require __DIR__ .  '/../bootstrap.php';
 
 $pf2data = file_get_contents("http://pinballfinder.org/pf2/pf");
 
@@ -18,11 +18,11 @@ foreach ($xml->locations->loc as $loc) {
   $venue->setPhone($loc->phone);
   $venue->setUrl($loc->url);
 
-  $app->em->persist($venue);
+  $entityManager->persist($venue);
 
   $num++;
 }
 
-$app->em->flush();
+$entityManager->flush();
 
 echo "Generated " . $num . ' venues' . "\n";

@@ -1,11 +1,5 @@
 <?php
 
-if (extension_loaded('xhprof')) {
-  include_once '/usr/share/php/xhprof_lib/utils/xhprof_lib.php';
-  include_once '/usr/share/php/xhprof_lib/utils/xhprof_runs.php';
-  xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
-}
-
 require_once 'bootstrap.php';
 
 $app->get('/venue/:id', function ($id) use ($app, $entityManager) {
@@ -44,10 +38,3 @@ $app->get('/venues', function () use ($app, $entityManager) {
 });
 
 $app->run();
-
-if (extension_loaded('xhprof')) {
-  $profiler_namespace = 'pf3server';  // namespace for your application
-  $xhprof_data = xhprof_disable();
-  $xhprof_runs = new XHProfRuns_Default();
-  $run_id = $xhprof_runs->save_run($xhprof_data, $profiler_namespace);
-}
