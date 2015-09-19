@@ -1,14 +1,14 @@
 {% block content %}
 {
-  "id": {{ venue.id }},
-  "name": "{{ venue.name }}",
-  "street": "{{ venue.street }}",
-  "city": "{{ venue.city }}",
-  "state": "{{ venue.state }}",
-  "zipcode": "{{ venue.zipcode }}",
-  "phone": "{{ venue.phone }}",
-  "url": "{{ venue.url }}",
-  "status": "{{ venue.status }}",
+  {% if venue.id %}"id": {{ venue.id }},{% endif %}
+  {% if venue.name %}"name": "{{ venue.name }}",{% endif %}
+  {% if venue.street %}"street": "{{ venue.street }}",{% endif %}
+  {% if venue.city %}"city": "{{ venue.city }}",{% endif %}
+  {% if venue.state %}"state": "{{ venue.state }}",{% endif %}
+  {% if venue.zipcode %}"zipcode": "{{ venue.zipcode }}",{% endif %}
+  {% if venue.phone %}"phone": "{{ venue.phone }}",{% endif %}
+  {% if venue.url %}"url": "{{ venue.url }}",{% endif %}
+  {% if venue.status %}"status": "{{ venue.status }}",{% endif %}
   "created": "{{ venue.created.format('c') }}"
 }
 {% endblock %}
