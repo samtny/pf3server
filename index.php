@@ -33,4 +33,28 @@ $app->get('/venues', function () use ($app, $entityManager) {
   $app->render('venues.json', array('venues' => $venues));
 });
 
+$app->get('/game/:id', function ($id) use ($app, $entityManager) {
+  $game = $entityManager->find('\PF\Game', $id);
+
+  if (empty($game)) {
+    $app->notFound();
+  }
+
+  $res = $app->response();
+
+  $res['Content-Type'] = 'application/json';
+  $app->render('game.json', array('game' => $game));
+});
+
+$app->post('/game', function() use ($app, $entityManager) {
+  $data = json_decode($app->request->getBody(), true);
+
+  $game = new \PF\Game($data);
+
+  $entityManager->persist($game);
+  $entityManager->flush();
+
+  $app->render('message.json', array('message' => 'Created Game with ID ' . $game->getId()));
+});
+
 $app->run();
