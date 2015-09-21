@@ -89,6 +89,20 @@ class Game {
   /**
    * @return mixed
    */
+  public function getAbbreviation() {
+    return $this->abbreviation;
+  }
+
+  /**
+   * @param mixed $abbreviation
+   */
+  public function setAbbreviation($abbreviation) {
+    $this->abbreviation = $abbreviation;
+  }
+
+  /**
+   * @return mixed
+   */
   public function getCreated() {
     return $this->created;
   }

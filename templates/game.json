@@ -2,8 +2,8 @@
 {
 {% if game.id %}"id": {{ game.id }},{% endif %}
 {% if game.name %}"name": "{{ game.name }}",{% endif %}
-{% if game.year %}"name": "{{ game.year }}",{% endif %}
-{% if game.ipdb %}"name": "{{ game.ipdb }}",{% endif %}
+{% if game.year %}"year": "{{ game.year }}",{% endif %}
+{% if game.ipdb %}"ipdb": "{{ game.ipdb }}",{% endif %}
 "created": "{{ game.created.format('c') }}"
 }
 {% endblock %}
