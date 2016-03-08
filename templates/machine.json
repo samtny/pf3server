@@ -1,8 +1,10 @@
 {% block content %}
 {
 {% if machine.id %}"id": {{ machine.id }},{% endif %}
-{% if machine.condition %}"condition": {{ machine.condition }},{% endif %}
-{% if machine.price %}"price": {{ machine.price }},{% endif %}
+"condition": {{ machine.condition }},
+"price": "{{ machine.price }}",
+"name": "{{ machine.game.name }}",
+"ipdb": {{ machine.game.ipdb }},
 "created": "{{ machine.created.format('c') }}"
 }
 {% endblock %}
