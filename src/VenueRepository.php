@@ -8,7 +8,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class VenueRepository extends EntityRepository {
   public function getRecentVenues($number = 75, $page = 0) {
-    $dql = "SELECT v, m FROM \PF\Venue v JOIN v.machines m ORDER BY v.created DESC";
+    $dql = "SELECT v, m, g FROM \PF\Venue v JOIN v.machines m JOIN m.game g ORDER BY v.created DESC";
 
     $query = $this->getEntityManager()->createQuery($dql);
     $query->setFirstResult($page * $number);
