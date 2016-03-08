@@ -18,18 +18,17 @@ foreach ($xml->locations->loc as $loc) {
   $venue->setPhone($loc->phone);
   $venue->setUrl($loc->url);
 
-  $entityManager->persist($venue);
-
   foreach ($loc->game as $locmachine) {
     $machine = new \PF\Machine();
 
     $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation' => $locmachine->abbr));
 
-    $machine->setVenue($venue);
     $machine->setGame($game);
 
-    $entityManager->persist($machine);
+    $venue->addMachine($machine);
   }
+
+  $entityManager->persist($venue);
 
   $num++;
 }
