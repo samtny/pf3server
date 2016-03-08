@@ -10,7 +10,7 @@ class Comment {
   /** @Id @Column(type="integer") @GeneratedValue **/
   protected $id;
 
-  /** @ManyToOne(targetEntity="Venue") */
+  /** @ManyToOne(targetEntity="Venue", inversedBy="comments") */
   protected $venue;
 
   public function __construct($data = array()) {
