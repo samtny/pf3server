@@ -1,0 +1,6 @@
+{% block content %}
+{
+{% if machine.id %}"id": {{ venue.id }},{% endif %}
+"created": "{{ machine.created.format('c') }}"
+}
+{% endblock %}
