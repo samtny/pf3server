@@ -20,6 +20,17 @@ foreach ($xml->locations->loc as $loc) {
 
   $entityManager->persist($venue);
 
+  foreach ($loc->game as $locmachine) {
+    $machine = new \PF\Machine();
+
+    $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation' => $locmachine->abbr));
+
+    $machine->setVenue($venue);
+    $machine->setGame($game);
+
+    $entityManager->persist($machine);
+  }
+
   $num++;
 }
 
