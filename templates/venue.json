@@ -9,6 +9,12 @@
   {% if venue.phone %}"phone": "{{ venue.phone }}",{% endif %}
   {% if venue.url %}"url": "{{ venue.url }}",{% endif %}
   {% if venue.status %}"status": "{{ venue.status }}",{% endif %}
+  "machines": [
+  {% for machine in venue.machines %}
+  {% include 'machine.json' %}
+  {% if not loop.last %},{% endif %}
+  {% endfor %}
+  ],
   "created": "{{ venue.created.format('c') }}"
 }
 {% endblock %}
