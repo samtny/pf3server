@@ -10,13 +10,19 @@ class Machine {
   /** @Id @Column(type="integer") @GeneratedValue **/
   protected $id;
 
-  /** @ManyToOne(targetEntity="Venue") */
+  /** @ManyToOne(targetEntity="Venue", inversedBy="machines") */
   protected $venue;
 
   /**
    * @ManyToOne(targetEntity="Game")
    */
   protected $game;
+
+  /** @Column(name="`condition`", type="integer", nullable=true) **/
+  protected $condition;
+
+  /** @Column(type="string", nullable=true) **/
+  protected $price;
 
   /** @Column(type="datetime") **/
   protected $created;
@@ -71,5 +77,21 @@ class Machine {
 
   public function setUpdated($updated) {
     $this->updated = $updated;
+  }
+
+  public function getCondition() {
+    return $this->condition;
+  }
+
+  public function setCondition($condition) {
+    $this->condition = $condition;
+  }
+
+  public function getPrice() {
+    return $this->price;
+  }
+
+  public function setPrice($price) {
+    $this->price = $price;
   }
 }
