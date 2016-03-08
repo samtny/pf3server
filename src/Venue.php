@@ -50,7 +50,7 @@ class Venue {
   protected $updated;
 
   /**
-   * @OneToMany(targetEntity="Machine", mappedBy="venue")
+   * @OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove"})
    */
   protected $machines;
 
@@ -222,11 +222,17 @@ class Venue {
     $this->flag_reason = $flag_reason;
   }
 
-  public function addMachine($machine) {
-    $this->machines[] = $machine;
+  public function getMachines() {
+    return $this->machines;
   }
 
-  public function addComment($comment) {
+  public function addMachine(Machine $machine) {
+    $this->machines[] = $machine;
+
+    $machine->setVenue($this);
+  }
+
+  public function addComment(Comment $comment) {
     $this->comments[] = $comment;
   }
 
