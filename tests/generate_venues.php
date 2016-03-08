@@ -21,6 +21,9 @@ foreach ($xml->locations->loc as $loc) {
   foreach ($loc->game as $locmachine) {
     $machine = new \PF\Machine();
 
+    $machine->setCondition($locmachine->cond);
+    $machine->setPrice($locmachine->price);
+
     $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation' => $locmachine->abbr));
 
     $machine->setGame($game);
