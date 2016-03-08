@@ -3,6 +3,7 @@
 namespace PF;
 
 /**
+ * @Entity(repositoryClass="GameRepository")
  * @Entity @Table(name="game")
  **/
 class Game {

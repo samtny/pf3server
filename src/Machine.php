@@ -40,11 +40,36 @@ class Machine {
     return $this->id;
   }
 
+  public function getVenue()
+  {
+    return $this->venue;
+  }
+
+  public function setVenue($venue) {
+    $this->venue = $venue;
+  }
+
+  public function getGame() {
+    return $this->game;
+  }
+
+  public function setGame($game) {
+    $this->game = $game;
+  }
+
   public function getCreated() {
     return $this->created;
   }
 
+  public function setCreated($created) {
+    $this->created = $created;
+  }
+
   public function getUpdated() {
     return $this->updated;
+  }
+
+  public function setUpdated($updated) {
+    $this->updated = $updated;
   }
 }
