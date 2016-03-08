@@ -15,6 +15,7 @@
   {% if not loop.last %},{% endif %}
   {% endfor %}
   ],
+  "updated": "{{ venue.updated.format('c') }}",
   "created": "{{ venue.created.format('c') }}"
 }
 {% endblock %}

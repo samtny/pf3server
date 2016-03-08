@@ -31,6 +31,8 @@ foreach ($xml->locations->loc as $loc) {
     $venue->addMachine($machine);
   }
 
+  $venue->approve();
+
   $entityManager->persist($venue);
 
   $num++;
