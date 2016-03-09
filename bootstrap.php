@@ -7,6 +7,7 @@ require_once "vendor/autoload.php";
 
 \Doctrine\DBAL\Types\Type::addType('point', '\CrEOF\Spatial\DBAL\Types\Geometry\PointType');
 
+
 $app = new \Slim\Slim(
   array(
     'mode' => 'development',
@@ -37,6 +38,9 @@ $app->configureMode('production', function () use ($app) {
 });
 
 $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/src"), $app->getMode() === 'development');
+
+$config->addCustomNumericFunction('ST_Distance', '\CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STDistance');
+$config->addCustomNumericFunction('Point', '\CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Point');
 
 $conn = array(
   'driver' => 'pdo_mysql',
