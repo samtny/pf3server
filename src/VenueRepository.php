@@ -7,14 +7,31 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class VenueRepository extends EntityRepository {
-  public function getRecentVenues($number = 75, $page = 0) {
-    $dql = "SELECT v, m, g FROM \PF\Venue v JOIN v.machines m JOIN m.game g ORDER BY v.created DESC";
+  public function getVenues($n = null, $number = 75, $page = 0) {
+    $qb = $this->getEntityManager()->createQueryBuilder();
 
-    $query = $this->getEntityManager()->createQuery($dql);
-    $query->setFirstResult($page * $number);
-    $query->setMaxResults($number);
+    $qb->select(array('v', 'm', 'g'));
+    $qb->from('\PF\Venue', 'v')
+      ->join('v.machines', 'm')
+      ->join('m.game', 'g');
 
-    $query->setHydrationMode(Doctrine\ORM\Query::HYDRATE_ARRAY);
+    if (!empty($n)) {
+      $point = explode(',', $n);
+
+      $qb->add('select', 'ST_Distance(Point(:lng, :lat), v.coordinate) AS HIDDEN distance', true)
+        ->setParameter('lng', $point[1])
+        ->setParameter('lat', $point[0])
+        ->addOrderBy('distance', 'ASC');
+    } else {
+      $qb->orderBy('v.created', 'DESC');
+    }
+
+    $qb->setFirstResult($page * $number)
+      ->setMaxResults($number);
+
+    $query = $qb->getQuery();
+
+    //$query->setHydrationMode(Doctrine\ORM\Query::HYDRATE_ARRAY);
 
     return new Paginator($query);
   }
