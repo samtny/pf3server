@@ -6,6 +6,8 @@
   {% if venue.city %}"city": "{{ venue.city }}",{% endif %}
   {% if venue.state %}"state": "{{ venue.state }}",{% endif %}
   {% if venue.zipcode %}"zipcode": "{{ venue.zipcode }}",{% endif %}
+  {% if venue.longitude %}"longitude": {{ venue.longitude }},{% endif %}
+  {% if venue.latitude %}"latitude": {{ venue.latitude }},{% endif %}
   {% if venue.phone %}"phone": "{{ venue.phone }}",{% endif %}
   {% if venue.url %}"url": "{{ venue.url }}",{% endif %}
   {% if venue.status %}"status": "{{ venue.status }}",{% endif %}
