@@ -192,6 +192,14 @@ class Venue {
     $this->coordinate = $coordinate;
   }
 
+  public function getLongitude() {
+    return !empty($this->coordinate) ? $this->coordinate->getLongitude() : null;
+  }
+
+  public function getLatitude() {
+    return !empty($this->coordinate) ? $this->coordinate->getLatitude() : null;
+  }
+
   /**
    * @return mixed
    */
