@@ -27,7 +27,9 @@ $app->post('/venue', function () use ($app, $entityManager) {
 });
 
 $app->get('/venues', function () use ($app, $entityManager) {
-  $venues = $entityManager->getRepository('\PF\Venue')->getRecentVenues();
+  $n = $app->request()->get('n');
+
+  $venues = $entityManager->getRepository('\PF\Venue')->getVenues($n);
 
   $res['Content-Type'] = 'application/json';
   $app->render('venues.json', array('venues' => $venues));
