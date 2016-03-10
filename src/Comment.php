@@ -2,15 +2,17 @@
 
 namespace PF;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @Entity @Table(name="comment")
+ * @ORM\Entity @ORM\Table(name="comment")
  **/
 class Comment {
 
-  /** @Id @Column(type="integer") @GeneratedValue **/
+  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
   protected $id;
 
-  /** @ManyToOne(targetEntity="Venue", inversedBy="comments") */
+  /** @ORM\ManyToOne(targetEntity="Venue", inversedBy="comments") */
   protected $venue;
 
   public function __construct($data = array()) {

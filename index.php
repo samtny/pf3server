@@ -2,7 +2,7 @@
 
 require_once 'bootstrap.php';
 
-$app->get('/venue/:id', function ($id) use ($app, $entityManager) {
+$app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
   $venue = $entityManager->find('\PF\Venue', $id);
 
   if (empty($venue)) {
@@ -12,7 +12,10 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager) {
   $res = $app->response();
 
   $res['Content-Type'] = 'application/json';
-  $app->render('response.json', array('template' => 'venue.json', 'venue' => $venue));
+
+  echo $serializer->serialize($venue, 'json');
+
+  //echo json_encode($venue);
 });
 
 $app->post('/venue', function () use ($app, $entityManager) {
@@ -26,15 +29,35 @@ $app->post('/venue', function () use ($app, $entityManager) {
   $app->render('message.json', array('message' => "Created Venue with ID " . $venue->getId()));
 });
 
-$app->get('/venues', function () use ($app, $entityManager) {
+$app->get('/venues', function () use ($app, $entityManager, $serializer) {
   $n = $app->request()->get('n');
 
-  $venues = $entityManager->getRepository('\PF\Venue')->getVenues($n);
+  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($n);
+
+  echo $serializer->serialize($venuesIterator, 'json');return;
+
+  $venues = [];
+
+  foreach ($venuesIterator as $venue) {
+    $venues[] = $venue;
+  }
 
   $res = $app->response();
 
   $res['Content-Type'] = 'application/json';
-  $app->render('response.json', array('template' => 'venues.json', 'venues' => $venues));
+
+  $data = array(
+    'venues' => $venues
+  );
+
+  $response = array(
+    'meta' => array(
+      'memory_get_peak_usage' => memory_get_peak_usage()
+    ),
+    'data' => $data,
+  );
+
+  echo json_encode($response);
 });
 
 $app->get('/game/:id', function ($id) use ($app, $entityManager) {

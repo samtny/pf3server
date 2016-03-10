@@ -4,60 +4,67 @@ namespace PF;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * @Entity(repositoryClass="VenueRepository")
- * @Table(name="venue",indexes={@Index(name="latitude_longitude_idx", columns={"latitude", "longitude"})})
- **/
-class Venue {
+use Doctrine\ORM\Mapping as ORM;
 
-  /** @Id @Column(type="integer") @GeneratedValue **/
+use JsonSerializable;
+
+use JMS\Serializer\Annotation as JMS;
+
+/**
+ * @ORM\Entity(repositoryClass="VenueRepository")
+ * @ORM\Table(name="venue",indexes={@ORM\Index(name="latitude_longitude_idx", columns={"latitude", "longitude"})})
+ * @JMS\ExclusionPolicy("all")
+ **/
+class Venue implements JsonSerializable {
+
+  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
   protected $id;
 
-  /** @Column(type="string") **/
+  /** @ORM\Column(type="string") @JMS\Expose **/
   protected $name;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $street;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $city;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $state;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $zipcode;
 
-  /** @Column(type="decimal", precision=10, scale=7, nullable=true) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $latitude;
 
-  /** @Column(type="decimal", precision=10, scale=7, nullable=true) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $longitude;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $phone;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $url;
 
-  /** @Column(type="string", options={"default":"NEW"}) **/
+  /** @ORM\Column(type="string", options={"default":"NEW"}) **/
   protected $status;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $flag_reason;
 
-  /** @Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") **/
   protected $created;
 
-  /** @Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") **/
   protected $updated;
 
   /**
-   * @OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove"})
+   * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove"})
    */
   protected $machines;
 
-  /** @OneToMany(targetEntity="Comment", mappedBy="venue") */
+  /** @ORM\OneToMany(targetEntity="Comment", mappedBy="venue") */
   protected $comments;
 
   public function __construct($data = array()) {
@@ -255,5 +262,18 @@ class Venue {
 
   public function approve() {
     $this->status = "APPROVED";
+  }
+
+  public function jsonSerialize() {
+    return array(
+      'id' => $this->id,
+      'name' => $this->name,
+      'street' => $this->street,
+      'city' => $this->city,
+      'state' => $this->state,
+      'zipcode' => $this->zipcode,
+      'latitude' => $this->latitude,
+      'longitude' => $this->longitude,
+    );
   }
 }

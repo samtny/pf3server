@@ -2,32 +2,34 @@
 
 namespace PF;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @Entity @Table(name="machine")
+ * @ORM\Entity @ORM\Table(name="machine")
  **/
 class Machine {
 
-  /** @Id @Column(type="integer") @GeneratedValue **/
+  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
   protected $id;
 
-  /** @ManyToOne(targetEntity="Venue", inversedBy="machines") */
+  /** @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines") */
   protected $venue;
 
   /**
-   * @ManyToOne(targetEntity="Game")
+   * @ORM\ManyToOne(targetEntity="Game")
    */
   protected $game;
 
-  /** @Column(name="`condition`", type="integer", nullable=true) **/
+  /** @ORM\Column(name="`condition`", type="integer", nullable=true) **/
   protected $condition;
 
-  /** @Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) **/
   protected $price;
 
-  /** @Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") **/
   protected $created;
 
-  /** @Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") **/
   protected $updated;
 
   public function __construct($data = array()) {

@@ -3,7 +3,11 @@
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
+
 require_once "vendor/autoload.php";
+
+AnnotationRegistry::registerAutoloadNamespace('JMS\Serializer\Annotation', __DIR__ . "/vendor/jms/serializer/src");
 
 $app = new \Slim\Slim(
   array(
@@ -34,7 +38,7 @@ $app->configureMode('production', function () use ($app) {
   ));
 });
 
-$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/src"), $app->getMode() === 'development');
+$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/src"), $app->getMode() === 'development', null, null, false);
 
 $config->addCustomNumericFunction('sin', '\DoctrineExtensions\Query\Mysql\Sin');
 $config->addCustomNumericFunction('cos', '\DoctrineExtensions\Query\Mysql\Cos');
@@ -50,3 +54,7 @@ $conn = array(
 );
 
 $entityManager = EntityManager::create($conn, $config);
+
+
+
+$serializer = JMS\Serializer\SerializerBuilder::create()->build();

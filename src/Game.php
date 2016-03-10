@@ -2,31 +2,33 @@
 
 namespace PF;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @Entity(repositoryClass="GameRepository")
- * @Entity @Table(name="game")
+ * @ORM\Entity(repositoryClass="GameRepository")
+ * @ORM\Entity @ORM\Table(name="game")
  **/
 class Game {
 
-  /** @Id @Column(type="integer") @GeneratedValue **/
+  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
   protected $id;
 
-  /** @Column(type="string") */
+  /** @ORM\Column(type="string") */
   protected $name;
 
-  /** @Column(type="string", nullable=true) */
+  /** @ORM\Column(type="string", nullable=true) */
   protected $abbreviation;
 
-  /** @Column(type="string", nullable=true) */
+  /** @ORM\Column(type="string", nullable=true) */
   protected $year;
 
-  /** @Column(type="integer", nullable=true) */
+  /** @ORM\Column(type="integer", nullable=true) */
   protected $ipdb;
 
-  /** @Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") **/
   protected $created;
 
-  /** @Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") **/
   protected $updated;
 
   public function __construct($data = array()) {

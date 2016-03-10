@@ -2,7 +2,7 @@
 
 require __DIR__ .  '/../bootstrap.php';
 
-$pf2data = file_get_contents("http://pinballfinder.org/pf2/pf");
+$pf2data = file_get_contents("http://pinballfinder.org/pf2/pf?l=1000");
 
 $xml = simplexml_load_string($pf2data);
 
