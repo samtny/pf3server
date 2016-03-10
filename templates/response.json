@@ -1,0 +1,5 @@
+{
+  {% if code %}"code": {{ code }},{% endif %}
+  {% if message %}"message": {{ message }},{% endif %}
+  "data": {% include template %}
+}

@@ -12,7 +12,7 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager) {
   $res = $app->response();
 
   $res['Content-Type'] = 'application/json';
-  $app->render('venue.json', array('venue' => $venue));
+  $app->render('response.json', array('template' => 'venue.json', 'venue' => $venue));
 });
 
 $app->post('/venue', function () use ($app, $entityManager) {
@@ -34,7 +34,7 @@ $app->get('/venues', function () use ($app, $entityManager) {
   $res = $app->response();
 
   $res['Content-Type'] = 'application/json';
-  $app->render('venues.json', array('venues' => $venues));
+  $app->render('response.json', array('template' => 'venues.json', 'venues' => $venues));
 });
 
 $app->get('/game/:id', function ($id) use ($app, $entityManager) {
