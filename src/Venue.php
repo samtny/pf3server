@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity(repositoryClass="VenueRepository")
- * @Table(name="venue")
+ * @Table(name="venue",indexes={@Index(name="latitude_longitude_idx", columns={"latitude", "longitude"})})
  **/
 class Venue {
 
