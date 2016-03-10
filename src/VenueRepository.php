@@ -18,9 +18,9 @@ class VenueRepository extends EntityRepository {
     if (!empty($n)) {
       $point = explode(',', $n);
 
-      $qb->add('select', 'ST_Distance(Point(:lng, :lat), v.coordinate) AS HIDDEN distance', true)
-        ->setParameter('lng', $point[1])
-        ->setParameter('lat', $point[0])
+      $qb->add('select', '( 3959 * acos( cos( radians(:latitude) ) * cos( radians( v.latitude ) ) * cos( radians( v.longitude ) - radians(:longitude) ) + sin( radians(:latitude) ) * sin( radians( v.latitude ) ) ) ) AS HIDDEN distance', true)
+        ->setParameter('latitude', $point[0])
+        ->setParameter('longitude', $point[1])
         ->addOrderBy('distance', 'ASC');
     } else {
       $qb->orderBy('v.created', 'DESC');

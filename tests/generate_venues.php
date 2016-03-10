@@ -17,7 +17,8 @@ foreach ($xml->locations->loc as $loc) {
   $venue->setZipcode($loc->zipcode);
   $venue->setPhone($loc->phone);
   $venue->setUrl($loc->url);
-  $venue->setCoordinate(new \CrEOF\Spatial\PHP\Types\Geometry\Point(round(floatval($loc->lon), 7), round(floatval($loc->lat), 7)));
+  $venue->setLatitude($loc->lat);
+  $venue->setLongitude($loc->lon);
 
   foreach ($loc->game as $locmachine) {
     $machine = new \PF\Machine();

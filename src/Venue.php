@@ -28,8 +28,11 @@ class Venue {
   /** @Column(type="string", nullable=true) **/
   protected $zipcode;
 
-  /** @Column(type="point", nullable=true) */
-  protected $coordinate;
+  /** @Column(type="decimal", precision=10, scale=7, nullable=true) */
+  protected $latitude;
+
+  /** @Column(type="decimal", precision=10, scale=7, nullable=true) */
+  protected $longitude;
 
   /** @Column(type="string", nullable=true) **/
   protected $phone;
@@ -178,26 +181,20 @@ class Venue {
     $this->zipcode = $zipcode;
   }
 
-  /**
-   * @return mixed
-   */
-  public function getCoordinate() {
-    return $this->coordinate;
+  public function getLatitude() {
+    return $this->latitude;
   }
 
-  /**
-   * @param mixed $coordinate
-   */
-  public function setCoordinate($coordinate) {
-    $this->coordinate = $coordinate;
+  public function setLatitude($latitude) {
+    $this->latitude = $latitude;
   }
 
   public function getLongitude() {
-    return !empty($this->coordinate) ? $this->coordinate->getLongitude() : null;
+    return $this->longitude;
   }
 
-  public function getLatitude() {
-    return !empty($this->coordinate) ? $this->coordinate->getLatitude() : null;
+  public function setLongitude($longitude) {
+    $this->longitude = $longitude;
   }
 
   /**
