@@ -7,13 +7,17 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class VenueRepository extends EntityRepository {
-  public function getVenues($n = null, $number = 75, $page = 0) {
+  public function getVenues($n = null, $number = 70, $page = 0) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('v', 'm', 'g'));
     $qb->from('\PF\Venue', 'v')
       ->join('v.machines', 'm')
-      ->join('m.game', 'g');
+      ->join('m.game', 'g')
+      ->where($qb->expr()->andX(
+        $qb->expr()->isNotNull('v.latitude'),
+        $qb->expr()->isNotNull('v.longitude')
+      ));
 
     if (!empty($n)) {
       $point = explode(',', $n);
@@ -31,7 +35,7 @@ class VenueRepository extends EntityRepository {
 
     $query = $qb->getQuery();
 
-    //$query->setHydrationMode(Doctrine\ORM\Query::HYDRATE_ARRAY);
+    $query->setHydrationMode(Doctrine\ORM\Query::HYDRATE_ARRAY);
 
     return new Paginator($query);
   }
