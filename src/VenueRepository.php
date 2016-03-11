@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class VenueRepository extends EntityRepository {
-  public function getVenues($request, $page = 0) {
+  public function getVenues($request) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('v', 'm', 'g', 'c'));
@@ -21,12 +21,41 @@ class VenueRepository extends EntityRepository {
       ));
 
     if (!empty($request->get('n'))) {
-      $latlon = explode(',', $request->get('n'));
+      $n = $request->get('n');
 
-      $qb->add('select', '( 3959 * acos( cos( radians(:latitude) ) * cos( radians( v.latitude ) ) * cos( radians( v.longitude ) - radians(:longitude) ) + sin( radians(:latitude) ) * sin( radians( v.latitude ) ) ) ) AS HIDDEN distance', true)
-        ->setParameter('latitude', $latlon[0])
-        ->setParameter('longitude', $latlon[1])
-        ->addOrderBy('distance', 'ASC');
+      preg_match('/^([0-9.-]+),([0-9.-]+)$/', $n, $latlon);
+
+      if ($latlon) {
+        $latitude = $latlon[1];
+        $longitude = $latlon[2];
+
+        $qb->add('select', '( 3959 * acos( cos( radians(:latitude) ) * cos( radians( v.latitude ) ) * cos( radians( v.longitude ) - radians(:longitude) ) + sin( radians(:latitude) ) * sin( radians( v.latitude ) ) ) ) AS HIDDEN distance', true)
+          ->setParameter('latitude', $latitude)
+          ->setParameter('longitude', $longitude)
+          ->addOrderBy('distance', 'ASC');
+      } else {
+        $geocode = $this->getEntityManager()->getRepository('\PF\Geocode')->findOneBy(array('string' => $n));
+
+        if ($geocode->getSouthwestLongitude() <= $geocode->getNortheastLongitude()) {
+          $qb->add('where', $qb->expr()->andX(
+            $qb->expr()->between('v.latitude', ':southwest_latitude', ':northeast_latitude'),
+            $qb->expr()->between('v.longitude', ':southwest_longitude', ':northeast_longitude')
+          ));
+        } else {
+          $qb->add('where', $qb->expr()->andX(
+            $qb->expr()->orX(
+              $qb->expr()->between('v.longitude', ':southwest_longitude', $qb->expr()->literal(180)),
+              $qb->expr()->between('v.longitude', $qb->expr()->literal(-180), ':northeast_longitude')
+            ),
+            $qb->expr()->between('v.latitude', ':southwest_latitude', ':northeast_latitude')
+          ));
+        }
+
+        $qb->setParameter('southwest_latitude', $geocode->getSouthwestLatitude())
+          ->setParameter('northeast_latitude', $geocode->getNortheastLatitude())
+          ->setParameter('southwest_longitude', $geocode->getSouthwestLongitude())
+          ->setParameter('northeast_longitude', $geocode->getNortheastLongitude());
+      }
     } else {
       $qb->orderBy('v.created', 'DESC');
     }
