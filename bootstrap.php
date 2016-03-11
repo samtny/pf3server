@@ -20,7 +20,7 @@ $app->view()->parserOptions = array(
   'autoescape' => false,
 );
 
-$app->add(new \PF\VenueMiddleware());
+$app->add(new \PF\ResponseMiddleware());
 
 $app->notFound(function () use ($app) {
   $app->render('404.html');

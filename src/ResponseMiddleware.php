@@ -5,7 +5,7 @@ namespace PF;
 use \Slim\Middleware;
 use \JMS\Serializer\SerializerBuilder;
 
-class VenueMiddleware extends Middleware
+class ResponseMiddleware extends Middleware
 {
   public function call() {
     $this->next->call();
