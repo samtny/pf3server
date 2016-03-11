@@ -21,10 +21,10 @@ class Venue {
   /** @ORM\Column(type="string") **/
   protected $name;
 
-  /** @ORM\Column(type="string") */
+  /** @ORM\Column(type="string") @JMS\Exclude */
   protected $name_clean;
 
-  /** @ORM\Column(type="string") */
+  /** @ORM\Column(type="string") @JMS\Exclude */
   protected $name_dm;
 
   /** @ORM\Column(type="string", nullable=true) **/
