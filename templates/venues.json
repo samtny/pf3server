@@ -1,6 +1,0 @@
-[
-  {% for venue in venues.iterator %}
-  {% include 'venue.json' %}
-  {% if not loop.last %},{% endif %}
-  {% endfor %}
-]
