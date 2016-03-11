@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class VenueRepository extends EntityRepository {
-  public function getVenues($n = null, $number = 1000, $page = 0) {
+  public function getVenues($n = null, $number = 70, $page = 0) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('v', 'm', 'g'));
