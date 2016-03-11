@@ -45,9 +45,10 @@ class VenueRepository extends EntityRepository {
         ->setParameter('name_dm', '%' . $name_dm . '%');
     }
 
+    $p = !empty($request->get('p')) ? $request->get('p') : 0;
     $l = !empty($request->get('l')) ? $request->get('l') : 70;
 
-    $qb->setFirstResult($page * $l)
+    $qb->setFirstResult($p * $l)
       ->setMaxResults($l);
 
     $query = $qb->getQuery();
