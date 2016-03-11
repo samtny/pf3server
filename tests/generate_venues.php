@@ -2,7 +2,9 @@
 
 require __DIR__ .  '/../bootstrap.php';
 
-$pf2data = file_get_contents("http://pinballfinder.org/pf2/pf?l=1000");
+$l = !empty($argv[1]) ? $argv[1] : "10";
+
+$pf2data = file_get_contents("http://pinballfinder.org/pf2/pf?l=" . $l);
 
 $xml = simplexml_load_string($pf2data);
 
@@ -31,6 +33,14 @@ foreach ($xml->locations->loc as $loc) {
     $machine->setGame($game);
 
     $venue->addMachine($machine);
+  }
+
+  foreach ($loc->comment as $loccomment) {
+    $comment = new \PF\Comment();
+
+    $comment->setText($loccomment->ctext);
+
+    $venue->addComment($comment);
   }
 
   $venue->approve();
