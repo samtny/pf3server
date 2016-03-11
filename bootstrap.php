@@ -47,6 +47,9 @@ $config->addCustomNumericFunction('cos', '\DoctrineExtensions\Query\Mysql\Cos');
 $config->addCustomNumericFunction('acos', '\DoctrineExtensions\Query\Mysql\Acos');
 $config->addCustomNumericFunction('radians', '\DoctrineExtensions\Query\Mysql\Radians');
 
+$config->setQueryCacheImpl(new \Doctrine\Common\Cache\ApcCache());
+$config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ApcCache());
+
 $conn = array(
   'driver' => 'pdo_mysql',
   'dbname' => 'pf3server',
@@ -57,4 +60,4 @@ $conn = array(
 
 $entityManager = EntityManager::create($conn, $config);
 
-$serializer = JMS\Serializer\SerializerBuilder::create()->build();
+$serializer = JMS\Serializer\SerializerBuilder::create()->setCacheDir('/tmp')->setDebug($app->getMode() === 'development')->build();
