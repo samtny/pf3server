@@ -6,21 +6,19 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use JsonSerializable;
-
 use JMS\Serializer\Annotation as JMS;
 
 /**
  * @ORM\Entity(repositoryClass="VenueRepository")
  * @ORM\Table(name="venue",indexes={@ORM\Index(name="latitude_longitude_idx", columns={"latitude", "longitude"})})
- * @JMS\ExclusionPolicy("all")
+ * @JMS\ExclusionPolicy("none")
  **/
-class Venue implements JsonSerializable {
+class Venue {
 
   /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
   protected $id;
 
-  /** @ORM\Column(type="string") @JMS\Expose **/
+  /** @ORM\Column(type="string") **/
   protected $name;
 
   /** @ORM\Column(type="string", nullable=true) **/

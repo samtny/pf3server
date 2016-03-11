@@ -4,8 +4,11 @@ namespace PF;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use JMS\Serializer\Annotation as JMS;
+
 /**
  * @ORM\Entity @ORM\Table(name="machine")
+ * @JMS\ExclusionPolicy("none")
  **/
 class Machine {
 
@@ -17,6 +20,7 @@ class Machine {
 
   /**
    * @ORM\ManyToOne(targetEntity="Game")
+   * @JMS\Exclude
    */
   protected $game;
 
@@ -59,6 +63,20 @@ class Machine {
 
   public function getGame() {
     return $this->game;
+  }
+
+  /**
+   * @JMS\VirtualProperty
+   */
+  public function getName() {
+    return $this->game->getName();
+  }
+
+  /**
+   * @JMS\VirtualProperty
+   */
+  public function getIpdb() {
+    return $this->game->getIpdb();
   }
 
   public function setGame($game) {
