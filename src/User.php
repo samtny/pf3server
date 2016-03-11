@@ -2,14 +2,16 @@
 
 namespace PF;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @Entity @Table(name="user")
+ * @ORM\Entity @ORM\Table(name="user")
  **/
 class User {
-  /** @Id @GeneratedValue @Column(type="integer") **/
+  /** @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer") **/
   protected $id;
 
-  /** @Column(type="string") **/
+  /** @ORM\Column(type="string") **/
   protected $name;
 
   public function getId()
