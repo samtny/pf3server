@@ -14,27 +14,14 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
   $res['Content-Type'] = 'application/json';
 
   echo $serializer->serialize($venue, 'json');
-
-  //echo json_encode($venue);
-});
-
-$app->post('/venue', function () use ($app, $entityManager) {
-  $data = json_decode($app->request->getBody(), true);
-
-  $venue = new \PF\Venue($data);
-
-  $entityManager->persist($venue);
-  $entityManager->flush();
-
-  $app->render('message.json', array('message' => "Created Venue with ID " . $venue->getId()));
 });
 
 $app->get('/venues', function () use ($app, $entityManager, $serializer) {
   $n = $app->request()->get('n');
 
-  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($n);
+  $memory_limit = ini_get('memory_limit');
 
-  echo $serializer->serialize($venuesIterator, 'json');return;
+  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($n);
 
   $venues = [];
 
@@ -52,12 +39,24 @@ $app->get('/venues', function () use ($app, $entityManager, $serializer) {
 
   $response = array(
     'meta' => array(
-      'memory_get_peak_usage' => memory_get_peak_usage()
+      'memory_get_peak_usage' => memory_get_peak_usage(),
+      'memory_limit' => $memory_limit,
     ),
     'data' => $data,
   );
 
-  echo json_encode($response);
+  echo $serializer->serialize($response, 'json');
+});
+
+$app->post('/venue', function () use ($app, $entityManager) {
+  $data = json_decode($app->request->getBody(), true);
+
+  $venue = new \PF\Venue($data);
+
+  $entityManager->persist($venue);
+  $entityManager->flush();
+
+  $app->render('message.json', array('message' => "Created Venue with ID " . $venue->getId()));
 });
 
 $app->get('/game/:id', function ($id) use ($app, $entityManager) {
