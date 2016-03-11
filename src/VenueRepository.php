@@ -10,9 +10,10 @@ class VenueRepository extends EntityRepository {
   public function getVenues($request, $page = 0) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
-    $qb->select(array('v', 'm', 'g'));
+    $qb->select(array('v', 'm', 'g', 'c'));
     $qb->from('\PF\Venue', 'v')
-      ->join('v.machines', 'm')
+      ->leftJoin('v.comments', 'c')
+      ->leftJoin('v.machines', 'm')
       ->join('m.game', 'g')
       ->where($qb->expr()->andX(
         $qb->expr()->isNotNull('v.latitude'),

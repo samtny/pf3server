@@ -68,7 +68,7 @@ class Venue {
    */
   protected $machines;
 
-  /** @ORM\OneToMany(targetEntity="Comment", mappedBy="venue") */
+  /** @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove"}) */
   protected $comments;
 
   public function __construct($data = array()) {
@@ -78,27 +78,6 @@ class Venue {
 
     $this->machines = new ArrayCollection();
     $this->comments = new ArrayCollection();
-
-    foreach ($data as $key => $val) {
-      if (property_exists($this, $key)) {
-        switch ($key) {
-          case 'machines':
-            $this->machines->add(new Machine($val));
-
-            break;
-
-          case 'comments':
-            $this->machines->add(new Comment($val));
-
-            break;
-
-          default:
-            $this->{$key} = $val;
-
-            break;
-        }
-      }
-    }
   }
 
   public function getId()
@@ -272,8 +251,14 @@ class Venue {
     $machine->setVenue($this);
   }
 
+  public function getComments() {
+    return $this->comments;
+  }
+
   public function addComment(Comment $comment) {
     $this->comments[] = $comment;
+
+    $comment->setVenue($this);
   }
 
   public function approve() {
