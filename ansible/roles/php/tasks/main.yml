@@ -18,6 +18,7 @@
     - php5-dev
     - build-essential
     - checkinstall
+    - php-apc
 
 - name: Ensure php.ini
   template: src=php.ini.j2 dest=/etc/php5/fpm/php.ini owner=root group=root mode=0644
