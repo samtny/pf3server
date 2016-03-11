@@ -7,6 +7,8 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 
 require_once "vendor/autoload.php";
 
+require_once "src/DoubleMetaPhone.php";
+
 AnnotationRegistry::registerAutoloadNamespace('JMS\Serializer\Annotation', __DIR__ . "/vendor/jms/serializer/src");
 
 $app = new \Slim\Slim(
@@ -60,4 +62,5 @@ $conn = array(
 
 $entityManager = EntityManager::create($conn, $config);
 
-$serializer = JMS\Serializer\SerializerBuilder::create()->setCacheDir('/tmp')->setDebug($app->getMode() === 'development')->build();
+//$serializer = JMS\Serializer\SerializerBuilder::create()->setCacheDir('/tmp')->setDebug($app->getMode() === 'development')->build();
+$serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->build();

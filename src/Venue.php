@@ -21,6 +21,12 @@ class Venue {
   /** @ORM\Column(type="string") **/
   protected $name;
 
+  /** @ORM\Column(type="string") */
+  protected $name_clean;
+
+  /** @ORM\Column(type="string") */
+  protected $name_dm;
+
   /** @ORM\Column(type="string", nullable=true) **/
   protected $street;
 
@@ -108,6 +114,18 @@ class Venue {
   public function setName($name)
   {
     $this->name = $name;
+
+    $this->name_clean = StringUtil::cleanName($name);
+
+    $this->name_dm = StringUtil::dmName($name);
+  }
+
+  public function getNameClean() {
+    return $this->name_clean;
+  }
+
+  public function getNameDm() {
+    return $this->name_dm;
   }
 
   public function getStreet()
