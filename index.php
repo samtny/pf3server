@@ -13,9 +13,7 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
 });
 
 $app->get('/venues', function () use ($app, $entityManager, $serializer) {
-  $n = $app->request()->get('n');
-
-  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($n);
+  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
 
   $venues = [];
 
