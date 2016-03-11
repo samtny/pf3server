@@ -20,6 +20,8 @@ $app->view()->parserOptions = array(
   'autoescape' => false,
 );
 
+$app->add(new \PF\VenueMiddleware());
+
 $app->notFound(function () use ($app) {
   $app->render('404.html');
 });
@@ -54,7 +56,5 @@ $conn = array(
 );
 
 $entityManager = EntityManager::create($conn, $config);
-
-
 
 $serializer = JMS\Serializer\SerializerBuilder::create()->build();

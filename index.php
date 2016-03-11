@@ -9,17 +9,11 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
     $app->notFound();
   }
 
-  $res = $app->response();
-
-  $res['Content-Type'] = 'application/json';
-
-  echo $serializer->serialize($venue, 'json');
+  $app->responseData = array('venue' => $venue);
 });
 
 $app->get('/venues', function () use ($app, $entityManager, $serializer) {
   $n = $app->request()->get('n');
-
-  $memory_limit = ini_get('memory_limit');
 
   $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($n);
 
@@ -29,23 +23,7 @@ $app->get('/venues', function () use ($app, $entityManager, $serializer) {
     $venues[] = $venue;
   }
 
-  $res = $app->response();
-
-  $res['Content-Type'] = 'application/json';
-
-  $data = array(
-    'venues' => $venues
-  );
-
-  $response = array(
-    'meta' => array(
-      'memory_get_peak_usage' => memory_get_peak_usage(),
-      'memory_limit' => $memory_limit,
-    ),
-    'data' => $data,
-  );
-
-  echo $serializer->serialize($response, 'json');
+  $app->responseData = array('count' => count($venues), 'venues' => $venues);
 });
 
 $app->post('/venue', function () use ($app, $entityManager) {
