@@ -30,6 +30,20 @@ class VenueRepository extends EntityRepository {
       $qb->orderBy('v.created', 'DESC');
     }
 
+    if (!empty($request->get('q'))) {
+      $name = $request->get('q');
+
+      $name_clean = StringUtil::cleanName($name);
+      $name_dm = StringUtil::dmName($name);
+
+      $qb->add('where', $qb->expr()->orX(
+        $qb->expr()->like('v.name_clean', ':name_clean'),
+        $qb->expr()->like('v.name_dm', ':name_dm')
+      ))
+        ->setParameter('name_clean', '%' . $name_clean . '%')
+        ->setParameter('name_dm', '%' . $name_dm . '%');
+    }
+
     $l = !empty($request->get('l')) ? $request->get('l') : 70;
 
     $qb->setFirstResult($page * $l)
