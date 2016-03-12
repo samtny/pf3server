@@ -31,6 +31,12 @@ class Game {
   /** @ORM\Column(type="integer", nullable=true) */
   protected $ipdb;
 
+  /** @ORM\Column(type="boolean", nullable=true) */
+  protected $new;
+
+  /** @ORM\Column(type="boolean", nullable=true) */
+  protected $rare;
+
   /** @ORM\Column(type="datetime") **/
   protected $created;
 
@@ -117,6 +123,22 @@ class Game {
    */
   public function setAbbreviation($abbreviation) {
     $this->abbreviation = $abbreviation;
+  }
+
+  public function getNew() {
+    return $this->new;
+  }
+
+  public function setNew($new) {
+    $this->new = $new;
+  }
+
+  public function getRare() {
+    return $this->rare;
+  }
+
+  public function setRare($rare) {
+    $this->rare = $rare;
   }
 
   /**

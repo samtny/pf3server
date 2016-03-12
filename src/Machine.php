@@ -79,6 +79,20 @@ class Machine {
     return $this->game->getIpdb();
   }
 
+  /**
+   * @JMS\VirtualProperty
+   */
+  public function getNew() {
+    return $this->game->getNew();
+  }
+
+  /**
+   * @JMS\VirtualProperty
+   */
+  public function getRare() {
+    return $this->game->getRare();
+  }
+
   public function setGame($game) {
     $this->game = $game;
   }

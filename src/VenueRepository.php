@@ -93,6 +93,23 @@ class VenueRepository extends EntityRepository {
         ->setParameter('game_dm', '%' . $game_dm . '%');
     }
 
+    if (!empty($request->get('x'))) {
+      $x_parts = explode(',', $request->get('x'));
+
+      foreach ($x_parts as $x_part) {
+        switch ($x_part) {
+          case 'new':
+            $qb->andWhere($qb->expr()->eq('g.new', $qb->expr()->literal(true)));
+
+            break;
+          case 'rare':
+            $qb->andWhere($qb->expr()->eq('g.rare', $qb->expr()->literal(true)));
+
+            break;
+        }
+      }
+    }
+
     $p = !empty($request->get('p')) ? $request->get('p') : 0;
     $l = !empty($request->get('l')) ? $request->get('l') : 70;
 

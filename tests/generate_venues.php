@@ -30,6 +30,18 @@ foreach ($xml->locations->loc as $loc) {
 
     $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation' => $locmachine->abbr));
 
+    if (!empty($game)) {
+      if ($locmachine['rare'] == '1') {
+        $game->setRare(true);
+      }
+
+      if ($locmachine['new'] == '1') {
+        $game->setNew(true);
+      }
+
+      $entityManager->persist($game);
+    }
+
     $machine->setGame($game);
 
     $venue->addMachine($machine);
