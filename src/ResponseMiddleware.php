@@ -12,22 +12,25 @@ class ResponseMiddleware extends Middleware
 
     $app = $this->getApplication();
 
-    $serializer = SerializerBuilder::create()->build();
-
-    $res = $app->response();
-    $res['Content-Type'] = 'application/json';
-
-    $response = array(
-      'status' => $app->response->getStatus(),
-      'meta' => array(
-        'memory_get_peak_usage' => memory_get_peak_usage(),
-      ),
-    );
-
     if (!empty($app->responseData)) {
-      $response['data'] = $app->responseData;
-    }
 
-    echo $serializer->serialize($response, 'json');
+      $serializer = SerializerBuilder::create()->build();
+
+      $res = $app->response();
+      $res['Content-Type'] = 'application/json';
+
+      $response = array(
+        'status' => $app->response->getStatus(),
+        'meta' => array(
+          'memory_get_peak_usage' => memory_get_peak_usage(),
+        ),
+      );
+
+      if (!empty($app->responseData)) {
+        $response['data'] = $app->responseData;
+      }
+
+      echo $serializer->serialize($response, 'json');
+    }
   }
 }
