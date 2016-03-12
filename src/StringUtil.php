@@ -11,11 +11,20 @@ class StringUtil {
     // special case of 's;
     $clean = preg_replace("/'s\s/i", "s ", $clean);
 
+    // parenthetical;
+    $clean = preg_replace("/\(.+\)/", "", $clean);
+
+    // &amp
+    $clean = preg_replace("/&amp/", "", $clean);
+
     // kill apostrophe'd single letters;
     $clean = preg_replace("/'[a-zA-Z0-9]\s/", " ", $clean);
 
     // kill apostrophes in general;
     $clean = preg_replace("/'/", "", $clean);
+
+    // misc
+    $clean = preg_replace("/\sand\s|\sor\s|\sof\s|\sfrom\s/i", " ", $clean);
 
     // replace non-alphanumeric with space
     $clean = preg_replace("/[^a-zA-Z0-9\s]/", " ", $clean);
@@ -24,7 +33,7 @@ class StringUtil {
     $clean = preg_replace("/\s+/", " ", $clean);
 
     // remove leading "the"
-    $clean = preg_replace("/^the/i", "", $clean);
+    $clean = preg_replace("/^the\s/i", "", $clean);
 
     // normalize numerics one thru ten, eleven
     $clean = preg_replace("/1st/i", "First", $clean);

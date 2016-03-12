@@ -79,6 +79,20 @@ class VenueRepository extends EntityRepository {
         ->setParameter('name_dm', '%' . $name_dm . '%');
     }
 
+    if (!empty($request->get('g'))) {
+      $game = $request->get('g');
+
+      $game_clean = StringUtil::cleanName($game);
+      $game_dm = StringUtil::dmName($game);
+
+      $qb->andWhere($qb->expr()->orX(
+        $qb->expr()->like('g.name_clean', ':game_clean'),
+        $qb->expr()->like('g.name_dm', ':game_dm')
+      ))
+        ->setParameter('game_clean', '%' . $game_clean . '%')
+        ->setParameter('game_dm', '%' . $game_dm . '%');
+    }
+
     $p = !empty($request->get('p')) ? $request->get('p') : 0;
     $l = !empty($request->get('l')) ? $request->get('l') : 70;
 
