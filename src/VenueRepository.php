@@ -37,12 +37,12 @@ class VenueRepository extends EntityRepository {
         $geocode = $this->getEntityManager()->getRepository('\PF\Geocode')->findOneBy(array('string' => $n));
 
         if ($geocode->getSouthwestLongitude() <= $geocode->getNortheastLongitude()) {
-          $qb->add('where', $qb->expr()->andX(
+          $qb->andWhere($qb->expr()->andX(
             $qb->expr()->between('v.latitude', ':southwest_latitude', ':northeast_latitude'),
             $qb->expr()->between('v.longitude', ':southwest_longitude', ':northeast_longitude')
           ));
         } else {
-          $qb->add('where', $qb->expr()->andX(
+          $qb->andWhere($qb->expr()->andX(
             $qb->expr()->orX(
               $qb->expr()->between('v.longitude', ':southwest_longitude', $qb->expr()->literal(180)),
               $qb->expr()->between('v.longitude', $qb->expr()->literal(-180), ':northeast_longitude')
@@ -66,7 +66,7 @@ class VenueRepository extends EntityRepository {
       $name_clean = StringUtil::cleanName($name);
       $name_dm = StringUtil::dmName($name);
 
-      $qb->add('where', $qb->expr()->orX(
+      $qb->andWhere($qb->expr()->orX(
         $qb->expr()->like('v.name_clean', ':name_clean'),
         $qb->expr()->like('v.name_dm', ':name_dm')
       ))
@@ -81,8 +81,6 @@ class VenueRepository extends EntityRepository {
       ->setMaxResults($l);
 
     $query = $qb->getQuery();
-
-    //$query->setHydrationMode(Doctrine\ORM\Query::HYDRATE_ARRAY);
 
     return new Paginator($query);
   }
