@@ -64,14 +64,14 @@ class Venue {
   protected $updated;
 
   /**
-   * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove"})
-   * @JMS\Type("array<PF\Machine>")
+   * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove", "merge"})
+   * @JMS\Type("ArrayCollection<PF\Machine>")
    */
   protected $machines;
 
   /**
-   * @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove"})
-   * @JMS\Type("array<  PF\Comment>")
+   * @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove", "merge"})
+   * @JMS\Type("ArrayCollection<PF\Comment>")
    */
   protected $comments;
 
