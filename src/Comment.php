@@ -12,10 +12,16 @@ use JMS\Serializer\Annotation as JMS;
  **/
 class Comment {
 
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
+  /**
+   * @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue
+   * @JMS\Type("integer")
+   */
   protected $id;
 
-  /** @ORM\ManyToOne(targetEntity="Venue", inversedBy="comments") */
+  /**
+   * @ORM\ManyToOne(targetEntity="Venue", inversedBy="comments")
+   * @JMS\Type("string")
+   */
   protected $venue;
 
   /** @ORM\Column(type="string") **/

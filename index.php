@@ -2,6 +2,8 @@
 
 require_once 'bootstrap.php';
 
+use \PF\Venue;
+
 $app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
   $venue = $entityManager->find('\PF\Venue', $id);
 
@@ -13,7 +15,7 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
 });
 
 $app->get('/venues', function () use ($app, $entityManager, $serializer) {
-  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
+  $venuesIterator = $entityManager->getRepository('Venue')->getVenues($app->request());
 
   $venues = [];
 
@@ -24,10 +26,12 @@ $app->get('/venues', function () use ($app, $entityManager, $serializer) {
   $app->responseData = array('count' => count($venues), 'venues' => $venues);
 });
 
-$app->post('/venue', function () use ($app, $entityManager) {
-  $data = json_decode($app->request->getBody(), true);
+$app->post('/venue', function () use ($app, $entityManager, $serializer) {
+  //$data = json_decode($app->request->getBody(), true);
 
-  $venue = new \PF\Venue($data);
+  $venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json');
+
+  echo $venue->getName();exit;
 
   $entityManager->persist($venue);
   $entityManager->flush();

@@ -12,10 +12,16 @@ use JMS\Serializer\Annotation as JMS;
  **/
 class Machine {
 
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
+  /**
+   * @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue
+   * @JMS\Type("integer")
+   */
   protected $id;
 
-  /** @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines") */
+  /**
+   * @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines")
+   * @JMS\Type("string")
+   */
   protected $venue;
 
   /**
@@ -24,16 +30,28 @@ class Machine {
    */
   protected $game;
 
-  /** @ORM\Column(name="`condition`", type="integer", nullable=true) **/
+  /**
+   * @ORM\Column(name="`condition`", type="integer", nullable=true)
+   * @JMS\Type("integer")
+   */
   protected $condition;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /**
+   * @ORM\Column(type="string", nullable=true)
+   * @JMS\Type("string")
+   */
   protected $price;
 
-  /** @ORM\Column(type="datetime") **/
+  /**
+   * @ORM\Column(type="datetime")
+   * @JMS\Type("DateTime")
+   */
   protected $created;
 
-  /** @ORM\Column(type="datetime") **/
+  /**
+   * @ORM\Column(type="datetime")
+   * @JMS\Type("DateTime")
+   */
   protected $updated;
 
   public function __construct($data = array()) {

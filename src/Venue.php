@@ -15,60 +15,64 @@ use JMS\Serializer\Annotation as JMS;
  **/
 class Venue {
 
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
+  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue @JMS\Type("integer") **/
   protected $id;
 
-  /** @ORM\Column(type="string") **/
+  /** @ORM\Column(type="string") @JMS\Type("string") **/
   protected $name;
 
-  /** @ORM\Column(type="string") @JMS\Exclude */
+  /** @ORM\Column(type="string") @JMS\Exclude @JMS\Type("string") */
   protected $name_clean;
 
-  /** @ORM\Column(type="string") @JMS\Exclude */
+  /** @ORM\Column(type="string") @JMS\Exclude @JMS\Type("string") */
   protected $name_dm;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $street;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $city;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $state;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $zipcode;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") */
   protected $latitude;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") */
   protected $longitude;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $phone;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $url;
 
-  /** @ORM\Column(type="string", options={"default":"NEW"}) **/
+  /** @ORM\Column(type="string", options={"default":"NEW"}) @JMS\Type("string") **/
   protected $status;
 
-  /** @ORM\Column(type="string", nullable=true) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $flag_reason;
 
-  /** @ORM\Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") **/
   protected $created;
 
-  /** @ORM\Column(type="datetime") **/
+  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") **/
   protected $updated;
 
   /**
    * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove"})
+   * @JMS\Type("array<\PF\Machine>")
    */
   protected $machines;
 
-  /** @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove"}) */
+  /**
+   * @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove"})
+   * @JMS\Type("array<\PF\Comment>")
+   */
   protected $comments;
 
   public function __construct($data = array()) {
