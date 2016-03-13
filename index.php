@@ -29,13 +29,17 @@ $app->get('/venues', function () use ($app, $entityManager, $serializer) {
 $app->post('/venue', function () use ($app, $entityManager, $serializer) {
   $deserialized_venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json');
 
-  $venue = $entityManager->merge($deserialized_venue);
+  try {
+    $venue = $entityManager->merge($deserialized_venue);
 
-  $entityManager->persist($venue);
+    $entityManager->persist($venue);
 
-  $entityManager->flush();
+    $entityManager->flush();
 
-  $app->responseMessage = 'Created Venue with ID ' . $venue->getId();
+    $app->responseMessage = 'Created Venue with ID ' . $venue->getId();
+  } catch (\Doctrine\ORM\EntityNotFoundException $e) {
+    $app->notFound();
+  }
 });
 
 $app->get('/game/:id', function ($id) use ($app, $entityManager) {
