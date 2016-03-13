@@ -20,7 +20,7 @@ class Machine {
 
   /**
    * @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines")
-   * @JMS\Type("string")
+   * @JMS\Type("PF\Venue")
    */
   protected $venue;
 
@@ -29,6 +29,26 @@ class Machine {
    * @JMS\Exclude
    */
   protected $game;
+
+  /**
+   * @JMS\Type("string")
+   */
+  protected $name;
+
+  /**
+   * @JMS\Type("integer")
+   */
+  protected $ipdb;
+
+  /**
+   * @JMS\Type("boolean")
+   */
+  protected $new;
+
+  /**
+   * @JMS\Type("boolean")
+   */
+  protected $rare;
 
   /**
    * @ORM\Column(name="`condition`", type="integer", nullable=true)
@@ -90,6 +110,12 @@ class Machine {
     return $this->game->getName();
   }
 
+  public function setName($name) {
+    $entityManager = $this->getEntityManager();
+
+    $this->game = $entityManager->findOneBy(array('name', $name));
+  }
+
   /**
    * @JMS\VirtualProperty
    */
@@ -97,18 +123,24 @@ class Machine {
     return $this->game->getIpdb();
   }
 
+  public function setIpdb($ipdb) {
+    $entityManager = $this->getEntityManager();
+
+    $this->game = $entityManager->findOneBy(array('ipdb', $ipdb));
+  }
+
   /**
    * @JMS\VirtualProperty
    */
   public function getNew() {
-    return $this->game->getNew();
+    return !empty($this->game) ? $this->game->getNew() : null;
   }
 
   /**
    * @JMS\VirtualProperty
    */
   public function getRare() {
-    return $this->game->getRare();
+    return !empty($this->game) ? $this->game->getRare() : null;
   }
 
   public function setGame($game) {

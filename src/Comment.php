@@ -20,17 +20,26 @@ class Comment {
 
   /**
    * @ORM\ManyToOne(targetEntity="Venue", inversedBy="comments")
-   * @JMS\Type("string")
+   * @JMS\Type("PF\Venue")
    */
   protected $venue;
 
-  /** @ORM\Column(type="string") **/
+  /**
+   * @ORM\Column(type="string")
+   * @JMS\Type("string")
+   */
   protected $text;
 
-  /** @ORM\Column(type="datetime") **/
+  /**
+   * @ORM\Column(type="datetime")
+   * @JMS\Type("DateTime")
+   */
   protected $created;
 
-  /** @ORM\Column(type="datetime") **/
+  /**
+   * @ORM\Column(type="datetime")
+   * @JMS\Type("DateTime")
+   */
   protected $updated;
 
   public function __construct($data = array()) {

@@ -12,7 +12,7 @@ class ResponseMiddleware extends Middleware
 
     $app = $this->getApplication();
 
-    if (!empty($app->responseData)) {
+    if (!empty($app->responseData) || !empty($app->responseMessage)) {
 
       $serializer = SerializerBuilder::create()->build();
 
@@ -28,6 +28,10 @@ class ResponseMiddleware extends Middleware
 
       if (!empty($app->responseData)) {
         $response['data'] = $app->responseData;
+      }
+
+      if (!empty($app->responseMessage)) {
+        $response['message'] = $app->responseMessage;
       }
 
       echo $serializer->serialize($response, 'json');

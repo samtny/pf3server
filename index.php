@@ -15,7 +15,7 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
 });
 
 $app->get('/venues', function () use ($app, $entityManager, $serializer) {
-  $venuesIterator = $entityManager->getRepository('Venue')->getVenues($app->request());
+  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
 
   $venues = [];
 
@@ -27,16 +27,12 @@ $app->get('/venues', function () use ($app, $entityManager, $serializer) {
 });
 
 $app->post('/venue', function () use ($app, $entityManager, $serializer) {
-  //$data = json_decode($app->request->getBody(), true);
-
   $venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json');
-
-  echo $venue->getName();exit;
 
   $entityManager->persist($venue);
   $entityManager->flush();
 
-  $app->render('message.json', array('message' => "Created Venue with ID " . $venue->getId()));
+  $app->responseMessage = 'Created Venue with ID ' . $venue->getId();
 });
 
 $app->get('/game/:id', function ($id) use ($app, $entityManager) {

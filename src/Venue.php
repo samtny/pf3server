@@ -65,13 +65,13 @@ class Venue {
 
   /**
    * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove"})
-   * @JMS\Type("array<\PF\Machine>")
+   * @JMS\Type("array<PF\Machine>")
    */
   protected $machines;
 
   /**
    * @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove"})
-   * @JMS\Type("array<\PF\Comment>")
+   * @JMS\Type("array<  PF\Comment>")
    */
   protected $comments;
 
@@ -101,6 +101,13 @@ class Venue {
     $this->name_clean = StringUtil::cleanName($name);
 
     $this->name_dm = StringUtil::dmName($name);
+  }
+
+  /**
+   * @JMS\PostDeserialize
+   */
+  public function postDeserialize() {
+    $this->setName($this->getName());
   }
 
   public function getNameClean() {
