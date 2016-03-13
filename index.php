@@ -29,6 +29,8 @@ $app->get('/venues', function () use ($app, $entityManager, $serializer) {
 $app->post('/venue', function () use ($app, $entityManager, $serializer) {
   $venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json');
 
+  $venue = $entityManager->merge($venue);
+
   $entityManager->persist($venue);
   $entityManager->flush();
 
