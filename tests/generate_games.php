@@ -2,23 +2,43 @@
 
 require __DIR__ .  '/../bootstrap.php';
 
-$pf2data = file_get_contents('http://pinballfinder.org/gamedict.txt');
+$dom = new DOMDocument();
+libxml_use_internal_errors(true);
 
-$games = explode('\g', $pf2data);
+$contents = file_get_contents("ipdb.html");
+
+$dom->loadHTML('<?xml encoding="utf-8" ?>' . $contents);
+
+// authenticate and then view-source:http://ipdb.org/lists.cgi?puid=23777&list=games
+// <tr><td><a href="machine.cgi?gid=2819&puid=23777">!WOW!</a></td><td>Mills Novelty Company</td><td>March, 1932</td><td>1</td><td>ME</td><td></td></tr>
 
 $num = 0;
-foreach ($games as $data) {
-  $game = new \PF\Game();
 
-  $parts = explode('\f', $data);
+foreach ($dom->getElementsByTagName("tr") as $tr) {
+  $fields = $tr->getElementsByTagName("td");
 
-  $game->setName($parts[1]);
-  $game->setIpdb($parts[2]);
-  $game->setAbbreviation($parts[0]);
+  if ($fields->length === 6) {
+    $href = $fields->item(0)->getElementsByTagName("a")->item(0)->getAttribute('href');
 
-  $entityManager->persist($game);
+    $re = '/gid=([0-9]*)/';
 
-  $num++;
+    preg_match($re, $href, $matches);
+
+    if (!empty($matches[1])) {
+      $game = new \PF\Game();
+
+      $game->setName($fields->item(0)->textContent);
+
+      $game->setIpdb($matches[1]);
+
+      //$game->setAbbreviation($parts[0]);
+
+      $entityManager->persist($game);
+
+      $num++;
+    }
+
+  }
 }
 
 $entityManager->flush();
