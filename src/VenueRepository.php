@@ -62,7 +62,7 @@ class VenueRepository extends EntityRepository {
           ->setParameter('northeast_longitude', $geocode->getNortheastLongitude());
       }
     } else {
-      $qb->orderBy('v.created', 'DESC');
+      $qb->orderBy('v.updated', 'DESC');
     }
 
     if (!empty($request->get('q'))) {
