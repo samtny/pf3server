@@ -21,6 +21,8 @@ foreach ($xml->locations->loc as $loc) {
   $venue->setUrl($loc->url);
   $venue->setLatitude($loc->lat);
   $venue->setLongitude($loc->lon);
+  $venue->setCreated(date_create_from_format('Y-m-d', $loc->created));
+  $venue->setUpdated(date_create_from_format('Y-m-d', $loc->date));
 
   foreach ($loc->game as $locmachine) {
     $machine = new \PF\Machine();
