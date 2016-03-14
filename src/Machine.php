@@ -104,12 +104,6 @@ class Machine {
     return $this->game->getName();
   }
 
-  public function setName($name) {
-    $entityManager = $this->getEntityManager();
-
-    $this->game = $entityManager->findOneBy(array('name', $name));
-  }
-
   /**
    * @JMS\VirtualProperty
    */
@@ -117,10 +111,14 @@ class Machine {
     return $this->game->getIpdb();
   }
 
-  public function setIpdb($ipdb) {
-    $entityManager = $this->getEntityManager();
-
-    $this->game = $entityManager->findOneBy(array('ipdb', $ipdb));
+  public function postDeserialize($entityManager) {
+    if (empty($this->game)) {
+      if (!empty($this->ipdb)) {
+        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $this->ipdb)));
+      } else if (!empty($this->name)) {
+        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $this->name)));
+      }
+    }
   }
 
   /**

@@ -103,11 +103,12 @@ class Venue {
     $this->name_dm = StringUtil::dmName($name);
   }
 
-  /**
-   * @JMS\PostDeserialize
-   */
-  public function postDeserialize() {
+  public function postDeserialize($entityManager) {
     $this->setName($this->getName());
+
+    foreach ($this->machines as $machine) {
+      $machine->postDeserialize($entityManager);
+    }
   }
 
   public function getNameClean() {
