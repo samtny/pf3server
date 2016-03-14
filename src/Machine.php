@@ -31,26 +31,6 @@ class Machine {
   protected $game;
 
   /**
-   * @JMS\Type("string")
-   */
-  protected $name;
-
-  /**
-   * @JMS\Type("integer")
-   */
-  protected $ipdb;
-
-  /**
-   * @JMS\Type("boolean")
-   */
-  protected $new;
-
-  /**
-   * @JMS\Type("boolean")
-   */
-  protected $rare;
-
-  /**
    * @ORM\Column(name="`condition`", type="integer", nullable=true)
    * @JMS\Type("integer")
    */
@@ -73,6 +53,38 @@ class Machine {
    * @JMS\Type("DateTime")
    */
   protected $updated;
+
+  /**
+   * @JMS\VirtualProperty
+   * @JMS\Type("string")
+   */
+  public function getName() {
+    return $this->game->getName();
+  }
+
+  /**
+   * @JMS\VirtualProperty
+   * @JMS\Type("integer")
+   */
+  public function getIpdb() {
+    return $this->game->getIpdb();
+  }
+
+  /**
+   * @JMS\VirtualProperty
+   * @JMS\Type("boolean")
+   */
+  public function getNew() {
+    return !empty($this->game) ? $this->game->getNew() : null;
+  }
+
+  /**
+   * @JMS\VirtualProperty
+   * @JMS\Type("boolean")
+   */
+  public function getRare() {
+    return !empty($this->game) ? $this->game->getRare() : null;
+  }
 
   public function __construct($data = array()) {
     $this->created = new \DateTime("now");
@@ -97,20 +109,6 @@ class Machine {
     return $this->game;
   }
 
-  /**
-   * @JMS\VirtualProperty
-   */
-  public function getName() {
-    return $this->game->getName();
-  }
-
-  /**
-   * @JMS\VirtualProperty
-   */
-  public function getIpdb() {
-    return $this->game->getIpdb();
-  }
-
   public function postDeserialize($entityManager) {
     if (empty($this->game)) {
       if (!empty($this->ipdb)) {
@@ -119,20 +117,6 @@ class Machine {
         $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $this->name)));
       }
     }
-  }
-
-  /**
-   * @JMS\VirtualProperty
-   */
-  public function getNew() {
-    return !empty($this->game) ? $this->game->getNew() : null;
-  }
-
-  /**
-   * @JMS\VirtualProperty
-   */
-  public function getRare() {
-    return !empty($this->game) ? $this->game->getRare() : null;
   }
 
   public function setGame($game) {
