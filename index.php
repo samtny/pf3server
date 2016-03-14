@@ -4,17 +4,7 @@ require_once 'bootstrap.php';
 
 use \PF\Venue;
 
-$app->get('/venue/:id', function ($id) use ($app, $entityManager) {
-  $venue = $entityManager->find('\PF\Venue', $id);
-
-  if (empty($venue)) {
-    $app->notFound();
-  }
-
-  $app->responseData = array('venue' => $venue);
-});
-
-$app->get('/venues', function () use ($app, $entityManager, $serializer) {
+$app->get('/venue/search', function () use ($app, $entityManager, $serializer) {
   $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
 
   $venues = [];
@@ -24,6 +14,16 @@ $app->get('/venues', function () use ($app, $entityManager, $serializer) {
   }
 
   $app->responseData = array('count' => count($venues), 'venues' => $venues);
+});
+
+$app->get('/venue/:id', function ($id) use ($app, $entityManager) {
+  $venue = $entityManager->find('\PF\Venue', $id);
+
+  if (empty($venue)) {
+    $app->notFound();
+  }
+
+  $app->responseData = array('venue' => $venue);
 });
 
 $app->post('/venue', function () use ($app, $entityManager, $serializer) {
