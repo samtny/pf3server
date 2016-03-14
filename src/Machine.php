@@ -31,6 +31,18 @@ class Machine {
   protected $game;
 
   /**
+   * @JMS\Type("integer")
+   * @JMS\Accessor(getter="getIpdb")
+   */
+  protected $ipdb;
+
+  /**
+   * @JMS\Type("string")
+   * @JMS\Accessor(getter="getName")
+   */
+  protected $name;
+
+  /**
    * @ORM\Column(name="`condition`", type="integer", nullable=true)
    * @JMS\Type("integer")
    */
@@ -93,6 +105,16 @@ class Machine {
     $this->updated = new \DateTime("now");
   }
 
+  public function postDeserialize($entityManager) {
+    if (empty($this->game)) {
+      if (!empty($this->ipdb)) {
+        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $this->ipdb)));
+      } else if (!empty($this->name)) {
+        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $this->name)));
+      }
+    }
+  }
+
   public function getId()
   {
     return $this->id;
@@ -109,16 +131,6 @@ class Machine {
 
   public function getGame() {
     return $this->game;
-  }
-
-  public function postDeserialize($entityManager) {
-    if (empty($this->game)) {
-      if (!empty($this->ipdb)) {
-        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $this->ipdb)));
-      } else if (!empty($this->name)) {
-        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $this->name)));
-      }
-    }
   }
 
   public function setGame($game) {
