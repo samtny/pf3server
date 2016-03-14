@@ -33,12 +33,14 @@ class Comment {
   /**
    * @ORM\Column(type="datetime")
    * @JMS\Type("DateTime")
+   * @JMS\Exclude
    */
   protected $created;
 
   /**
    * @ORM\Column(type="datetime")
    * @JMS\Type("DateTime")
+   * @JMS\Exclude
    */
   protected $updated;
 
