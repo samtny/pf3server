@@ -22,8 +22,6 @@ $app->view()->parserOptions = array(
   'autoescape' => false,
 );
 
-$app->add(new \PF\ResponseMiddleware());
-
 $app->notFound(function () use ($app) {
   $app->render('404.html');
 });
@@ -64,3 +62,5 @@ $entityManager = EntityManager::create($conn, $config);
 
 //$serializer = JMS\Serializer\SerializerBuilder::create()->setCacheDir('/tmp')->setDebug($app->getMode() === 'development')->build();
 $serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->build();
+
+$app->add(new \PF\ResponseMiddleware($serializer));

@@ -4,7 +4,7 @@ require_once 'bootstrap.php';
 
 use \PF\Venue;
 
-$app->get('/venue/:id', function ($id) use ($app, $entityManager, $serializer) {
+$app->get('/venue/:id', function ($id) use ($app, $entityManager) {
   $venue = $entityManager->find('\PF\Venue', $id);
 
   if (empty($venue)) {

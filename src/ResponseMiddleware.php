@@ -3,19 +3,21 @@
 namespace PF;
 
 use \Slim\Middleware;
-use \JMS\Serializer\SerializerBuilder;
 
 class ResponseMiddleware extends Middleware
 {
+  private $serializer;
+
+  public function __construct($serializer) {
+    $this->serializer = $serializer;
+  }
+
   public function call() {
     $this->next->call();
 
     $app = $this->getApplication();
 
     if (!empty($app->responseData) || !empty($app->responseMessage)) {
-
-      $serializer = SerializerBuilder::create()->build();
-
       $res = $app->response();
       $res['Content-Type'] = 'application/json';
 
@@ -34,7 +36,7 @@ class ResponseMiddleware extends Middleware
         $response['message'] = $app->responseMessage;
       }
 
-      echo $serializer->serialize($response, 'json');
+      echo $this->serializer->serialize($response, 'json');
     }
   }
 }
