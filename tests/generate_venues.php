@@ -2,7 +2,7 @@
 
 require __DIR__ .  '/../bootstrap.php';
 
-$l = !empty($argv[1]) ? $argv[1] : "10";
+$l = !empty($argv[1]) ? $argv[1] : "10000";
 
 $pf2data = file_get_contents("http://pinballfinder.org/pf2/pf?l=" . $l);
 
@@ -25,28 +25,39 @@ foreach ($xml->locations->loc as $loc) {
   $venue->setUpdated(date_create_from_format('Y-m-d', $loc->date));
 
   foreach ($loc->game as $locmachine) {
-    $machine = new \PF\Machine();
+    $ipdb = $locmachine->ipdb;
 
-    $machine->setCondition($locmachine->cond);
-    $machine->setPrice($locmachine->price);
+    switch ((string) $ipdb) {
+      case '4652':
+        $ipdb = 1267;
 
-    $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation' => $locmachine->abbr));
+        break;
+    }
+
+    $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $ipdb));
 
     if (!empty($game)) {
       if ($locmachine['rare'] == '1') {
         $game->setRare(true);
+        $entityManager->persist($game);
       }
 
       if ($locmachine['new'] == '1') {
         $game->setNew(true);
+        $entityManager->persist($game);
       }
 
-      $entityManager->persist($game);
+      $machine = new \PF\Machine();
+
+      $machine->setCondition($locmachine->cond);
+      $machine->setPrice($locmachine->price);
+
+      $machine->setGame($game);
+
+      $venue->addMachine($machine);
+    } else {
+      echo "missing game: " . $locmachine['key'];
     }
-
-    $machine->setGame($game);
-
-    $venue->addMachine($machine);
   }
 
   foreach ($loc->comment as $loccomment) {
