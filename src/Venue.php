@@ -11,6 +11,7 @@ use JMS\Serializer\Annotation as JMS;
 /**
  * @ORM\Entity(repositoryClass="VenueRepository")
  * @ORM\Table(name="venue",indexes={@ORM\Index(name="latitude_longitude_idx", columns={"latitude", "longitude"})})
+ * @ORM\HasLifecycleCallbacks
  * @JMS\ExclusionPolicy("none")
  **/
 class Venue {
@@ -75,11 +76,20 @@ class Venue {
    */
   protected $comments;
 
-  public function __construct($data = array()) {
-    $this->status  = "NEW";
-    $this->created = new \DateTime("now");
-    $this->updated = new \DateTime("now");
+  /**
+   * @ORM\PrePersist
+   */
+  public function prePersist() {
+    $this->name_clean = StringUtil::cleanName($this->name);
 
+    $this->name_dm = StringUtil::dmName($this->name);
+
+    foreach ($this->machines as $machine) {
+      $machine->setVenue($this);
+    }
+  }
+
+  public function __construct($data = array()) {
     $this->machines = new ArrayCollection();
     $this->comments = new ArrayCollection();
   }
@@ -275,18 +285,5 @@ class Venue {
 
   public function approve() {
     $this->status = "APPROVED";
-  }
-
-  public function jsonSerialize() {
-    return array(
-      'id' => $this->id,
-      'name' => $this->name,
-      'street' => $this->street,
-      'city' => $this->city,
-      'state' => $this->state,
-      'zipcode' => $this->zipcode,
-      'latitude' => $this->latitude,
-      'longitude' => $this->longitude,
-    );
   }
 }

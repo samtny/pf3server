@@ -8,6 +8,7 @@ use JMS\Serializer\Annotation as JMS;
 
 /**
  * @ORM\Entity @ORM\Table(name="machine")
+ * @ORM\HasLifecycleCallbacks
  * @JMS\ExclusionPolicy("none")
  **/
 class Machine {
@@ -73,7 +74,7 @@ class Machine {
    * @JMS\Type("string")
    */
   public function getName() {
-    return $this->game->getName();
+    //return $this->game->getName();
   }
 
   /**
@@ -81,7 +82,7 @@ class Machine {
    * @JMS\Type("integer")
    */
   public function getIpdb() {
-    return $this->game->getIpdb();
+    //return $this->game->getIpdb();
   }
 
   /**
@@ -98,6 +99,14 @@ class Machine {
    */
   public function getRare() {
     return !empty($this->game) ? $this->game->getRare() : null;
+  }
+
+  /**
+   * @ORM\PrePersist
+   */
+  public function prePersist() {
+    $this->created = new \DateTime("now");
+    $this->updated = new \DateTime("now");
   }
 
   public function __construct($data = array()) {

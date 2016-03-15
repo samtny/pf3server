@@ -60,7 +60,26 @@ $conn = array(
 
 $entityManager = EntityManager::create($conn, $config);
 
+$connection = $entityManager->getConnection();
+
+$registry = new \PF\SimpleManagerRegistry(
+  function($id) use($connection, $entityManager) {
+    switch ($id) {
+      case 'default_manager':
+        return $entityManager;
+
+      default:
+        throw new \RuntimeException(sprintf('Unknown service id "%s".', $id));
+    }
+  }
+);
+
+$fallback_constructor = new \JMS\Serializer\Construction\UnserializeObjectConstructor();
+
+$object_constructor = new \JMS\Serializer\Construction\DoctrineObjectConstructor($registry, $fallback_constructor);
+
 //$serializer = JMS\Serializer\SerializerBuilder::create()->setCacheDir('/tmp')->setDebug($app->getMode() === 'development')->build();
 $serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->build();
+//$serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->setObjectConstructor($object_constructor)->build();
 
 $app->add(new \PF\ResponseMiddleware($serializer));

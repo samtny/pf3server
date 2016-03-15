@@ -8,6 +8,7 @@ use JMS\Serializer\Annotation as JMS;
 
 /**
  * @ORM\Entity @ORM\Table(name="comment")
+ * @ORM\HasLifecycleCallbacks
  * @JMS\ExclusionPolicy("none")
  **/
 class Comment {
@@ -43,6 +44,14 @@ class Comment {
    * @JMS\Exclude
    */
   protected $updated;
+
+  /**
+   * @ORM\PrePersist
+   */
+  public function prePersist() {
+    $this->created = new \DateTime("now");
+    $this->updated = new \DateTime("now");
+  }
 
   public function __construct($data = array()) {
     $this->created = new \DateTime("now");
