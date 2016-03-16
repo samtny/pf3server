@@ -53,6 +53,14 @@ class Comment {
     $this->updated = new \DateTime("now");
   }
 
+  /**
+   * @JMS\PostDeserialize
+   */
+  public function postDeserialize() {
+    $this->created = new \DateTime("now");
+    $this->updated = new \DateTime("now");
+  }
+
   public function __construct($data = array()) {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");

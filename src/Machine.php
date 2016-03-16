@@ -14,22 +14,12 @@ use JMS\Serializer\Annotation as JMS;
 class Machine {
 
   /**
-   * @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue
+   * @ORM\Id
+   * @ORM\Column(type="integer")
+   * @ORM\GeneratedValue
    * @JMS\Type("integer")
    */
   protected $id;
-
-  /**
-   * @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines")
-   * @JMS\Type("PF\Venue")
-   */
-  protected $venue;
-
-  /**
-   * @ORM\ManyToOne(targetEntity="Game")
-   * @JMS\Exclude
-   */
-  protected $game;
 
   /**
    * @JMS\Type("integer")
@@ -38,10 +28,16 @@ class Machine {
   protected $ipdb;
 
   /**
-   * @JMS\Type("string")
-   * @JMS\Accessor(getter="getName")
+   * @ORM\ManyToOne(targetEntity="Game")
+   * @JMS\Exclude
    */
-  protected $name;
+  protected $game;
+
+  /**
+   * @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines")
+   * @JMS\Type("PF\Venue")
+   */
+  protected $venue;
 
   /**
    * @ORM\Column(name="`condition`", type="integer", nullable=true)
@@ -58,31 +54,29 @@ class Machine {
   /**
    * @ORM\Column(type="datetime")
    * @JMS\Type("DateTime")
-   * @JMS\Exclude
    */
   protected $created;
 
   /**
    * @ORM\Column(type="datetime")
    * @JMS\Type("DateTime")
-   * @JMS\Exclude
    */
   protected $updated;
-
-  /**
-   * @JMS\VirtualProperty
-   * @JMS\Type("string")
-   */
-  public function getName() {
-    //return $this->game->getName();
-  }
 
   /**
    * @JMS\VirtualProperty
    * @JMS\Type("integer")
    */
   public function getIpdb() {
-    //return $this->game->getIpdb();
+    return !empty($this->game) ? $this->game->getId() : null;
+  }
+
+  /**
+   * @JMS\VirtualProperty
+   * @JMS\Type("string")
+   */
+  public function getName() {
+    return !empty($this->game) ? $this->game->getName() : null;
   }
 
   /**
@@ -109,24 +103,39 @@ class Machine {
     $this->updated = new \DateTime("now");
   }
 
+  /**
+   * @JMS\PostDeserialize
+   */
+  public function postDeserialize() {
+    $game = new Game();
+    $game->setId($this->ipdb);
+
+    $this->setGame($game);
+  }
+
   public function __construct($data = array()) {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
   }
 
-  public function postDeserialize($entityManager) {
-    if (empty($this->game)) {
-      if (!empty($this->ipdb)) {
-        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $this->ipdb)));
-      } else if (!empty($this->name)) {
-        $this->setGame($entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $this->name)));
-      }
-    }
+  public function getId() {
+    return $this->id;
   }
 
-  public function getId()
-  {
-    return $this->id;
+  public function setId($id) {
+    $this->id = $id;
+  }
+
+  public function setIpdb($ipdb) {
+    $this->ipdb = $ipdb;
+  }
+
+  public function getGame() {
+    return $this->game;
+  }
+
+  public function setGame($game) {
+    $this->game = $game;
   }
 
   public function getVenue()
@@ -136,14 +145,6 @@ class Machine {
 
   public function setVenue($venue) {
     $this->venue = $venue;
-  }
-
-  public function getGame() {
-    return $this->game;
-  }
-
-  public function setGame($game) {
-    $this->game = $game;
   }
 
   public function getCreated() {

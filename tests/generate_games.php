@@ -29,7 +29,7 @@ foreach ($dom->getElementsByTagName("tr") as $tr) {
 
       $game->setName($fields->item(0)->textContent);
 
-      $game->setIpdb($matches[1]);
+      $game->setId($matches[1]);
 
       //$game->setAbbreviation($parts[0]);
 

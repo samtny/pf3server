@@ -83,10 +83,15 @@ class Venue {
     $this->name_clean = StringUtil::cleanName($this->name);
 
     $this->name_dm = StringUtil::dmName($this->name);
+  }
 
-    foreach ($this->machines as $machine) {
-      $machine->setVenue($this);
-    }
+  /**
+   * @JMS\PostDeserialize
+   */
+  public function postDeserialize() {
+    $this->name_clean = StringUtil::cleanName($this->name);
+
+    $this->name_dm = StringUtil::dmName($this->name);
   }
 
   public function __construct($data = array()) {
@@ -111,14 +116,6 @@ class Venue {
     $this->name_clean = StringUtil::cleanName($name);
 
     $this->name_dm = StringUtil::dmName($name);
-  }
-
-  public function postDeserialize($entityManager) {
-    $this->setName($this->getName());
-
-    foreach ($this->machines as $machine) {
-      $machine->postDeserialize($entityManager);
-    }
   }
 
   public function getNameClean() {

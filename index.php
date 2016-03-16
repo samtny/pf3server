@@ -31,21 +31,26 @@ $app->post('/venue', function () use ($app, $entityManager, $serializer) {
 
   //$deserialized_venue->postDeserialize($entityManager);
 
-  try {
+  if ($deserialized_venue->getId() != null) {
+    $venue = $entityManager->merge($deserialized_venue);
 
-    if ($deserialized_venue->getId() == null) {
-      $entityManager->persist($deserialized_venue);
+    $entityManager->persist($venue);
 
-      $entityManager->flush();
+    $entityManager->flush();
 
-      $app->responseMessage = 'Created Venue with ID ' . $deserialized_venue->getId();
-    } else {
+    $app->responseMessage = 'Updated Venue with ID ' . $venue->getId();
+  } else {
+    try {
       $venue = $entityManager->merge($deserialized_venue);
 
       $entityManager->persist($venue);
+
+      $entityManager->flush();
+
+      $app->responseMessage = 'Created Venue with ID ' . $venue->getId();
+    } catch (\Doctrine\ORM\EntityNotFoundException $e) {
+      $app->notFound();
     }
-  } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-    $app->notFound();
   }
 });
 

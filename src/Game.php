@@ -10,7 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
  **/
 class Game {
 
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
+  /**
+   * @ORM\Id
+   * @ORM\Column(type="integer")
+   */
   protected $id;
 
   /** @ORM\Column(type="string") */
@@ -27,9 +30,6 @@ class Game {
 
   /** @ORM\Column(type="string", nullable=true) */
   protected $year;
-
-  /** @ORM\Column(type="integer", nullable=true) */
-  protected $ipdb;
 
   /** @ORM\Column(type="boolean", nullable=true) */
   protected $new;
@@ -54,14 +54,14 @@ class Game {
     }
   }
 
-  public function getId()
-  {
+  public function getId() {
     return $this->id;
   }
 
-  /**
-   * @return mixed
-   */
+  public function setId($id) {
+    $this->id = $id;
+  }
+
   public function getName() {
     return $this->name;
   }
@@ -83,44 +83,18 @@ class Game {
     return $this->name_dm;
   }
 
-  /**
-   * @return mixed
-   */
   public function getYear() {
     return $this->year;
   }
 
-  /**
-   * @param mixed $year
-   */
   public function setYear($year) {
     $this->year = $year;
   }
 
-  /**
-   * @return mixed
-   */
-  public function getIpdb() {
-    return $this->ipdb;
-  }
-
-  /**
-   * @param mixed $ipdb
-   */
-  public function setIpdb($ipdb) {
-    $this->ipdb = $ipdb;
-  }
-
-  /**
-   * @return mixed
-   */
   public function getAbbreviation() {
     return $this->abbreviation;
   }
 
-  /**
-   * @param mixed $abbreviation
-   */
   public function setAbbreviation($abbreviation) {
     $this->abbreviation = $abbreviation;
   }
@@ -141,30 +115,18 @@ class Game {
     $this->rare = $rare;
   }
 
-  /**
-   * @return mixed
-   */
   public function getCreated() {
     return $this->created;
   }
 
-  /**
-   * @param mixed $created
-   */
   public function setCreated($created) {
     $this->created = $created;
   }
 
-  /**
-   * @return mixed
-   */
   public function getUpdated() {
     return $this->updated;
   }
 
-  /**
-   * @param mixed $updated
-   */
   public function setUpdated($updated) {
     $this->updated = $updated;
   }
