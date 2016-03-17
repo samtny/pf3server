@@ -96,14 +96,6 @@ class Machine {
   }
 
   /**
-   * @ORM\PrePersist
-   */
-  public function prePersist() {
-    $this->created = new \DateTime("now");
-    $this->updated = new \DateTime("now");
-  }
-
-  /**
    * @JMS\PostDeserialize
    */
   public function postDeserialize() {

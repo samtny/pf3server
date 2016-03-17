@@ -32,7 +32,7 @@ class Comment {
   protected $text;
 
   /**
-   * @ORM\Column(type="datetime")
+   * @ORM\Column(type="datetime", options={"default":0})
    * @JMS\Type("DateTime")
    * @JMS\Exclude
    */
@@ -45,24 +45,7 @@ class Comment {
    */
   protected $updated;
 
-  /**
-   * @ORM\PrePersist
-   */
-  public function prePersist() {
-    $this->created = new \DateTime("now");
-    $this->updated = new \DateTime("now");
-  }
-
-  /**
-   * @JMS\PostDeserialize
-   */
-  public function postDeserialize() {
-    $this->created = new \DateTime("now");
-    $this->updated = new \DateTime("now");
-  }
-
   public function __construct($data = array()) {
-    $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
   }
 

@@ -19,7 +19,7 @@ class Venue {
   /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue @JMS\Type("integer") **/
   protected $id;
 
-  /** @ORM\Column(type="string") @JMS\Type("string") **/
+  /** @ORM\Column(type="string") @JMS\Type("string") @JMS\Accessor(setter="setName") @JMS\Groups({"test"}) **/
   protected $name;
 
   /** @ORM\Column(type="string") @JMS\Exclude @JMS\Type("string") */
@@ -67,6 +67,7 @@ class Venue {
   /**
    * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove", "merge"})
    * @JMS\Type("ArrayCollection<PF\Machine>")
+   * @JMS\Accessor(setter="setMachinesDummy")
    */
   protected $machines;
 
@@ -77,26 +78,18 @@ class Venue {
   protected $comments;
 
   /**
-   * @ORM\PrePersist
-   */
-  public function prePersist() {
-    $this->name_clean = StringUtil::cleanName($this->name);
-
-    $this->name_dm = StringUtil::dmName($this->name);
-  }
-
-  /**
    * @JMS\PostDeserialize
    */
   public function postDeserialize() {
-    $this->name_clean = StringUtil::cleanName($this->name);
 
-    $this->name_dm = StringUtil::dmName($this->name);
   }
 
   public function __construct($data = array()) {
     $this->machines = new ArrayCollection();
     $this->comments = new ArrayCollection();
+    $this->created = new \DateTime("now");
+    $this->updated = new \DateTime("now");
+    $this->status = 'NEW';
   }
 
   public function getId()

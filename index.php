@@ -27,9 +27,19 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager) {
 });
 
 $app->post('/venue', function () use ($app, $entityManager, $serializer) {
-  $deserialized_venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json');
+  $deserializion_context = \JMS\Serializer\DeserializationContext::create()->setGroups(array('test'));
 
-  //$deserialized_venue->postDeserialize($entityManager);
+  $json_decoded_venue = json_decode($app->request->getBody(), true);
+
+  if (!empty($json_decoded_venue['id'])) {
+    $deserializion_context->setAttribute('target', $entityManager->getRepository('\PF\Venue')->find($json_decoded_venue['id']));
+  } else {
+    $deserializion_context->setAttribute('target', new Venue());
+  }
+
+  $deserialized_venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json', $deserializion_context);
+
+  //foreach($objectA as $k => $v) $objectB->$k = $v;
 
   if ($deserialized_venue->getId() != null) {
     $venue = $entityManager->merge($deserialized_venue);
