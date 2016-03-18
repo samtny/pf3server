@@ -12,7 +12,7 @@ $dom->loadHTML('<?xml encoding="utf-8" ?>' . $contents);
 // authenticate and then view-source:http://ipdb.org/lists.cgi?puid=23777&list=games
 // <tr><td><a href="machine.cgi?gid=2819&puid=23777">!WOW!</a></td><td>Mills Novelty Company</td><td>March, 1932</td><td>1</td><td>ME</td><td></td></tr>
 
-$num = 0;
+$new = 0;
 
 foreach ($dom->getElementsByTagName("tr") as $tr) {
   $fields = $tr->getElementsByTagName("td");
@@ -25,22 +25,31 @@ foreach ($dom->getElementsByTagName("tr") as $tr) {
     preg_match($re, $href, $matches);
 
     if (!empty($matches[1])) {
-      $game = new \PF\Game();
+      $ipdb = $matches[1];
 
-      $game->setName($fields->item(0)->textContent);
+      $game = $entityManager->getRepository('\PF\Game')->find($ipdb);
 
-      $game->setId($matches[1]);
+      if (!empty($game)) {
+        $game->setName($fields->item(0)->textContent);
 
-      //$game->setAbbreviation($parts[0]);
+        //$game->setAbbreviation($parts[0]);
+      } else {
+        $game = new \PF\Game();
+
+        $game->setId($ipdb);
+
+        $game->setName($fields->item(0)->textContent);
+
+        //$game->setAbbreviation($parts[0]);
+
+        $new++;
+      }
 
       $entityManager->persist($game);
-
-      $num++;
     }
-
   }
 }
 
 $entityManager->flush();
 
-echo "Generated " . $num . ' games' . "\n";
+echo "Generated " . $new . ' new games' . "\n";
