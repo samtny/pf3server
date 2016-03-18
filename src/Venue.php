@@ -64,6 +64,9 @@ class Venue {
   /** @ORM\Column(type="datetime") @JMS\Type("DateTime") **/
   protected $updated;
 
+  /** @ORM\Column(type="integer", nullable=true) @JMS\Exclude */
+  protected $legacy_key;
+
   /**
    * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove", "merge"})
    * @JMS\Type("ArrayCollection<PF\Machine>")
@@ -274,5 +277,13 @@ class Venue {
 
   public function approve() {
     $this->status = "APPROVED";
+  }
+
+  public function getLegacyKey() {
+    return $this->legacy_key;
+  }
+
+  public function setLegacyKey($legacy_key) {
+    $this->legacy_key = $legacy_key;
   }
 }

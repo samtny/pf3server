@@ -23,6 +23,7 @@ foreach ($xml->locations->loc as $loc) {
   $venue->setLongitude($loc->lon);
   $venue->setCreated(date_create_from_format('Y-m-d', $loc->created));
   $venue->setUpdated(date_create_from_format('Y-m-d', $loc->date));
+  $venue->setLegacyKey($loc['key']);
 
   foreach ($loc->game as $locmachine) {
     $ipdb = $locmachine->ipdb;
@@ -34,7 +35,7 @@ foreach ($xml->locations->loc as $loc) {
         break;
     }
 
-    $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $ipdb));
+    $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('id' => $ipdb));
 
     if (!empty($game)) {
       if ($locmachine['rare'] == '1') {
