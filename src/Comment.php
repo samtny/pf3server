@@ -28,6 +28,7 @@ class Comment {
   /**
    * @ORM\Column(type="string")
    * @JMS\Type("string")
+   * @JMS\Groups({"create","update"})
    */
   protected $text;
 
@@ -46,6 +47,7 @@ class Comment {
   protected $updated;
 
   public function __construct($data = array()) {
+    $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
   }
 

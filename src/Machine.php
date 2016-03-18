@@ -54,6 +54,9 @@ class Machine {
    */
   protected $price;
 
+  /** @ORM\Column(type="boolean", options={"default":false}) @JMS\Type("boolean") @JMS\Groups({"create","update"}) */
+  protected $deleted;
+
   /**
    * @ORM\Column(type="datetime")
    * @JMS\Type("DateTime")
@@ -111,6 +114,7 @@ class Machine {
   public function __construct($data = array()) {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
+    $this->deleted = false;
   }
 
   public function getId() {

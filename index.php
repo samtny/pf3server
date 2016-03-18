@@ -4,6 +4,7 @@ require_once 'bootstrap.php';
 
 use \PF\Venue;
 use \PF\Machine;
+use \PF\Comment;
 
 $app->get('/venue/search', function () use ($app, $entityManager, $serializer) {
   $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
@@ -68,6 +69,26 @@ $app->post('/venue', function () use ($app, $entityManager, $serializer) {
     $venue->addMachine($machine);
   }
 
+  foreach ($json_venue_decoded['comments'] as $json_comment_decoded) {
+    $json_comment_encoded = json_encode($json_comment_decoded);
+
+    $is_new_comment = empty($json_comment_decoded['id']);
+
+    $comment_deserialization_context = \JMS\Serializer\DeserializationContext::create();
+
+    if ($is_new_comment) {
+      $comment_deserialization_context->setGroups(array('create'));
+      $comment_deserialization_context->setAttribute('target', new Comment());
+    } else {
+      $comment_deserialization_context->setGroups(array('update'));
+      $comment_deserialization_context->setAttribute('target', $entityManager->getRepository('\PF\Comment')->find($json_comment_decoded['id']));
+    }
+
+    $comment = $serializer->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_deserialization_context);
+
+    $venue->addComment($comment);
+  }
+  
   try {
     $entityManager->persist($venue);
 
