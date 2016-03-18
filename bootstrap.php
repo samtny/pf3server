@@ -11,7 +11,7 @@ require_once "src/DoubleMetaPhone.php";
 
 AnnotationRegistry::registerAutoloadNamespace('JMS\Serializer\Annotation', __DIR__ . "/vendor/jms/serializer/src");
 
-$app = new \Slim\Slim(
+$app = new \PF\PinfinderApp(
   array(
     'mode' => 'development',
     'view' => new \Slim\Views\Twig(),
