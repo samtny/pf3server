@@ -31,12 +31,12 @@ $app->post('/venue', function () use ($app, $entityManager, $serializer) {
 
   $is_new_venue = empty($json_venue_decoded['id']);
 
-  $deserializion_context = \JMS\Serializer\DeserializationContext::create()->setGroups(array('test'));
-
-  if (!$is_new_venue) {
-    $deserializion_context->setAttribute('target', $entityManager->getRepository('\PF\Venue')->find($json_venue_decoded['id']));
-  } else {
+  if ($is_new_venue) {
+    $deserializion_context = \JMS\Serializer\DeserializationContext::create()->setGroups(array('create'));
     $deserializion_context->setAttribute('target', new Venue());
+  } else {
+    $deserializion_context = \JMS\Serializer\DeserializationContext::create()->setGroups(array('update'));
+    $deserializion_context->setAttribute('target', $entityManager->getRepository('\PF\Venue')->find($json_venue_decoded['id']));
   }
 
   $venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json', $deserializion_context);

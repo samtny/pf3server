@@ -19,40 +19,40 @@ class Venue {
   /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue @JMS\Type("integer") **/
   protected $id;
 
-  /** @ORM\Column(type="string") @JMS\Type("string") @JMS\Accessor(setter="setName") @JMS\Groups({"test"}) **/
+  /** @ORM\Column(type="string") @JMS\Type("string") @JMS\Accessor(setter="setName") @JMS\Groups({"create","update"}) **/
   protected $name;
 
-  /** @ORM\Column(type="string") @JMS\Exclude @JMS\Type("string") */
+  /** @ORM\Column(type="string") @JMS\Exclude */
   protected $name_clean;
 
-  /** @ORM\Column(type="string") @JMS\Exclude @JMS\Type("string") */
+  /** @ORM\Column(type="string") @JMS\Exclude */
   protected $name_dm;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
   protected $street;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
   protected $city;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
   protected $state;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
   protected $zipcode;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"test"}) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","update"}) */
   protected $latitude;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"test"}) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","update"}) */
   protected $longitude;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
   protected $phone;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
   protected $url;
 
-  /** @ORM\Column(type="string", options={"default":"NEW"}) @JMS\Type("string") @JMS\Groups({"test"}) **/
+  /** @ORM\Column(type="string", options={"default":"NEW"}) @JMS\Type("string") **/
   protected $status;
 
   /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
