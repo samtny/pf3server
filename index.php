@@ -3,6 +3,7 @@
 require_once 'bootstrap.php';
 
 use \PF\Venue;
+use \PF\Machine;
 
 $app->get('/venue/search', function () use ($app, $entityManager, $serializer) {
   $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
@@ -27,19 +28,45 @@ $app->get('/venue/:id', function ($id) use ($app, $entityManager) {
 });
 
 $app->post('/venue', function () use ($app, $entityManager, $serializer) {
-  $json_venue_decoded = json_decode($app->request->getBody(), true);
+  $json_venue_encoded = $app->request->getBody();
+
+  $json_venue_decoded = json_decode($json_venue_encoded, true);
 
   $is_new_venue = empty($json_venue_decoded['id']);
 
+  $venue_deserialization_context = \JMS\Serializer\DeserializationContext::create();
+
   if ($is_new_venue) {
-    $deserializion_context = \JMS\Serializer\DeserializationContext::create()->setGroups(array('create'));
-    $deserializion_context->setAttribute('target', new Venue());
+    $venue_deserialization_context->setGroups(array('create'));
+    $venue_deserialization_context->setAttribute('target', new Venue());
   } else {
-    $deserializion_context = \JMS\Serializer\DeserializationContext::create()->setGroups(array('update'));
-    $deserializion_context->setAttribute('target', $entityManager->getRepository('\PF\Venue')->find($json_venue_decoded['id']));
+    $venue_deserialization_context->setGroups(array('update'));
+    $venue_deserialization_context->setAttribute('target', $entityManager->getRepository('\PF\Venue')->find($json_venue_decoded['id']));
   }
 
-  $venue = $serializer->deserialize($app->request->getBody(), 'PF\Venue', 'json', $deserializion_context);
+  $venue = $serializer->deserialize($json_venue_encoded, 'PF\Venue', 'json', $venue_deserialization_context);
+
+  foreach ($json_venue_decoded['machines'] as $json_machine_decoded) {
+    $json_machine_encoded = json_encode($json_machine_decoded);
+
+    $is_new_machine = empty($json_machine_decoded['id']);
+
+    $machine_deserialization_context = \JMS\Serializer\DeserializationContext::create(); 
+
+    if ($is_new_machine) {
+      $machine_deserialization_context->setGroups(array('create'));
+      $machine_deserialization_context->setAttribute('target', new Machine());
+    } else {
+      $machine_deserialization_context->setGroups(array('update'));
+      $machine_deserialization_context->setAttribute('target', $entityManager->getRepository('\PF\Machine')->find($json_machine_decoded['id']));
+    }
+
+    $machine = $serializer->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
+
+    $machine->setGame($entityManager->getRepository('\PF\Game')->find($machine->getIpdb()));
+
+    $venue->addMachine($machine);
+  }
 
   try {
     $entityManager->persist($venue);

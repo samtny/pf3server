@@ -67,7 +67,6 @@ class Venue {
   /**
    * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove", "merge"})
    * @JMS\Type("ArrayCollection<PF\Machine>")
-   * @JMS\Accessor(setter="setMachinesDummy")
    */
   protected $machines;
 

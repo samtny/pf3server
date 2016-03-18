@@ -23,7 +23,8 @@ class Machine {
 
   /**
    * @JMS\Type("integer")
-   * @JMS\Accessor(getter="getIpdb")
+   * @JMS\Accessor(getter="getIpdb", setter="setIpdb")
+   * @JMS\Groups({"create","update"})
    */
   protected $ipdb;
 
@@ -42,12 +43,14 @@ class Machine {
   /**
    * @ORM\Column(name="`condition`", type="integer", nullable=true)
    * @JMS\Type("integer")
+   * @JMS\Groups({"create","update"})
    */
   protected $condition;
 
   /**
    * @ORM\Column(type="string", nullable=true)
    * @JMS\Type("string")
+   * @JMS\Groups({"create","update"})
    */
   protected $price;
 
