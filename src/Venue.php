@@ -16,10 +16,10 @@ use JMS\Serializer\Annotation as JMS;
  **/
 class Venue {
 
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue @JMS\Type("integer") **/
+  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue @JMS\Type("integer") @JMS\Groups({"read"}) **/
   protected $id;
 
-  /** @ORM\Column(type="string") @JMS\Type("string") @JMS\Accessor(setter="setName") @JMS\Groups({"create","update"}) **/
+  /** @ORM\Column(type="string") @JMS\Type("string") @JMS\Accessor(setter="setName") @JMS\Groups({"create","read","update"}) **/
   protected $name;
 
   /** @ORM\Column(type="string") @JMS\Exclude */
@@ -28,28 +28,28 @@ class Venue {
   /** @ORM\Column(type="string") @JMS\Exclude */
   protected $name_dm;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
   protected $street;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
   protected $city;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
   protected $state;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
   protected $zipcode;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","update"}) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","read","update"}) */
   protected $latitude;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","update"}) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","read","update"}) */
   protected $longitude;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
   protected $phone;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
   protected $url;
 
   /** @ORM\Column(type="string", options={"default":"NEW"}) @JMS\Type("string") **/
@@ -58,10 +58,10 @@ class Venue {
   /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $flag_reason;
 
-  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") **/
+  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") @JMS\Groups({"read"}) */
   protected $created;
 
-  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") **/
+  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") @JMS\Groups({"read"}) */
   protected $updated;
 
   /** @ORM\Column(type="integer", nullable=true) @JMS\Exclude */
@@ -70,21 +70,16 @@ class Venue {
   /**
    * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove", "merge"})
    * @JMS\Type("ArrayCollection<PF\Machine>")
+   * @JMS\Groups({"read"})
    */
   protected $machines;
 
   /**
    * @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove", "merge"})
    * @JMS\Type("ArrayCollection<PF\Comment>")
+   * @JMS\Groups({"read"})
    */
   protected $comments;
-
-  /**
-   * @JMS\PostDeserialize
-   */
-  public function postDeserialize() {
-
-  }
 
   public function __construct($data = array()) {
     $this->machines = new ArrayCollection();

@@ -2,6 +2,8 @@
 
 namespace PF;
 
+use \JMS\Serializer;
+use \JMS\Serializer\SerializationContext;
 use \Slim\Middleware;
 
 class ResponseMiddleware extends Middleware
@@ -36,7 +38,11 @@ class ResponseMiddleware extends Middleware
         $response['message'] = $app->responseMessage;
       }
 
-      echo $this->serializer->serialize($response, 'json');
+      $venue_serialization_context = SerializationContext::create();
+
+      $venue_serialization_context->setGroups(array('read'));
+
+      echo $this->serializer->serialize($response, 'json', $venue_serialization_context);
     }
   }
 }

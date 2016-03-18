@@ -18,13 +18,14 @@ class Machine {
    * @ORM\Column(type="integer")
    * @ORM\GeneratedValue
    * @JMS\Type("integer")
+   * @JMS\Groups({"read"})
    */
   protected $id;
 
   /**
    * @JMS\Type("integer")
    * @JMS\Accessor(getter="getIpdb", setter="setIpdb")
-   * @JMS\Groups({"create","update"})
+   * @JMS\Groups({"create","read","update"})
    */
   protected $ipdb;
 
@@ -36,21 +37,21 @@ class Machine {
 
   /**
    * @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines")
-   * @JMS\Type("PF\Venue")
+   * @JMS\Exclude
    */
   protected $venue;
 
   /**
    * @ORM\Column(name="`condition`", type="integer", nullable=true)
    * @JMS\Type("integer")
-   * @JMS\Groups({"create","update"})
+   * @JMS\Groups({"create","read","update"})
    */
   protected $condition;
 
   /**
    * @ORM\Column(type="string", nullable=true)
    * @JMS\Type("string")
-   * @JMS\Groups({"create","update"})
+   * @JMS\Groups({"create","read","update"})
    */
   protected $price;
 
@@ -72,6 +73,7 @@ class Machine {
   /**
    * @JMS\VirtualProperty
    * @JMS\Type("integer")
+   * @JMS\Groups({"read"})
    */
   public function getIpdb() {
     return !empty($this->game) ? $this->game->getId() : null;
@@ -80,6 +82,7 @@ class Machine {
   /**
    * @JMS\VirtualProperty
    * @JMS\Type("string")
+   * @JMS\Groups({"read"})
    */
   public function getName() {
     return !empty($this->game) ? $this->game->getName() : null;
@@ -88,6 +91,7 @@ class Machine {
   /**
    * @JMS\VirtualProperty
    * @JMS\Type("boolean")
+   * @JMS\Groups({"read"})
    */
   public function getNew() {
     return !empty($this->game) ? $this->game->getNew() : null;
@@ -96,6 +100,7 @@ class Machine {
   /**
    * @JMS\VirtualProperty
    * @JMS\Type("boolean")
+   * @JMS\Groups({"read"})
    */
   public function getRare() {
     return !empty($this->game) ? $this->game->getRare() : null;

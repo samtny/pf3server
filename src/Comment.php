@@ -16,6 +16,7 @@ class Comment {
   /**
    * @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue
    * @JMS\Type("integer")
+   * @JMS\Groups({"read"})
    */
   protected $id;
 
@@ -28,14 +29,14 @@ class Comment {
   /**
    * @ORM\Column(type="string")
    * @JMS\Type("string")
-   * @JMS\Groups({"create","update"})
+   * @JMS\Groups({"create","read","update"})
    */
   protected $text;
 
   /**
    * @ORM\Column(type="datetime", options={"default":0})
    * @JMS\Type("DateTime")
-   * @JMS\Exclude
+   * @JMS\Groups({"read"})
    */
   protected $created;
 

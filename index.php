@@ -6,26 +6,28 @@ use \PF\Venue;
 use \PF\Machine;
 use \PF\Comment;
 
-$app->get('/venue/search', function () use ($app, $entityManager, $serializer) {
-  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
+$app->group('/venue', function () use ($app, $entityManager) {
+  $app->get('/search', function () use ($app, $entityManager) {
+    $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
 
-  $venues = [];
+    $venues = [];
 
-  foreach ($venuesIterator as $venue) {
-    $venues[] = $venue;
-  }
+    foreach ($venuesIterator as $venue) {
+      $venues[] = $venue;
+    }
 
-  $app->responseData = array('count' => count($venues), 'venues' => $venues);
-});
+    $app->responseData = array('count' => count($venues), 'venues' => $venues);
+  });
 
-$app->get('/venue/:id', function ($id) use ($app, $entityManager) {
-  $venue = $entityManager->find('\PF\Venue', $id);
+  $app->get('/:id', function ($id) use ($app, $entityManager) {
+    $venue = $entityManager->find('\PF\Venue', $id);
 
-  if (empty($venue)) {
-    $app->notFound();
-  }
+    if (empty($venue)) {
+      $app->notFound();
+    }
 
-  $app->responseData = array('venue' => $venue);
+    $app->responseData = array('venue' => $venue);
+  });
 });
 
 $app->post('/venue', function () use ($app, $entityManager, $serializer) {
