@@ -40,10 +40,10 @@ class Venue {
   /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $zipcode;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"test"}) */
   protected $latitude;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"test"}) */
   protected $longitude;
 
   /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
@@ -52,7 +52,7 @@ class Venue {
   /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
   protected $url;
 
-  /** @ORM\Column(type="string", options={"default":"NEW"}) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", options={"default":"NEW"}) @JMS\Type("string") @JMS\Groups({"test"}) **/
   protected $status;
 
   /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
