@@ -20,14 +20,8 @@ class ResponseMiddleware extends Middleware
     $app = $this->getApplication();
 
     if (!empty($app->responseData) || !empty($app->responseMessage)) {
-      $res = $app->response();
-      $res['Content-Type'] = 'application/json';
-
       $response = array(
         'status' => $app->response->getStatus(),
-        'meta' => array(
-          'memory_get_peak_usage' => memory_get_peak_usage(),
-        ),
       );
 
       if (!empty($app->responseData)) {
@@ -42,7 +36,14 @@ class ResponseMiddleware extends Middleware
 
       $venue_serialization_context->setGroups(array('read'));
 
-      echo $this->serializer->serialize($response, 'json', $venue_serialization_context);
+      $app->response->headers['Content-Type'] = 'application/json';
+
+      $response = $this->serializer->serialize($response, 'json', $venue_serialization_context);
+
+      header('Content-Type: application/json');
+      header('PF-Memory-Get-Peak-Usage: ' . memory_get_peak_usage());
+
+      echo $response;
     }
   }
 }
