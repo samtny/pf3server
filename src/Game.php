@@ -2,56 +2,22 @@
 
 namespace PF;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Entity(repositoryClass="GameRepository")
- * @ORM\Entity @ORM\Table(name="game")
- **/
 class Game {
-
-  /**
-   * @ORM\Id
-   * @ORM\Column(type="integer")
-   */
   protected $id;
-
-  /** @ORM\Column(type="string") */
   protected $name;
-
-  /** @ORM\Column(type="string") */
   protected $name_clean;
-
-  /** @ORM\Column(type="string") */
   protected $name_dm;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $abbreviation;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $year;
-
-  /** @ORM\Column(type="boolean", nullable=true) */
+  protected $manufacturer;
   protected $new;
-
-  /** @ORM\Column(type="boolean", nullable=true) */
   protected $rare;
-
-  /** @ORM\Column(type="datetime") **/
   protected $created;
-
-  /** @ORM\Column(type="datetime") **/
   protected $updated;
 
-  public function __construct($data = array()) {
+  public function __construct() {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
-
-    foreach ($data as $key => $val) {
-      if (property_exists($this, $key)) {
-        $this->{$key} = $val;
-      }
-    }
   }
 
   public function getId() {

@@ -1,0 +1,33 @@
+PF\Game:
+  type: entity
+  repositoryClass: PF\GameRepository
+  table: game
+  id:
+    id:
+      type: integer
+  fields:
+    name:
+      type: string
+    name_clean:
+      type: string
+    name_dm:
+      type: string
+    abbreviation:
+      type: string
+      nullable: true
+    year:
+      type: string
+      nullable: true
+    manufacturer:
+      type: string
+      nullable: true
+    new:
+      type: boolean
+      nullable: true
+    rare:
+      type: boolean
+      nullable: true
+    created:
+      type: datetime
+    updated:
+      type: datetime

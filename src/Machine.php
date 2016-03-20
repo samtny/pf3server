@@ -2,56 +2,15 @@
 
 namespace PF;
 
-use Doctrine\ORM\Mapping as ORM;
-
-use JMS\Serializer\Annotation as JMS;
-
-/**
- * @ORM\Entity @ORM\Table(name="machine")
- * @ORM\HasLifecycleCallbacks
- **/
 class Machine {
-
-  /**
-   * @ORM\Id
-   * @ORM\Column(type="integer")
-   * @ORM\GeneratedValue
-   */
   protected $id;
-
   protected $ipdb;
-
-  /**
-   * @ORM\ManyToOne(targetEntity="Game")
-   */
   protected $game;
-
-  /**
-   * @ORM\ManyToOne(targetEntity="Venue", inversedBy="machines")
-   */
   protected $venue;
-
-  /**
-   * @ORM\Column(name="`condition`", type="integer", nullable=true)
-   */
   protected $condition;
-
-  /**
-   * @ORM\Column(type="string", nullable=true)
-   */
   protected $price;
-
-  /** @ORM\Column(type="boolean", options={"default":false}) */
   protected $deleted;
-
-  /**
-   * @ORM\Column(type="datetime")
-   */
   protected $created;
-
-  /**
-   * @ORM\Column(type="datetime")
-   */
   protected $updated;
 
   public function getIpdb() {

@@ -2,42 +2,14 @@
 
 namespace PF;
 
-use Doctrine\ORM\Mapping as ORM;
-
-use JMS\Serializer\Annotation as JMS;
-
-/**
- * @ORM\Entity @ORM\Table(name="comment")
- * @ORM\HasLifecycleCallbacks
- **/
 class Comment {
-
-  /**
-   * @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue
-   */
   protected $id;
-
-  /**
-   * @ORM\ManyToOne(targetEntity="Venue", inversedBy="comments")
-   */
   protected $venue;
-
-  /**
-   * @ORM\Column(type="string")
-   */
   protected $text;
-
-  /**
-   * @ORM\Column(type="datetime", options={"default":0})
-   */
   protected $created;
-
-  /**
-   * @ORM\Column(type="datetime")
-   */
   protected $updated;
 
-  public function __construct($data = array()) {
+  public function __construct() {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
   }

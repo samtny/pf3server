@@ -4,80 +4,29 @@ namespace PF;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Doctrine\ORM\Mapping as ORM;
-
-use JMS\Serializer\Annotation as JMS;
-
-/**
- * @ORM\Entity(repositoryClass="VenueRepository")
- * @ORM\Table(name="venue",indexes={@ORM\Index(name="latitude_longitude_idx", columns={"latitude", "longitude"})})
- * @ORM\HasLifecycleCallbacks
- * @JMS\ExclusionPolicy("none")
- **/
 class Venue {
-
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue */
   protected $id;
-
-  /** @ORM\Column(type="string") */
   protected $name;
-
-  /** @ORM\Column(type="string") */
   protected $name_clean;
-
-  /** @ORM\Column(type="string") */
   protected $name_dm;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $street;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $city;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $state;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $zipcode;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $latitude;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $longitude;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $phone;
-
-  /** @ORM\Column(type="string", nullable=true)*/
   protected $url;
-
-  /** @ORM\Column(type="string", options={"default":"NEW"}) */
   protected $status;
-
-  /** @ORM\Column(type="string", nullable=true) */
   protected $flag_reason;
-
-  /** @ORM\Column(type="datetime") */
   protected $created;
-
-  /** @ORM\Column(type="datetime") */
   protected $updated;
-
-  /** @ORM\Column(type="integer", nullable=true) */
   protected $legacy_key;
 
-  /**
-   * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove", "merge"})
-   */
   protected $machines;
-
-  /**
-   * @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove", "merge"})
-   */
   protected $comments;
 
-  public function __construct($data = array()) {
+  public function __construct() {
     $this->machines = new ArrayCollection();
     $this->comments = new ArrayCollection();
     $this->created = new \DateTime("now");
@@ -146,44 +95,26 @@ class Venue {
     $this->updated = $updated;
   }
 
-  /**
-   * @return mixed
-   */
   public function getCity() {
     return $this->city;
   }
 
-  /**
-   * @param mixed $city
-   */
   public function setCity($city) {
     $this->city = $city;
   }
 
-  /**
-   * @return mixed
-   */
   public function getState() {
     return $this->state;
   }
 
-  /**
-   * @param mixed $state
-   */
   public function setState($state) {
     $this->state = $state;
   }
 
-  /**
-   * @return mixed
-   */
   public function getZipcode() {
     return $this->zipcode;
   }
 
-  /**
-   * @param mixed $zipcode
-   */
   public function setZipcode($zipcode) {
     $this->zipcode = $zipcode;
   }
@@ -204,44 +135,26 @@ class Venue {
     $this->longitude = $longitude;
   }
 
-  /**
-   * @return mixed
-   */
   public function getPhone() {
     return $this->phone;
   }
 
-  /**
-   * @param mixed $phone
-   */
   public function setPhone($phone) {
     $this->phone = $phone;
   }
 
-  /**
-   * @return mixed
-   */
   public function getUrl() {
     return $this->url;
   }
 
-  /**
-   * @param mixed $url
-   */
   public function setUrl($url) {
     $this->url = $url;
   }
 
-  /**
-   * @return mixed
-   */
   public function getFlagReason() {
     return $this->flag_reason;
   }
 
-  /**
-   * @param mixed $flag_reason
-   */
   public function setFlagReason($flag_reason) {
     $this->flag_reason = $flag_reason;
   }

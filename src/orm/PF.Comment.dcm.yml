@@ -1,0 +1,20 @@
+PF\Comment:
+  type: entity
+  repositoryClass: PF\CommentRepository
+  table: comment
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    text:
+      type: string
+    created:
+      type: datetime
+    updated:
+      type: datetime
+  manyToOne:
+    venue:
+      targetEntity: PF\Venue
+      inversedBy: comments

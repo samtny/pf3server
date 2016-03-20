@@ -1,0 +1,30 @@
+PF\Machine:
+  type: entity
+  repositoryClass: PF\MachineRepository
+  table: machine
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    condition:
+      type: integer
+      nullable: true
+    price:
+      type: string
+      nullable: true
+    deleted:
+      type: boolean
+      options:
+        default: false
+    created:
+      type: datetime
+    updated:
+      type: datetime
+  manyToOne:
+    venue:
+      targetEntity: PF\Venue
+      inversedBy: machines
+    game:
+      targetEntity: PF\Game
