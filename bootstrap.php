@@ -1,15 +1,11 @@
 <?php
 
-use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
-
-use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\ORM\Tools\Setup;
 
 require_once "vendor/autoload.php";
 
 require_once "src/DoubleMetaPhone.php";
-
-AnnotationRegistry::registerAutoloadNamespace('JMS\Serializer\Annotation', __DIR__ . "/vendor/jms/serializer/src");
 
 $app = new \PF\PinfinderApp(
   array(
@@ -40,15 +36,15 @@ $app->configureMode('production', function () use ($app) {
   ));
 });
 
-$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/src"), $app->getMode() === 'development', null, null, false);
+$config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/orm'), $app->getMode() === 'development', null, null);
+
+//$config->setQueryCacheImpl(new \Doctrine\Common\Cache\ApcCache());
+//$config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ApcCache());
 
 $config->addCustomNumericFunction('sin', '\DoctrineExtensions\Query\Mysql\Sin');
 $config->addCustomNumericFunction('cos', '\DoctrineExtensions\Query\Mysql\Cos');
 $config->addCustomNumericFunction('acos', '\DoctrineExtensions\Query\Mysql\Acos');
 $config->addCustomNumericFunction('radians', '\DoctrineExtensions\Query\Mysql\Radians');
-
-//$config->setQueryCacheImpl(new \Doctrine\Common\Cache\ApcCache());
-//$config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ApcCache());
 
 $conn = array(
   'driver' => 'pdo_mysql',
@@ -80,14 +76,11 @@ $object_constructor = new \JMS\Serializer\Construction\DoctrineObjectConstructor
 
 $initialized_object_constructor = new \PF\InitializedObjectConstructor($object_constructor);
 
-//$serializer = JMS\Serializer\SerializerBuilder::create()->setCacheDir('/tmp')->setDebug($app->getMode() === 'development')->build();
-//$serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->build();
 $serializer = JMS\Serializer\SerializerBuilder::create()
-  ->setMetadataDirs(array('PF' => __DIR__ . '/src'))
+  ->setMetadataDirs(array('PF' => __DIR__ . '/src/jms'))
   ->setDebug($app->getMode() === 'development')
   ->setObjectConstructor($initialized_object_constructor)
   //->setCacheDir('/tmp')
   ->build();
-//$serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->setObjectConstructor($object_constructor)->build();
 
 $app->add(new \PF\ResponseMiddleware($serializer));
