@@ -2,7 +2,7 @@
   hosts: all
   remote_user: root
   pre_tasks:
-    - shell: sudo apt-get update
+    - apt: update_cache=yes
   roles:
     - common
 
