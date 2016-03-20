@@ -1,6 +1,5 @@
 PF\Machine:
   type: entity
-  repositoryClass: PF\MachineRepository
   table: machine
   id:
     id:
@@ -11,6 +10,7 @@ PF\Machine:
     condition:
       type: integer
       nullable: true
+      column: "`condition`"
     price:
       type: string
       nullable: true
