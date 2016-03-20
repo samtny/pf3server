@@ -2,10 +2,6 @@
 
 require_once 'bootstrap.php';
 
-use \PF\Venue;
-use \PF\Machine;
-use \PF\Comment;
-
 $app->group('/venue', function () use ($app, $entityManager) {
   $app->get('/search', function () use ($app, $entityManager) {
     $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
