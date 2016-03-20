@@ -5,7 +5,8 @@
     "slim/views": "0.1.*",
     "twig/twig": "1.*",
     "beberlei/DoctrineExtensions": "^1.0",
-    "jms/serializer": "^1.1"
+    "jms/serializer": "^1.1",
+    "symfony/yaml": "^3.0"
   },
   "autoload": {
     "psr-4": { "PF\\": "src/" }

@@ -1,0 +1,53 @@
+PF\Machine:
+  exclusion_policy: NONE
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, name, ipdb, condition, price, created, updated]
+  virtual_properties:
+    getIpdb:
+      serialized_name: ipdb
+      type: integer
+      groups: [read]
+    getName:
+      serialized_name: name
+      type: string
+      groups: [read]
+    getNew:
+      serialized_name: new
+      type: boolean
+      groups: [read]
+    getRare:
+      serialized_name: rare
+      type: boolean
+      groups: [read]
+  properties:
+    id:
+      type: integer
+      groups: [read]
+    ipdb:
+      type: integer
+      groups: [create, read, update]
+      access_type: public_method
+    game:
+      exclude: true
+    venue:
+      exclude: true
+    condition:
+      type: integer
+      groups: [create, read, update]
+    price:
+      type: integer
+      groups: [create, read, update]
+    deleted:
+      type: boolean
+      groups: [create, update]
+    created:
+      type: DateTime
+      groups: [read]
+    updated:
+      type: DateTime
+      groups: [read]
+  callback_methods:
+    post_deserialize: [postDeserialize]

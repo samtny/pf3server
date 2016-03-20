@@ -82,7 +82,12 @@ $initialized_object_constructor = new \PF\InitializedObjectConstructor($object_c
 
 //$serializer = JMS\Serializer\SerializerBuilder::create()->setCacheDir('/tmp')->setDebug($app->getMode() === 'development')->build();
 //$serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->build();
-$serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->setObjectConstructor($initialized_object_constructor)->build();
+$serializer = JMS\Serializer\SerializerBuilder::create()
+  ->setMetadataDirs(array('PF' => __DIR__ . '/src'))
+  ->setDebug($app->getMode() === 'development')
+  ->setObjectConstructor($initialized_object_constructor)
+  //->setCacheDir('/tmp')
+  ->build();
 //$serializer = JMS\Serializer\SerializerBuilder::create()->setDebug($app->getMode() === 'development')->setObjectConstructor($object_constructor)->build();
 
 $app->add(new \PF\ResponseMiddleware($serializer));

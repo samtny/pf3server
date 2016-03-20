@@ -1,0 +1,21 @@
+PF\Comment:
+  exclusion_policy: NONE
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, text, created, updated]
+  properties:
+    id:
+      type: integer
+      groups: [read]
+    venue:
+      exclude: true
+    text:
+      type: string
+      groups: [create, read, update]
+    created:
+      type: DateTime
+      groups: [read]
+    updated:
+      exclude: true

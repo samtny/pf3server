@@ -16,68 +16,64 @@ use JMS\Serializer\Annotation as JMS;
  **/
 class Venue {
 
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue @JMS\Type("integer") @JMS\Groups({"read"}) **/
+  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue */
   protected $id;
 
-  /** @ORM\Column(type="string") @JMS\Type("string") @JMS\Accessor(setter="setName") @JMS\Groups({"create","read","update"}) **/
+  /** @ORM\Column(type="string") */
   protected $name;
 
-  /** @ORM\Column(type="string") @JMS\Exclude */
+  /** @ORM\Column(type="string") */
   protected $name_clean;
 
-  /** @ORM\Column(type="string") @JMS\Exclude */
+  /** @ORM\Column(type="string") */
   protected $name_dm;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) */
   protected $street;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) */
   protected $city;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) */
   protected $state;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) */
   protected $zipcode;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","read","update"}) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $latitude;
 
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) @JMS\Type("double") @JMS\Groups({"create","read","update"}) */
+  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $longitude;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
+  /** @ORM\Column(type="string", nullable=true) */
   protected $phone;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") @JMS\Groups({"create","read","update"}) **/
+  /** @ORM\Column(type="string", nullable=true)*/
   protected $url;
 
-  /** @ORM\Column(type="string", options={"default":"NEW"}) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", options={"default":"NEW"}) */
   protected $status;
 
-  /** @ORM\Column(type="string", nullable=true) @JMS\Type("string") **/
+  /** @ORM\Column(type="string", nullable=true) */
   protected $flag_reason;
 
-  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") @JMS\Groups({"read"}) */
+  /** @ORM\Column(type="datetime") */
   protected $created;
 
-  /** @ORM\Column(type="datetime") @JMS\Type("DateTime") @JMS\Groups({"read"}) */
+  /** @ORM\Column(type="datetime") */
   protected $updated;
 
-  /** @ORM\Column(type="integer", nullable=true) @JMS\Exclude */
+  /** @ORM\Column(type="integer", nullable=true) */
   protected $legacy_key;
 
   /**
    * @ORM\OneToMany(targetEntity="Machine", mappedBy="venue", cascade={"persist", "remove", "merge"})
-   * @JMS\Type("ArrayCollection<PF\Machine>")
-   * @JMS\Groups({"read"})
    */
   protected $machines;
 
   /**
    * @ORM\OneToMany(targetEntity="Comment", mappedBy="venue", cascade={"persist", "remove", "merge"})
-   * @JMS\Type("ArrayCollection<PF\Comment>")
-   * @JMS\Groups({"read"})
    */
   protected $comments;
 

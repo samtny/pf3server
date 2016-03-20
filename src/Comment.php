@@ -9,41 +9,31 @@ use JMS\Serializer\Annotation as JMS;
 /**
  * @ORM\Entity @ORM\Table(name="comment")
  * @ORM\HasLifecycleCallbacks
- * @JMS\ExclusionPolicy("none")
  **/
 class Comment {
 
   /**
    * @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue
-   * @JMS\Type("integer")
-   * @JMS\Groups({"read"})
    */
   protected $id;
 
   /**
    * @ORM\ManyToOne(targetEntity="Venue", inversedBy="comments")
-   * @JMS\Type("PF\Venue")
    */
   protected $venue;
 
   /**
    * @ORM\Column(type="string")
-   * @JMS\Type("string")
-   * @JMS\Groups({"create","read","update"})
    */
   protected $text;
 
   /**
    * @ORM\Column(type="datetime", options={"default":0})
-   * @JMS\Type("DateTime")
-   * @JMS\Groups({"read"})
    */
   protected $created;
 
   /**
    * @ORM\Column(type="datetime")
-   * @JMS\Type("DateTime")
-   * @JMS\Exclude
    */
   protected $updated;
 

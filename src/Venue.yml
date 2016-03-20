@@ -1,0 +1,67 @@
+PF\Venue:
+  exclusion_policy: NONE
+  xml_root_name: pinfinderapp
+  xml_root_namespace: http://pinballfinder.org
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, name, street, city, state, zipcode, phone, latitude, longitude, url, created, updated, machines, comments]
+  properties:
+    id:
+      type: integer
+      groups: [read]
+    name:
+      type: string
+      access_type: public_method
+      accessor:
+        setter: setName
+      groups: [create, read, update]
+    name_clean:
+      exclude: true
+    name_dm:
+      exclude: ture
+    street:
+      type: string
+      groups: [create, read, update]
+    city:
+      type: string
+      groups: [create, read, update]
+    state:
+      type: string
+      groups: [create, read, update]
+    zipcode:
+      type: string
+      groups: [create, read, update]
+    phone:
+      type: string
+      groups: [create, read, update]
+    latitude:
+      type: double
+      groups: [create, read, update]
+    longitude:
+      type: double
+      groups: [create, read, update]
+    url:
+      type: string
+      groups: [create, read, update]
+    status:
+      type: string
+      groups: [admin]
+    flag_reason:
+      type: string
+      groups: [admin]
+    created:
+      type: DateTime
+      groups: [read]
+    updated:
+      type: DateTime
+      groups: [read]
+    legacy_key:
+      exclude: true
+    machines:
+      type: ArrayCollection<PF\Machine>
+      groups: [read]
+    comments:
+      type: ArrayCollection<PF\Comment>
+      groups: [read]
