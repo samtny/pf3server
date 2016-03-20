@@ -36,8 +36,6 @@ class ResponseMiddleware extends Middleware
 
       $venue_serialization_context->setGroups(array('read'));
 
-      $app->response->headers['Content-Type'] = 'application/json';
-
       $response = $this->serializer->serialize($response, 'json', $venue_serialization_context);
 
       header('Content-Type: application/json');
