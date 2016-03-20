@@ -44,10 +44,8 @@ PF\Machine:
       type: boolean
       groups: [create, update]
     created:
-      type: DateTime
-      groups: [read]
+      exclude: true
     updated:
-      type: DateTime
-      groups: [read]
+      exclude: true
   callback_methods:
     post_deserialize: [postDeserialize]
