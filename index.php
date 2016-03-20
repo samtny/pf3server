@@ -29,7 +29,7 @@ $app->group('/venue', function () use ($app, $entityManager) {
 $app->post('/venue', function () use ($app, $entityManager, $venueDeserializer) {
   $venue = $venueDeserializer->deserialize($app->request->getBody());
 
-  $is_new_venue = !empty($venue->getId());
+  $is_new_venue = empty($venue->getId());
 
   try {
     $entityManager->persist($venue);
