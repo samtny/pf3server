@@ -38,7 +38,7 @@ PF\Machine:
       type: integer
       groups: [create, read, update]
     price:
-      type: integer
+      type: string
       groups: [create, read, update]
     deleted:
       type: boolean
