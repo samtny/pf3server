@@ -84,3 +84,7 @@ $serializer = JMS\Serializer\SerializerBuilder::create()
   ->build();
 
 $app->add(new \PF\ResponseMiddleware($serializer));
+
+$venueDeserializer = new \PF\VenueDeserializer();
+$venueDeserializer->setEntityManager($entityManager);
+$venueDeserializer->setSerializer($serializer);
