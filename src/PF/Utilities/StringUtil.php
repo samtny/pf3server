@@ -9,7 +9,7 @@ class StringUtil {
     // special case of 's;
     $clean = preg_replace("/'s\s/i", "s ", $clean);
 
-    // parenthetical;
+    // text between parentheses;
     $clean = preg_replace("/\(.+\)/", "", $clean);
 
     // &amp
