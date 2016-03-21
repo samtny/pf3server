@@ -3,8 +3,8 @@ PF\Venue:
   repositoryClass: PF\VenueRepository
   table: venue
   indexes:
-    latitude_longitude_idx:
-      columns: [ latitude, longitude ]
+    latitude_longitude_status_updated_idx:
+      columns: [ latitude, longitude, status, updated ]
   id:
     id:
       type: integer
