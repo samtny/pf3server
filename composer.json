@@ -1,6 +1,7 @@
 {
   "name": "Pinball Finder Server",
   "description": "Pinball Finder Server",
+  "license": "MIT",
   "require": {
     "doctrine/orm": "2.5.*",
     "slim/slim": "2.*",
