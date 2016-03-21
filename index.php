@@ -49,9 +49,6 @@ $app->get('/game/:id', function ($id) use ($app, $entityManager) {
     $app->notFound();
   }
 
-  $res = $app->response();
-
-  $res['Content-Type'] = 'application/json';
   $app->render('game.json', array('game' => $game));
 });
 

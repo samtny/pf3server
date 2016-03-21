@@ -36,7 +36,7 @@ class Machine {
     $this->setGame($game);
   }
 
-  public function __construct($data = array()) {
+  public function __construct() {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
     $this->deleted = false;

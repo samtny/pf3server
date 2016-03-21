@@ -54,10 +54,8 @@ $conn = array(
 
 $entityManager = EntityManager::create($conn, $config);
 
-$connection = $entityManager->getConnection();
-
 $registry = new \PF\Serializer\SimpleManagerRegistry(
-  function($id) use($connection, $entityManager) {
+  function($id) use($entityManager) {
     switch ($id) {
       case 'default_manager':
         return $entityManager;
