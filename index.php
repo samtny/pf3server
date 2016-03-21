@@ -42,6 +42,22 @@ $app->group('/venue', function () use ($app, $entityManager, $venueDeserializer)
       $app->notFound();
     }
   });
+
+  $app->delete('/:id', function ($id) use ($app, $entityManager) {
+    $venue = $entityManager->find('\PF\Venue', $id);
+
+    if (empty($venue)) {
+      $app->notFound();
+    }
+
+    $venue->delete();
+
+    $entityManager->persist($venue);
+
+    $entityManager->flush();
+
+    $app->responseMessage = 'Deleted Venue with ID ' . $venue->getId();
+  });
 });
 
 $app->group('/game', function () use ($app, $entityManager) {
