@@ -85,11 +85,19 @@ class VenueRepository extends EntityRepository {
       $game_clean = StringUtil::cleanName($game);
       $game_dm = StringUtil::dmName($game);
 
-      $qb->andWhere($qb->expr()->orX(
-        $qb->expr()->like('g.name_clean', ':game_clean'),
-        $qb->expr()->like('g.name_dm', ':game_dm')
-      ))
-        ->setParameter('game_clean', '%' . $game_clean . '%')
+      $qb2 = $this->getEntityManager()->createQueryBuilder();
+
+      $qb2->select(array('identity(m2.venue)'))
+        ->from('PF\Machine', 'm2')
+        ->innerJoin('m2.game', 'g2')
+        ->where($qb->expr()->andX(
+          $qb->expr()->like('g2.name_clean', ':game_clean'),
+          $qb->expr()->like('g2.name_dm', ':game_dm')
+        ));
+
+      $qb->andWhere($qb->expr()->in('v.id', $qb2->getDQL()));
+
+      $qb->setParameter('game_clean', '%' . $game_clean . '%')
         ->setParameter('game_dm', '%' . $game_dm . '%');
     }
 
