@@ -15,5 +15,7 @@
     "psr-4": { "PF\\": "src/PF/" }
   },
   "require-dev": {
+    "guzzlehttp/guzzle": "^6.1",
+    "phpunit/phpunit": "^5.2"
   }
 }
