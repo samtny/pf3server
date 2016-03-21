@@ -185,6 +185,10 @@ class Venue {
     $this->status = "APPROVED";
   }
 
+  public function delete() {
+    $this->status = "DELETED";
+  }
+
   public function getLegacyKey() {
     return $this->legacy_key;
   }
