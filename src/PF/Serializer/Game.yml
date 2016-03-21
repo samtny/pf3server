@@ -1,0 +1,30 @@
+PF\Game:
+  exclusion_policy: NONE
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, name, created, updated]
+  properties:
+    id:
+      type: integer
+      groups: [read]
+    name:
+      type: string
+      groups: [read]
+    year:
+      type: string
+      groups: [read]
+    manufacturer:
+      type: string
+      groups: [read]
+    new:
+      type: boolean
+      groups: [read]
+    rare:
+      type: boolean
+      groups: [read]
+    created:
+      exclude: true
+    updated:
+      exclude: true
