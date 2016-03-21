@@ -35,6 +35,8 @@ $app->group('/venue', function () use ($app, $entityManager, $venueDeserializer)
 
       $entityManager->flush();
 
+      $app->status($is_new_venue ? 201 : 200);
+
       $app->responseMessage = ($is_new_venue ? 'Created Venue with ID ' : 'Updated Venue with ID ') . $venue->getId();
     } catch (\Doctrine\ORM\EntityNotFoundException $e) {
       $app->notFound();
