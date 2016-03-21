@@ -4,6 +4,8 @@ namespace PF\Doctrine;
 
 use Doctrine\ORM\EntityRepository;
 
+use PF\Geocode;
+
 class GeocodeRepository extends EntityRepository {
   private $base_url = "http://maps.googleapis.com/maps/api/geocode/xml?sensor=false";
 
@@ -44,7 +46,7 @@ class GeocodeRepository extends EntityRepository {
     $response = curl_exec($ch);
     curl_close($ch);
 
-    $xml = simplexml_load_string($response) or die();
+    $xml = simplexml_load_string($response);
 
     $status = $xml->status;
 
