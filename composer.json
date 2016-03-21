@@ -12,6 +12,8 @@
     "symfony/yaml": "^3.0"
   },
   "autoload": {
-    "psr-4": { "PF\\": "src/" }
+    "psr-4": { "PF\\": "src/PF/" }
+  },
+  "require-dev": {
   }
 }
