@@ -6,8 +6,9 @@ use GuzzleHttp\Client;
 
 class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 {
-  public function testPOST()
-  {
+  private $createdVenueId;
+
+  public function testCreateVenue() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
@@ -48,5 +49,52 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 
     $this->assertArrayHasKey('status', $data);
     $this->assertArrayHasKey('message', $data);
+
+    $message = $data['message'];
+
+    $this->assertContains('with ID ', $message);
+
+    preg_match('/with\sID\s([0-9]+)?/', $message, $matches);
+
+    return $matches[1];
+  }
+
+  /**
+   * @depends testCreateVenue
+   */
+  public function testDeleteVenue($id) {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $response = $client->delete('/venue/' . $id);
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $data = json_decode($response->getBody(), true);
+
+    $this->assertArrayHasKey('status', $data);
+    $this->assertArrayHasKey('message', $data);
+
+    $message = $data['message'];
+
+    $this->assertContains('with ID ', $message);
+
+    return $id;
+  }
+
+  /**
+   * @depends testDeleteVenue
+   */
+  public function testGetDeletedVenue($id) {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $response = $client->get('/venue/' . $id);
+
+    $this->assertEquals(404, $response->getStatusCode());
   }
 }
