@@ -16,7 +16,7 @@ $app->group('/venue', function () use ($app, $entityManager, $venueDeserializer)
   });
 
   $app->get('/:id', function ($id) use ($app, $entityManager) {
-    $venue = $entityManager->find('\PF\Venue', $id);
+    $venue = $entityManager->getRepository('\PF\Venue')->find($id);
 
     if (empty($venue)) {
       $app->notFound();
@@ -44,7 +44,7 @@ $app->group('/venue', function () use ($app, $entityManager, $venueDeserializer)
   });
 
   $app->delete('/:id', function ($id) use ($app, $entityManager) {
-    $venue = $entityManager->find('\PF\Venue', $id);
+    $venue = $entityManager->getRepository('\PF\Venue')->find($id);
 
     if (empty($venue)) {
       $app->notFound();
