@@ -9,6 +9,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use PF\Utilities\StringUtil;
 
 class VenueRepository extends EntityRepository {
+  public function find($id) {
+    $venue = parent::find($id);
+
+    if (!empty($venue)) {
+      if ($venue->getStatus() === 'DELETED') {
+        $venue = null;
+      }
+    };
+
+    return $venue;
+  }
+
   public function getVenues($request) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
