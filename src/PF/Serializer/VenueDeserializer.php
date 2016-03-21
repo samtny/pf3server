@@ -46,46 +46,60 @@ class VenueDeserializer
 
     $venue = $this->getSerializer()->deserialize($json_venue_encoded, 'PF\Venue', 'json', $venue_deserialization_context);
 
-    foreach ($json_venue_decoded['machines'] as $json_machine_decoded) {
-      $json_machine_encoded = json_encode($json_machine_decoded);
+    if (!empty($json_venue_decoded['machines'])) {
+      foreach ($json_venue_decoded['machines'] as $json_machine_decoded) {
+        $json_machine_encoded = json_encode($json_machine_decoded);
 
-      $is_new_machine = empty($json_machine_decoded['id']);
+        $is_new_machine = empty($json_machine_decoded['id']);
 
-      $machine_deserialization_context = DeserializationContext::create();
+        $machine_deserialization_context = DeserializationContext::create();
 
-      if ($is_new_machine) {
-        $machine_deserialization_context->setGroups(array('create'));
-        $machine_deserialization_context->setAttribute('target', new Machine());
-      } else {
-        $machine_deserialization_context->setGroups(array('update'));
-        $machine_deserialization_context->setAttribute('target', $this->getEntityManager()->getRepository('\PF\Machine')->find($json_machine_decoded['id']));
+        if ($is_new_machine) {
+          $machine_deserialization_context->setGroups(array('create'));
+          $machine_deserialization_context->setAttribute('target', new Machine());
+        }
+        else {
+          $machine_deserialization_context->setGroups(array('update'));
+          $machine_deserialization_context->setAttribute('target', $this->getEntityManager()
+            ->getRepository('\PF\Machine')
+            ->find($json_machine_decoded['id']));
+        }
+
+        $machine = $this->getSerializer()
+          ->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
+
+        $machine->setGame($this->getEntityManager()
+          ->getRepository('\PF\Game')
+          ->find($machine->getIpdb()));
+
+        $venue->addMachine($machine);
       }
-
-      $machine = $this->getSerializer()->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
-
-      $machine->setGame($this->getEntityManager()->getRepository('\PF\Game')->find($machine->getIpdb()));
-
-      $venue->addMachine($machine);
     }
 
-    foreach ($json_venue_decoded['comments'] as $json_comment_decoded) {
-      $json_comment_encoded = json_encode($json_comment_decoded);
+    if (!empty($json_venue_decoded['comments'])) {
+      foreach ($json_venue_decoded['comments'] as $json_comment_decoded) {
+        $json_comment_encoded = json_encode($json_comment_decoded);
 
-      $is_new_comment = empty($json_comment_decoded['id']);
+        $is_new_comment = empty($json_comment_decoded['id']);
 
-      $comment_deserialization_context = DeserializationContext::create();
+        $comment_deserialization_context = DeserializationContext::create();
 
-      if ($is_new_comment) {
-        $comment_deserialization_context->setGroups(array('create'));
-        $comment_deserialization_context->setAttribute('target', new Comment());
-      } else {
-        $comment_deserialization_context->setGroups(array('update'));
-        $comment_deserialization_context->setAttribute('target', $this->getEntityManager()->getRepository('\PF\Comment')->find($json_comment_decoded['id']));
+        if ($is_new_comment) {
+          $comment_deserialization_context->setGroups(array('create'));
+          $comment_deserialization_context->setAttribute('target', new Comment());
+        }
+        else {
+          $comment_deserialization_context->setGroups(array('update'));
+          $comment_deserialization_context->setAttribute('target', $this->getEntityManager()
+            ->getRepository('\PF\Comment')
+            ->find($json_comment_decoded['id']));
+        }
+
+        $comment = $this->getSerializer()
+          ->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_deserialization_context);
+
+        $venue->addComment($comment);
       }
-
-      $comment = $this->getSerializer()->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_deserialization_context);
-
-      $venue->addComment($comment);
     }
 
     return $venue;
