@@ -16,8 +16,6 @@ PF\Machine:
       nullable: true
     deleted:
       type: boolean
-      options:
-        default: false
     created:
       type: datetime
     updated:

@@ -49,8 +49,6 @@ PF\Venue:
       nullable: true
     status:
       type: string
-      options:
-        default: "NEW"
     flag_reason:
       type: string
       nullable: true
