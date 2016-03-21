@@ -1,5 +1,5 @@
 {
-  "name": "Pinball Finder Server",
+  "name": "samtny/pf3server",
   "description": "Pinball Finder Server",
   "license": "MIT",
   "require": {
