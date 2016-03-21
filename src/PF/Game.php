@@ -2,6 +2,8 @@
 
 namespace PF;
 
+use PF\Utilities\StringUtil;
+
 class Game {
   protected $id;
   protected $name;
