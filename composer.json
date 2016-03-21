@@ -1,4 +1,6 @@
 {
+  "name": "pf3server",
+  "description": "pf3server",
   "require": {
     "doctrine/orm": "2.5.*",
     "slim/slim": "2.*",
