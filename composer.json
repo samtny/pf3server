@@ -1,6 +1,6 @@
 {
-  "name": "pf3server",
-  "description": "pf3server",
+  "name": "Pinball Finder Server",
+  "description": "Pinball Finder Server",
   "require": {
     "doctrine/orm": "2.5.*",
     "slim/slim": "2.*",
