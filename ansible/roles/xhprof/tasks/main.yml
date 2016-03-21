@@ -17,6 +17,9 @@
 - name: Copy xhprof_html
   copy: src=xhprof_html dest=/usr/share/php
 
+- name: Copy xhprof_lib
+  copy: src=xhprof_lib dest=/usr/share/php
+
 - name: Create xhprof vhost entry
   template: src=xhprof.j2 dest=/etc/nginx/sites-available/xhprof owner=root group=root mode=644
   notify: Reload nginx
