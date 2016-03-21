@@ -1,6 +1,6 @@
 <?php
 
-namespace PF;
+namespace PF\Doctrine;
 
 use Doctrine\ORM\EntityRepository;
 

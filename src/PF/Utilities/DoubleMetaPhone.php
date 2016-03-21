@@ -33,6 +33,8 @@
 //
 // ------------------------------------------------------------------
 
+namespace PF\Utilities;
+
 class DoubleMetaPhone
 {
 //  properties

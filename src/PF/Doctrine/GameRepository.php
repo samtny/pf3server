@@ -1,10 +1,8 @@
 <?php
 
-namespace PF;
+namespace PF\Doctrine;
 
-use Doctrine;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class GameRepository extends EntityRepository {
 

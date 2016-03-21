@@ -1,8 +1,6 @@
 <?php
 
-namespace PF;
-
-use DoubleMetaPhone;
+namespace PF\Utilities;
 
 class StringUtil {
   public static function cleanName($name) {

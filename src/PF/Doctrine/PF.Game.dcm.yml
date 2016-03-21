@@ -1,6 +1,6 @@
 PF\Game:
   type: entity
-  repositoryClass: PF\GameRepository
+  repositoryClass: PF\Doctrine\GameRepository
   table: game
   id:
     id:

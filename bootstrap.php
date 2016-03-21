@@ -5,9 +5,7 @@ use Doctrine\ORM\Tools\Setup;
 
 require_once "vendor/autoload.php";
 
-require_once "src/DoubleMetaPhone.php";
-
-$app = new \PF\PinfinderApp(
+$app = new \PF\Slim\PinfinderApp(
   array(
     'mode' => 'development',
     'view' => new \Slim\Views\Twig(),
@@ -36,7 +34,7 @@ $app->configureMode('production', function () use ($app) {
   ));
 });
 
-$config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/orm'), $app->getMode() === 'development', null, null);
+$config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine'), $app->getMode() === 'development', null, null);
 
 //$config->setQueryCacheImpl(new \Doctrine\Common\Cache\ApcCache());
 //$config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ApcCache());
@@ -58,7 +56,7 @@ $entityManager = EntityManager::create($conn, $config);
 
 $connection = $entityManager->getConnection();
 
-$registry = new \PF\SimpleManagerRegistry(
+$registry = new \PF\Serializer\SimpleManagerRegistry(
   function($id) use($connection, $entityManager) {
     switch ($id) {
       case 'default_manager':
@@ -74,17 +72,17 @@ $fallback_constructor = new \JMS\Serializer\Construction\UnserializeObjectConstr
 
 $object_constructor = new \JMS\Serializer\Construction\DoctrineObjectConstructor($registry, $fallback_constructor);
 
-$initialized_object_constructor = new \PF\InitializedObjectConstructor($object_constructor);
+$initialized_object_constructor = new \PF\Serializer\InitializedObjectConstructor($object_constructor);
 
 $serializer = JMS\Serializer\SerializerBuilder::create()
-  ->setMetadataDirs(array('PF' => __DIR__ . '/src/jms'))
+  ->setMetadataDirs(array('PF' => __DIR__ . '/src/PF/Serializer'))
   ->setDebug($app->getMode() === 'development')
   ->setObjectConstructor($initialized_object_constructor)
   //->setCacheDir('/tmp')
   ->build();
 
-$app->add(new \PF\ResponseMiddleware($serializer));
+$app->add(new \PF\Slim\ResponseMiddleware($serializer));
 
-$venueDeserializer = new \PF\VenueDeserializer();
+$venueDeserializer = new \PF\Serializer\VenueDeserializer();
 $venueDeserializer->setEntityManager($entityManager);
 $venueDeserializer->setSerializer($serializer);

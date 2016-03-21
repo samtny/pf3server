@@ -1,6 +1,6 @@
 PF\Comment:
   type: entity
-  repositoryClass: PF\CommentRepository
+  repositoryClass: PF\Doctrine\CommentRepository
   table: comment
   id:
     id:

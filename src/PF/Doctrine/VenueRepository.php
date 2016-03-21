@@ -1,10 +1,12 @@
 <?php
 
-namespace PF;
+namespace PF\Doctrine;
 
 use Doctrine;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+
+use PF\Utilities\StringUtil;
 
 class VenueRepository extends EntityRepository {
   public function getVenues($request) {

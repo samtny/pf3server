@@ -1,6 +1,6 @@
 PF\Venue:
   type: entity
-  repositoryClass: PF\VenueRepository
+  repositoryClass: PF\Doctrine\VenueRepository
   table: venue
   indexes:
     updated_latitude_longitude_status_idx:

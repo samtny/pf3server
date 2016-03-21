@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace PF;
+namespace PF\Serializer;
 
 use JMS\Serializer\VisitorInterface;
 use JMS\Serializer\Metadata\ClassMetadata;

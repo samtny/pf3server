@@ -1,8 +1,12 @@
 <?php
 
-namespace PF;
+namespace PF\Serializer;
 
 use \JMS\Serializer\DeserializationContext;
+
+use PF\Comment;
+use PF\Machine;
+use PF\Venue;
 
 class VenueDeserializer
 {

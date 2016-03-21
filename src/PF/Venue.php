@@ -4,6 +4,8 @@ namespace PF;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use PF\Utilities\StringUtil;
+
 class Venue {
   protected $id;
   protected $name;

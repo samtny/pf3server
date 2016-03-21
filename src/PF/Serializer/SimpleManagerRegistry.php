@@ -1,6 +1,6 @@
 <?php
 
-namespace PF;
+namespace PF\Serializer;
 
 use Doctrine\Common\Persistence\AbstractManagerRegistry;
 use Doctrine\ORM\EntityManager;
