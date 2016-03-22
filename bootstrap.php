@@ -12,7 +12,7 @@ $app = new \PF\Slim\PinfinderApp(
   )
 );
 
-$config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine'), $app->getMode() === 'development', null, null);
+$config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), $app->getMode() === 'development', null, null);
 
 $config->addCustomNumericFunction('sin', '\DoctrineExtensions\Query\Mysql\Sin');
 $config->addCustomNumericFunction('cos', '\DoctrineExtensions\Query\Mysql\Cos');
@@ -48,7 +48,7 @@ $object_constructor = new \JMS\Serializer\Construction\DoctrineObjectConstructor
 $initialized_object_constructor = new \PF\Serializer\InitializedObjectConstructor($object_constructor);
 
 $serializer_builder = JMS\Serializer\SerializerBuilder::create()
-  ->setMetadataDirs(array('PF' => __DIR__ . '/src/PF/Serializer'))
+  ->setMetadataDirs(array('PF' => __DIR__ . '/src/PF/Serializer/yml'))
   ->setDebug($app->getMode() === 'development')
   ->setObjectConstructor($initialized_object_constructor);
 
