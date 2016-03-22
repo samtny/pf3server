@@ -6,6 +6,12 @@ use GuzzleHttp\Client;
 
 class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 {
+  private $bogusCreatedDate;
+
+  public function setUp() {
+    $this->bogusCreatedDate = '2009-09-01T02:49:45+0000';
+  }
+
   public function testCreateVenue() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
@@ -35,11 +41,14 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
           'text' => 'Here is a comment, yo',
         ),
       ),
+      'created' => $this->bogusCreatedDate,
     );
 
     $response = $client->post('/venue', array(
       'body' => json_encode($data),
     ));
+
+    //echo $response->getBody();exit;
 
     $this->assertEquals(201, $response->getStatusCode());
 
@@ -50,11 +59,67 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 
     $message = $data['message'];
 
-    $this->assertContains('with ID ', $message);
+    $this->assertContains('Created', $message);
 
     preg_match('/with\sID\s([0-9]+)?/', $message, $matches);
 
     return $matches[1];
+  }
+
+  /**
+   * @depends testCreateVenue
+   */
+  public function testUpdateVenue($id) {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $data = array(
+      'id' => $id,
+      'name' => 'Arcade Age',
+      'street' => '1018 Commercial Dr.',
+      'city' => 'Brooklyn',
+      'state' => 'New York',
+      'zipcode' => '11238',
+      'latitude' => 30.4331415,
+      'longitude' => -84.2938679,
+      'phone' => '3789337',
+      'url' => 'pinballfinder.org',
+      'machines' => array(
+        array(
+          'name' => 'Dracula',
+          'ipdb' => 728,
+          'condition' => 3,
+          'price' => '0.50',
+        )
+      ),
+      'comments' => array(
+        array(
+          'text' => 'Here is a comment, yo',
+        ),
+      ),
+      'created' => $this->bogusCreatedDate,
+    );
+
+    $response = $client->post('/venue', array(
+      'body' => json_encode($data),
+    ));
+
+    //echo $response->getBody();exit;
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $data = json_decode($response->getBody(), true);
+
+    $this->assertArrayHasKey('status', $data);
+    $this->assertArrayHasKey('message', $data);
+
+    $message = $data['message'];
+
+    $this->assertContains('Updated', $message);
+
+    preg_match('/with\sID\s([0-9]+)?/', $message, $matches);
   }
 
   /**
@@ -96,6 +161,23 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
     $response = $client->get('/venue/' . $id);
 
     $this->assertEquals(200, $response->getStatusCode());
+
+    $response_body = json_decode($response->getBody(), true);
+
+    $this->assertArrayHasKey('status', $response_body);
+    $this->assertArrayHasKey('data', $response_body);
+
+    $data = $response_body['data'];
+
+    $this->assertArrayHasKey('venue', $data);
+
+    $venue = $data['venue'];
+
+    $this->assertArrayHasKey('created', $venue);
+
+    $created = $venue['created'];
+
+    $this->assertNotEquals($this->bogusCreatedDate, $created);
 
     return $id;
   }
