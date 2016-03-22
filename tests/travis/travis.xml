@@ -1,0 +1,8 @@
+<phpunit>
+<testsuites>
+    <testsuite name="default">
+        <directory>..</directory>
+        <exclude>../PF/Slim</exclude>
+    </testsuite>
+</testsuites>
+</phpunit>
