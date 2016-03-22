@@ -6,8 +6,6 @@ use GuzzleHttp\Client;
 
 class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 {
-  private $createdVenueId;
-
   public function testCreateVenue() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
@@ -61,6 +59,22 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 
   /**
    * @depends testCreateVenue
+   */
+  public function testGetVenue($id) {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $response = $client->get('/venue/' . $id);
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    return $id;
+  }
+
+  /**
+   * @depends testGetVenue
    */
   public function testDeleteVenue($id) {
     $client = new Client(array(
