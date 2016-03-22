@@ -3,12 +3,17 @@
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 
+use PF\Serializer\PinfinderSerializer;
+use PF\Slim\PinfinderApp;
+
+use Slim\Views\Twig;
+
 require_once "vendor/autoload.php";
 
-$app = new \PF\Slim\PinfinderApp(
+$app = new PinfinderApp(
   array(
     'mode' => 'development',
-    'view' => new \Slim\Views\Twig(),
+    'view' => new Twig(),
   )
 );
 
@@ -29,30 +34,6 @@ $conn = array(
 
 $entityManager = EntityManager::create($conn, $config);
 
-$registry = new \PF\Serializer\SimpleManagerRegistry(
-  function($id) use($entityManager) {
-    switch ($id) {
-      case 'default_manager':
-        return $entityManager;
-
-      default:
-        throw new \RuntimeException(sprintf('Unknown service id "%s".', $id));
-    }
-  }
-);
-
-$fallback_constructor = new \JMS\Serializer\Construction\UnserializeObjectConstructor();
-
-$object_constructor = new \JMS\Serializer\Construction\DoctrineObjectConstructor($registry, $fallback_constructor);
-
-$initialized_object_constructor = new \PF\Serializer\InitializedObjectConstructor($object_constructor);
-
-$serializer_builder = JMS\Serializer\SerializerBuilder::create()
-  ->setMetadataDirs(array('PF' => __DIR__ . '/src/PF/Serializer/yml'))
-  ->setDebug($app->getMode() === 'development')
-  ->setObjectConstructor($initialized_object_constructor);
-
-
 $app->configureMode('development', function () use ($app) {
   $app->config(array(
     'cookies.lifetime' => 'Never',
@@ -60,7 +41,7 @@ $app->configureMode('development', function () use ($app) {
   ));
 });
 
-$app->configureMode('production', function () use ($app, $config, $serializer_builder) {
+$app->configureMode('production', function () use ($app, $config) {
   $app->config(array(
     'cookies.lifetime' => '2 Hours',
     'debug' => false,
@@ -68,17 +49,11 @@ $app->configureMode('production', function () use ($app, $config, $serializer_bu
 
   $config->setQueryCacheImpl(new \Doctrine\Common\Cache\ApcCache());
   $config->setMetadataCacheImpl(new \Doctrine\Common\Cache\ApcCache());
-
-  $serializer_builder->setCacheDir('/tmp');
 });
 
-$serializer = $serializer_builder->build();
+$serializer = PinfinderSerializer::create($entityManager, $app->getMode() === 'development');
 
 $app->add(new \PF\Slim\ResponseMiddleware($serializer));
-
-$venueDeserializer = new \PF\Serializer\VenueDeserializer();
-$venueDeserializer->setEntityManager($entityManager);
-$venueDeserializer->setSerializer($serializer);
 
 $app->view()->parserOptions = array(
   'autoescape' => false,
