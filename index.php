@@ -32,12 +32,12 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer) {
 
     $json_venue_decoded = json_decode($json_venue_encoded, true);
 
-    $is_new_venue = empty($json_venue_encoded['id']);
+    $is_new_venue = empty($json_venue_decoded['id']);
 
-    $venue_serialization_context = DeserializationContext::create();
-    $venue_serialization_context->setGroups($is_new_venue ? array('create') : array('update'));
+    $venue_deserialization_context = DeserializationContext::create();
+    $venue_deserialization_context->setGroups($is_new_venue ? array('create') : array('update'));
 
-    $venue = $serializer->deserialize($json_venue_encoded, 'PF\Venue', 'json');
+    $venue = $serializer->deserialize($json_venue_encoded, 'PF\Venue', 'json', $venue_deserialization_context);
 
     if (!empty($json_venue_decoded['machines'])) {
       foreach ($json_venue_decoded['machines'] as $json_machine_decoded) {
@@ -45,10 +45,10 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer) {
 
         $is_new_machine = empty($json_machine_decoded['id']);
 
-        $machine_serialization_context = DeserializationContext::create();
-        $machine_serialization_context->setGroups($is_new_machine ? array('create') : array('update'));
+        $machine_deserialization_context = DeserializationContext::create();
+        $machine_deserialization_context->setGroups($is_new_machine ? array('create') : array('update'));
 
-        $machine = $serializer->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_serialization_context);
+        $machine = $serializer->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
 
         $game = $entityManager->getRepository('\PF\Game')->find($json_machine_decoded['ipdb']);
 
@@ -64,10 +64,10 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer) {
 
         $is_new_comment = empty($json_comment_decoded['id']);
 
-        $comment_serialization_context = DeserializationContext::create();
-        $comment_serialization_context->setGroups($is_new_comment ? array('create') : array('update'));
+        $comment_deserialization_context = DeserializationContext::create();
+        $comment_deserialization_context->setGroups($is_new_comment ? array('create') : array('update'));
 
-        $comment = $serializer->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_serialization_context);
+        $comment = $serializer->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_deserialization_context);
 
         $venue->addComment($comment);
       }
