@@ -48,8 +48,6 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
       'body' => json_encode($data),
     ));
 
-    //echo $response->getBody();exit;
-
     $this->assertEquals(201, $response->getStatusCode());
 
     $data = json_decode($response->getBody(), true);
@@ -105,8 +103,6 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
     $response = $client->post('/venue', array(
       'body' => json_encode($data),
     ));
-
-    //echo $response->getBody();exit;
 
     $this->assertEquals(200, $response->getStatusCode());
 
