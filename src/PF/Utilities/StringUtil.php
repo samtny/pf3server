@@ -2,6 +2,8 @@
 
 namespace PF\Utilities;
 
+use PF\Utilities\DoubleMetaPhone;
+
 class StringUtil {
   public static function cleanName($name) {
     $clean = $name;
@@ -60,12 +62,14 @@ class StringUtil {
     $name_clean_parts = explode(" ", $name_clean);
 
     foreach ($name_clean_parts as $name_clean_part) {
-      $name_clean_part_dm = new DoubleMetaPhone($name_clean_part);
+      $dm = new DoubleMetaPhone();
 
-      if (!empty($name_clean_part_dm->secondary) && $name_clean_part_dm->primary != $name_clean_part_dm->secondary) {
-        $dm_parts[] = $name_clean_part_dm->primary . ':' . $name_clean_part_dm->secondary;
+      $dm->DoubleMetaPhone($name_clean_part);
+
+      if (!empty($dm->secondary) && $dm->primary != $dm->secondary) {
+        $dm_parts[] = $dm->primary . ':' . $dm->secondary;
       } else {
-        $dm_parts[] = $name_clean_part_dm->primary;
+        $dm_parts[] = $dm->primary;
       }
     }
 
