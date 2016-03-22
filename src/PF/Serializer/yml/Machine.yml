@@ -26,10 +26,6 @@ PF\Machine:
     id:
       type: integer
       groups: [read]
-    ipdb:
-      type: integer
-      groups: [create, read, update]
-      access_type: public_method
     game:
       exclude: true
     venue:
@@ -47,5 +43,3 @@ PF\Machine:
       exclude: true
     updated:
       exclude: true
-  callback_methods:
-    post_deserialize: [postDeserialize]

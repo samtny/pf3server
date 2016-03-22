@@ -4,7 +4,6 @@ namespace PF;
 
 class Machine {
   protected $id;
-  protected $ipdb;
   protected $game;
   protected $venue;
   protected $condition;
@@ -29,13 +28,6 @@ class Machine {
     return !empty($this->game) ? $this->game->getRare() : null;
   }
 
-  public function postDeserialize() {
-    $game = new Game();
-    $game->setId($this->ipdb);
-
-    $this->setGame($game);
-  }
-
   public function __construct() {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
@@ -48,10 +40,6 @@ class Machine {
 
   public function setId($id) {
     $this->id = $id;
-  }
-
-  public function setIpdb($ipdb) {
-    $this->ipdb = $ipdb;
   }
 
   public function getGame() {
