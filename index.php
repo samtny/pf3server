@@ -3,18 +3,6 @@
 require_once 'bootstrap.php';
 
 $app->group('/venue', function () use ($app, $entityManager, $venueDeserializer) {
-  $app->get('/search', function () use ($app, $entityManager) {
-    $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
-
-    $venues = [];
-
-    foreach ($venuesIterator as $venue) {
-      $venues[] = $venue;
-    }
-
-    $app->responseData = array('count' => count($venues), 'venues' => $venues);
-  });
-
   $app->get('/:id', function ($id) use ($app, $entityManager) {
     $venue = $entityManager->getRepository('\PF\Venue')->find($id);
 
@@ -25,7 +13,7 @@ $app->group('/venue', function () use ($app, $entityManager, $venueDeserializer)
     $app->responseData = array('venue' => $venue);
   });
 
-  $app->post('/', function () use ($app, $entityManager, $venueDeserializer) {
+  $app->post('', function () use ($app, $entityManager, $venueDeserializer) {
     $venue = $venueDeserializer->deserialize($app->request->getBody());
 
     $is_new_venue = empty($venue->getId());
@@ -57,6 +45,18 @@ $app->group('/venue', function () use ($app, $entityManager, $venueDeserializer)
     $entityManager->flush();
 
     $app->responseMessage = 'Deleted Venue with ID ' . $venue->getId();
+  });
+
+  $app->get('/search', function () use ($app, $entityManager) {
+    $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
+
+    $venues = [];
+
+    foreach ($venuesIterator as $venue) {
+      $venues[] = $venue;
+    }
+
+    $app->responseData = array('count' => count($venues), 'venues' => $venues);
   });
 });
 
