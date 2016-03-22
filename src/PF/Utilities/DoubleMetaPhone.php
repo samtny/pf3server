@@ -989,10 +989,10 @@ class DoubleMetaPhone
   }
 
   function IsVowel($string, $pos) {
-    return ereg("[AEIOUY]", substr($string, $pos, 1));
+    return preg_match("/[AEIOUY]/", substr($string, $pos, 1));
   }
 
   function SlavoGermanic($string) {
-    return ereg("W|K|CZ|WITZ", $string);
+    return preg_match("/W|K|CZ|WITZ/", $string);
   }
 } // end of class MetaPhone
