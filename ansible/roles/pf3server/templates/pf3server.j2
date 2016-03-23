@@ -29,7 +29,7 @@ server {
 	}
 
 	location ~ \.php$ {
-		if ($http_origin ~* (http?://[^/]*photos.com(:[0-9]+)?)) {
+		if ($http_origin ~* (http?://[^/]*pf3admin.com(:[0-9]+)?)) {
         		set $cors "true";
     		}
 
