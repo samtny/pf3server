@@ -28,9 +28,10 @@ $app->any('/login', function () use ($app, $entityManager) {
       $session->setUser($user);
 
       $entityManager->persist($session);
+      $entityManager->flush();
     }
 
-    setcookie("session", $session->getId(), time() + 3600 * 24 * 365);
+    $app->setCookie('session', $session->getId(), '365 days');
 
     $app->redirect('/admin');
   }
