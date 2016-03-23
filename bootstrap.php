@@ -63,3 +63,5 @@ $app->notFound(function () use ($app) {
   $app->status(401);
   $app->render('404.html');
 });
+
+$adminRouteMiddleware = new \PF\Slim\AdminRouteMiddleware();

@@ -4,7 +4,7 @@ require_once 'bootstrap.php';
 
 use JMS\Serializer\DeserializationContext;
 
-$app->group('/venue', function () use ($app, $entityManager, $serializer) {
+$app->group('/venue', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
   $app->get('/search', function () use ($app, $entityManager) {
     $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
 
@@ -25,6 +25,21 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer) {
     }
 
     $app->responseData = array('venue' => $venue);
+  });
+
+  $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
+    $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+
+    if (empty($venue)) {
+      $app->notFound();
+    }
+
+    $venue->approve();
+
+    $entityManager->persist($venue);
+    $entityManager->flush();
+
+    $app->responseMessage = 'Approved Venue with ID ' . $venue->getId();
   });
 
   $app->post('', function () use ($app, $entityManager, $serializer) {

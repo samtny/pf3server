@@ -220,4 +220,18 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 
     $this->assertEquals(404, $response->getStatusCode());
   }
+
+  /**
+   * @depends testCreateVenue
+   */
+  public function testAdminRoute($id) {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $response = $client->post('/venue/' . $id . '/approve');
+
+    $this->assertEquals(401, $response->getStatusCode());
+  }
 }
