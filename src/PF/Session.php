@@ -2,12 +2,9 @@
 
 namespace PF;
 
-use Doctrine\ORM\Mapping as ORM;
-
-class User {
+class Session {
   protected $id;
-  protected $username;
-  protected $password;
+  protected $user;
   protected $created;
   protected $updated;
 
@@ -36,37 +33,21 @@ class User {
   /**
    * @return mixed
    */
-  public function getUsername()
+  public function getUser()
   {
-    return $this->username;
+    return $this->user;
   }
 
   /**
-   * @param mixed $username
+   * @param mixed $user
    */
-  public function setUsername($username)
+  public function setUser($user)
   {
-    $this->username = $username;
+    $this->user = $user;
   }
 
   /**
    * @return mixed
-   */
-  public function getPassword()
-  {
-    return $this->password;
-  }
-
-  /**
-   * @param mixed $password
-   */
-  public function setPassword($password)
-  {
-    $this->password = $password;
-  }
-
-  /**
-   * @return \DateTime
    */
   public function getCreated()
   {
@@ -74,7 +55,7 @@ class User {
   }
 
   /**
-   * @param \DateTime $created
+   * @param mixed $created
    */
   public function setCreated($created)
   {
@@ -82,7 +63,7 @@ class User {
   }
 
   /**
-   * @return \DateTime
+   * @return mixed
    */
   public function getUpdated()
   {
@@ -90,7 +71,7 @@ class User {
   }
 
   /**
-   * @param \DateTime $updated
+   * @param mixed $updated
    */
   public function setUpdated($updated)
   {

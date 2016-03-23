@@ -1,0 +1,16 @@
+PF\Session:
+  type: entity
+  table: session
+  id:
+      id:
+        type: integer
+        generator:
+          strategy: AUTO
+  fields:
+    created:
+      type: datetime
+    updated:
+      type: datetime
+  oneToOne:
+    user:
+      targetEntity: PF\User
