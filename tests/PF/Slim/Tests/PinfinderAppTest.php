@@ -7,9 +7,11 @@ use GuzzleHttp\Client;
 class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 {
   private $bogusCreatedDate;
+  private $bogusCreateToken;
 
   public function setUp() {
     $this->bogusCreatedDate = '2009-09-01T02:49:45+0000';
+    $this->bogusCreateToken = 'bogus_token';
   }
 
   public function testCreateVenue() {
@@ -28,6 +30,7 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
       'longitude' => -84.2938679,
       'phone' => '3789337',
       'url' => 'pinballfinder.org',
+      'created_token' => 'FE66489F304DC75B8D6E8200DFF8A456E8DAEACEC428B427E9518741C92C6660',
       'machines' => array(
         array(
           'name' => 'Dracula',
@@ -84,6 +87,7 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
       'longitude' => -84.2938679,
       'phone' => '3789337',
       'url' => 'pinballfinder.org',
+      'created_token' => $this->bogusCreateToken,
       'machines' => array(
         array(
           'name' => 'Dracula',

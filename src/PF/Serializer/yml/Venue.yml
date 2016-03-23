@@ -20,7 +20,7 @@ PF\Venue:
     name_clean:
       exclude: true
     name_dm:
-      exclude: ture
+      exclude: true
     street:
       type: string
       groups: [create, read, update]
@@ -51,6 +51,9 @@ PF\Venue:
     flag_reason:
       type: string
       groups: [admin]
+    created_token:
+      type: string
+      groups: [create]
     created:
       type: DateTime
       groups: [read]
