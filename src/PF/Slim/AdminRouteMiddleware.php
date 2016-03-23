@@ -7,7 +7,12 @@ use Slim\Slim;
 class AdminRouteMiddleware
 {
   public function call() {
-    $app = Slim::getInstance();
-    $app->halt(401);
+    session_start();
+
+    if (empty($_COOKIE['session'])) {
+      $app = Slim::getInstance();
+
+      $app->redirect('/login');
+    }
   }
 }

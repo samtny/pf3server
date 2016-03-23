@@ -4,6 +4,44 @@ require_once 'bootstrap.php';
 
 use JMS\Serializer\DeserializationContext;
 
+$app->any('/login', function () use ($app, $entityManager) {
+  $username = $app->request->post('username');
+  $password = $app->request->post('password');
+
+  $username_addslashes = addslashes($username);
+  $password_md5 = md5($password);
+
+  $user = $entityManager->getRepository('\PF\User')->findOneBy(array('username' => $username_addslashes, 'password' => $password_md5));
+
+  if (empty($user)) {
+    $app->render('login.html');
+  } else {
+    session_start();
+
+    $_SESSION['username'] = $username_addslashes;
+    $_SESSION['password'] = $password_md5;
+
+    $session = $entityManager->getRepository('\PF\Session')->findOneBy(array('user' => $user));
+
+    if (empty($session)) {
+      $session = new \PF\Session();
+      $session->setUser($user);
+
+      $entityManager->persist($session);
+    }
+
+    setcookie("session", $session->getId(), time() + 3600 * 24 * 365);
+
+    $app->redirect('/admin');
+  }
+});
+
+$app->group('/admin', array($adminRouteMiddleware, 'call'), function () use ($app) {
+  $app->get('', function () use ($app) {
+    $app->render('admin.html');
+  });
+});
+
 $app->group('/venue', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
   $app->get('/search', function () use ($app, $entityManager) {
     $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
