@@ -180,6 +180,31 @@ $app->group('/comment', function () use ($app, $entityManager, $serializer, $adm
     $app->responseData = array('comment' => $comment);
   });
 
+  $app->post('', function () use ($app, $entityManager, $serializer) {
+    $json_comment_encoded = $app->request->getBody();
+
+    $json_comment_decoded = json_decode($json_comment_encoded, true);
+
+    $is_new_comment = empty($json_comment_decoded['id']);
+
+    $comment_deserialization_context = DeserializationContext::create();
+    $comment_deserialization_context->setGroups($is_new_comment ? array('create') : array('update'));
+
+    $comment = $serializer->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_deserialization_context);
+
+    try {
+      $entityManager->persist($comment);
+
+      $entityManager->flush();
+
+      $app->status($is_new_comment ? 201 : 200);
+
+      $app->responseMessage = ($is_new_comment ? 'Created Comment with ID ' : 'Updated Comment with ID ') . $comment->getId();
+    } catch (\Doctrine\ORM\EntityNotFoundException $e) {
+      $app->notFound();
+    }
+  });
+
   $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
     $comment = $entityManager->getRepository('\PF\Comment')->find($id);
 
@@ -195,7 +220,7 @@ $app->group('/comment', function () use ($app, $entityManager, $serializer, $adm
     $app->responseMessage = 'Approved Comment with ID ' . $comment->getId();
   });
 
-  $app->delete('/:id', function ($id) use ($app, $entityManager) {
+  $app->delete('/:id', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
     $comment = $entityManager->getRepository('\PF\Comment')->find($id);
 
     if (empty($comment)) {
