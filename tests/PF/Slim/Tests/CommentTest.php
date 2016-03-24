@@ -4,7 +4,7 @@ namespace PF\Slim\Tests;
 
 use GuzzleHttp\Client;
 
-class PinfinderAppTest extends \PHPUnit_Framework_TestCase
+class CommentTest extends \PHPUnit_Framework_TestCase
 {
   private $bogusCreatedDate;
   private $bogusCreateToken;
@@ -14,40 +14,19 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
     $this->bogusCreateToken = 'bogus_token';
   }
 
-  public function testCreateVenue() {
+  public function testCreateComment() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
     ));
 
     $data = array(
-      'name' => 'Arcade Age',
-      'street' => '1018 Commercial Dr.',
-      'city' => 'Brooklyn',
-      'state' => 'New York',
-      'zipcode' => '11238',
-      'latitude' => 30.4331415,
-      'longitude' => -84.2938679,
-      'phone' => '3789337',
-      'url' => 'pinballfinder.org',
+      'text' => 'A fun new comment',
       'created_token' => 'FE66489F304DC75B8D6E8200DFF8A456E8DAEACEC428B427E9518741C92C6660',
-      'machines' => array(
-        array(
-          'name' => 'Dracula',
-          'ipdb' => 728,
-          'condition' => 3,
-          'price' => '0.50',
-        )
-      ),
-      'comments' => array(
-        array(
-          'text' => 'Here is a comment, yo',
-        ),
-      ),
       'created' => $this->bogusCreatedDate,
     );
 
-    $response = $client->post('/venue', array(
+    $response = $client->post('/comment', array(
       'body' => json_encode($data),
     ));
 
@@ -68,9 +47,9 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @depends testCreateVenue
+   * @depends testCreateComment
    */
-  public function testUpdateVenue($id) {
+  public function testUpdateComment($id) {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
@@ -78,33 +57,12 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 
     $data = array(
       'id' => $id,
-      'name' => 'Arcade Age',
-      'street' => '1018 Commercial Dr.',
-      'city' => 'Brooklyn',
-      'state' => 'New York',
-      'zipcode' => '11238',
-      'latitude' => 30.4331415,
-      'longitude' => -84.2938679,
-      'phone' => '3789337',
-      'url' => 'pinballfinder.org',
+      'text' => 'I changed my mind',
       'created_token' => $this->bogusCreateToken,
-      'machines' => array(
-        array(
-          'name' => 'Dracula',
-          'ipdb' => 728,
-          'condition' => 3,
-          'price' => '0.50',
-        )
-      ),
-      'comments' => array(
-        array(
-          'text' => 'Here is a comment, yo',
-        ),
-      ),
       'created' => $this->bogusCreatedDate,
     );
 
-    $response = $client->post('/venue', array(
+    $response = $client->post('/comment', array(
       'body' => json_encode($data),
     ));
 
@@ -123,15 +81,15 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @depends testCreateVenue
+   * @depends testCreateComment
    */
-  public function testSearchVenue() {
+  public function testSearchComment() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
     ));
 
-    $response = $client->get('/venue/search');
+    $response = $client->get('/comment/search');
 
     $this->assertEquals(200, $response->getStatusCode());
 
@@ -142,23 +100,23 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 
     $data = $response_body['data'];
 
-    $this->assertArrayHasKey('venues', $data);
+    $this->assertArrayHasKey('comments', $data);
 
-    $first_venue = $data['venues'][0];
+    $first_comment = $data['comments'][0];
 
-    $this->assertArrayHasKey('id', $first_venue);
+    $this->assertArrayHasKey('id', $first_comment);
   }
 
   /**
-   * @depends testCreateVenue
+   * @depends testCreateComment
    */
-  public function testGetVenue($id) {
+  public function testGetComment($id) {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
     ));
 
-    $response = $client->get('/venue/' . $id);
+    $response = $client->get('/comment/' . $id);
 
     $this->assertEquals(200, $response->getStatusCode());
 
@@ -169,9 +127,9 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
 
     $data = $response_body['data'];
 
-    $this->assertArrayHasKey('venue', $data);
+    $this->assertArrayHasKey('comment', $data);
 
-    $venue = $data['venue'];
+    $venue = $data['comment'];
 
     $this->assertArrayHasKey('created', $venue);
 
@@ -183,41 +141,19 @@ class PinfinderAppTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @depends testGetVenue
+   * @depends testGetComment
    */
-  public function testDeleteVenue($id) {
+  public function testDeleteCommentAnonymous($id) {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
+      'allow_redirects' => false,
     ));
 
-    $response = $client->delete('/venue/' . $id);
+    $response = $client->delete('/comment/' . $id);
 
-    $this->assertEquals(200, $response->getStatusCode());
-
-    $data = json_decode($response->getBody(), true);
-
-    $this->assertArrayHasKey('status', $data);
-    $this->assertArrayHasKey('message', $data);
-
-    $message = $data['message'];
-
-    $this->assertContains('with ID ', $message);
+    $this->assertEquals(301, $response->getStatusCode());
 
     return $id;
-  }
-
-  /**
-   * @depends testDeleteVenue
-   */
-  public function testGetDeletedVenue($id) {
-    $client = new Client(array(
-      'base_uri' => 'http://localhost:80',
-      'exceptions' => false,
-    ));
-
-    $response = $client->get('/venue/' . $id);
-
-    $this->assertEquals(404, $response->getStatusCode());
   }
 }

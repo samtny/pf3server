@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 
 class AdminTest extends \PHPUnit_Framework_TestCase
 {
-  public function testAdminRoute() {
+  public function testAdminRouteAnonymous() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
@@ -22,7 +22,7 @@ class AdminTest extends \PHPUnit_Framework_TestCase
     $this->assertEquals($location, '/login');
   }
 
-  public function testVenueApproveRoute() {
+  public function testVenueApproveRouteAnonymous() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
@@ -36,5 +36,17 @@ class AdminTest extends \PHPUnit_Framework_TestCase
     $location = $response->getHeader('Location')[0];
 
     $this->assertEquals($location, '/login');
+  }
+
+  public function testDeleteCommentAnonymous() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+      'allow_redirects' => false,
+    ));
+
+    $response = $client->delete('/comment/1');
+
+    $this->assertEquals(301, $response->getStatusCode());
   }
 }
