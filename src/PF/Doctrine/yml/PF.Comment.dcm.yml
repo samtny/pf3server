@@ -10,6 +10,8 @@ PF\Comment:
   fields:
     text:
       type: string
+    status:
+      type: string
     created:
       type: datetime
     updated:

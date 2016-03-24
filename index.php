@@ -157,6 +157,61 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
   });
 });
 
+$app->group('/comment', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
+  $app->get('/search', function () use ($app, $entityManager) {
+    $commentsIterator = $entityManager->getRepository('\PF\Comment')->getComments($app->request());
+
+    $comments = [];
+
+    foreach ($commentsIterator as $comment) {
+      $comments[] = $comment;
+    }
+
+    $app->responseData = array('count' => count($comments), 'comments' => $comments);
+  });
+
+  $app->get('/:id', function ($id) use ($app, $entityManager) {
+    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
+
+    if (empty($comment)) {
+      $app->notFound();
+    }
+
+    $app->responseData = array('comment' => $comment);
+  });
+
+  $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
+    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
+
+    if (empty($comment)) {
+      $app->notFound();
+    }
+
+    $comment->approve();
+
+    $entityManager->persist($comment);
+    $entityManager->flush();
+
+    $app->responseMessage = 'Approved Comment with ID ' . $comment->getId();
+  });
+
+  $app->delete('/:id', function ($id) use ($app, $entityManager) {
+    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
+
+    if (empty($comment)) {
+      $app->notFound();
+    }
+
+    $comment->delete();
+
+    $entityManager->persist($comment);
+
+    $entityManager->flush();
+
+    $app->responseMessage = 'Deleted Comment with ID ' . $comment->getId();
+  });
+});
+
 $app->group('/game', function () use ($app, $entityManager) {
   $app->get('/:id', function ($id) use ($app, $entityManager) {
     $game = $entityManager->find('\PF\Game', $id);

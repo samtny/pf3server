@@ -6,12 +6,14 @@ class Comment {
   protected $id;
   protected $venue;
   protected $text;
+  protected $status;
   protected $created;
   protected $updated;
 
   public function __construct() {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
+    $this->status = 'NEW';
   }
 
   public function getId()
@@ -35,6 +37,14 @@ class Comment {
     $this->text = $text;
   }
 
+  public function getStatus() {
+    return $this->status;
+  }
+
+  public function setStatus($status) {
+    $this->status = $status;
+  }
+
   public function getCreated() {
     return $this->created;
   }
@@ -49,5 +59,13 @@ class Comment {
 
   public function setUpdated($updated) {
     $this->updated = $updated;
+  }
+
+  public function approve() {
+    $this->status = 'APPROVED';
+  }
+
+  public function delete() {
+    $this->status = 'DELETED';
   }
 }
