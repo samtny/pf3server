@@ -1,0 +1,25 @@
+PF\Notification:
+  exclusion_policy: NONE
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, message, token, created, updated]
+  properties:
+    id:
+      type: integer
+      groups: [read]
+    token:
+      type: string
+      groups: [create, read, update]
+    message:
+      type: string
+      groups: [create, read, update]
+    status:
+      type: string
+      groups: [create, update]
+    created:
+      type: DateTime
+      groups: [read]
+    updated:
+      exclude: true

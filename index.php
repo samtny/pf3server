@@ -74,8 +74,19 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
     }
 
     $venue->approve();
-
     $entityManager->persist($venue);
+
+    $token = $venue->getCreatedToken();
+
+    if (!empty($token)) {
+      $notification = new \PF\Notification();
+
+      $notification->setToken($token);
+      $notification->setMessage('The venue \'' . $venue->getName() . '\' you added was approved!  Thank you!  -The Pinfinder Team');
+
+      $entityManager->persist($notification);
+    }
+
     $entityManager->flush();
 
     $app->responseMessage = 'Approved Venue with ID ' . $venue->getId();

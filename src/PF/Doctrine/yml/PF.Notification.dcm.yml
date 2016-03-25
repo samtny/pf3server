@@ -1,0 +1,19 @@
+PF\Notification:
+  type: entity
+  table: notification
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    token:
+      type: string
+    message:
+      type: string
+    status:
+      type: string
+    created:
+      type: datetime
+    updated:
+      type: datetime
