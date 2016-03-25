@@ -66,6 +66,8 @@ foreach ($xml->locations->loc as $loc) {
 
     $comment->setText($loccomment->ctext);
 
+    $comment->approve();
+
     $venue->addComment($comment);
   }
 
