@@ -21,7 +21,7 @@ server {
 	}
 
 	location / {
-		try_files $uri $uri/ /index.php?$query_string;
+	    try_files $uri $uri/ /index.php?$query_string;
 	}
 
 	location /resources|/resource_list|/folders|/folder_list {
@@ -29,65 +29,37 @@ server {
 	}
 
 	location ~ \.php$ {
-		if ($http_origin ~* (http?://[^/]*pf3admin.com(:[0-9]+)?)) {
-        		set $cors "true";
-    		}
-
-		if ($request_method = 'OPTIONS') {
-        		set $cors "${cors}options";
-    		}
-
-		if ($request_method = 'GET') {
-        		set $cors "${cors}get";
-    		}
-
-		if ($request_method = 'POST') {
-        		set $cors "${cors}post";
-    		}
-
-		if ($cors = "trueget") {
-        		# Tells the browser this origin may make cross-origin requests
-        		# (Here, we echo the requesting origin, which matched the whitelist.)
-        		add_header 'Access-Control-Allow-Origin' "$http_origin";
-        		# Tells the browser it may show the response, when XmlHttpRequest.withCredentials=true.
-        		add_header 'Access-Control-Allow-Credentials' 'true';
-        		# # Tell the browser which response headers the JS can see, besides the "simple response headers"
-        		# add_header 'Access-Control-Expose-Headers' 'myresponseheader';
-    		}
-
-		if ($cors = "truepost") {
-        		# Tells the browser this origin may make cross-origin requests
-        		# (Here, we echo the requesting origin, which matched the whitelist.)
-        		add_header 'Access-Control-Allow-Origin' "$http_origin";
-        		# Tells the browser it may show the response, when XmlHttpRequest.withCredentials=true.
-        		add_header 'Access-Control-Allow-Credentials' 'true';
-        		# # Tell the browser which response headers the JS can see, besides the "simple response headers"
-        		# add_header 'Access-Control-Expose-Headers' 'myresponseheader';
-    		}
-
-		if ($cors = "trueoptions") {
-        		# Tells the browser this origin may make cross-origin requests
-        		# (Here, we echo the requesting origin, which matched the whitelist.)
-        		add_header 'Access-Control-Allow-Origin' "$http_origin";
-
-        		# in a preflight response, tells browser the subsequent actual request can include user credentials (e.g., cookies)
-        		add_header 'Access-Control-Allow-Credentials' 'true';
-
-        		# Tell browser to cache this pre-flight info for 20 days
-        		add_header 'Access-Control-Max-Age' 1728000;
-
-        		add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-
-        		add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since';
-
-        		# build entire response to the preflight request
-        		# no body in this response
-        		add_header 'Content-Length' 0;
-        		# (should not be necessary, but included for non-conforming browsers)
-        		add_header 'Content-Type' 'text/plain charset=UTF-8';
-        		# indicate successful return with no content
-        		return 204;
-    		}
+	if ($request_method = 'OPTIONS') {
+                    add_header 'Access-Control-Allow-Origin' '*';
+                    #
+                    # Om nom nom cookies
+                    #
+                    add_header 'Access-Control-Allow-Credentials' 'true';
+                    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                    #
+                    # Custom headers and headers various browsers *should* be OK with but aren't
+                    #
+                    add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                    #
+                    # Tell client that this pre-flight info is valid for 20 days
+                    #
+                    add_header 'Access-Control-Max-Age' 1728000;
+                    add_header 'Content-Type' 'text/plain charset=UTF-8';
+                    add_header 'Content-Length' 0;
+                    return 204;
+                 }
+                 if ($request_method = 'POST') {
+                    add_header 'Access-Control-Allow-Origin' '*';
+                    add_header 'Access-Control-Allow-Credentials' 'true';
+                    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                    add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                 }
+                 if ($request_method = 'GET') {
+                    add_header 'Access-Control-Allow-Origin' '*';
+                    add_header 'Access-Control-Allow-Credentials' 'true';
+                    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                    add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                 }
 
 		fastcgi_split_path_info ^(.+\.php)(/.+)$;
 		# NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
