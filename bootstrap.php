@@ -19,15 +19,15 @@ $app = new PinfinderApp(
 
 $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), $app->getMode() === 'development', null, null);
 
-$config->addCustomNumericFunction('sin', '\DoctrineExtensions\Query\Mysql\Sin');
-$config->addCustomNumericFunction('cos', '\DoctrineExtensions\Query\Mysql\Cos');
-$config->addCustomNumericFunction('acos', '\DoctrineExtensions\Query\Mysql\Acos');
-$config->addCustomNumericFunction('radians', '\DoctrineExtensions\Query\Mysql\Radians');
-$config->addCustomNumericFunction('year', '\DoctrineExtensions\Query\Mysql\Year');
-$config->addCustomNumericFunction('month', '\DoctrineExtensions\Query\Mysql\Month');
-$config->addCustomNumericFunction('datediff', '\DoctrineExtensions\Query\Mysql\DateDiff');
+$config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');
+$config->addCustomNumericFunction('COS', '\DoctrineExtensions\Query\Mysql\Cos');
+$config->addCustomNumericFunction('ACOS', '\DoctrineExtensions\Query\Mysql\Acos');
+$config->addCustomNumericFunction('RADIANS', '\DoctrineExtensions\Query\Mysql\Radians');
+$config->addCustomNumericFunction('YEAR', '\DoctrineExtensions\Query\Mysql\Year');
+$config->addCustomNumericFunction('MONTH', '\DoctrineExtensions\Query\Mysql\Month');
+$config->addCustomNumericFunction('DATEDIFF', '\DoctrineExtensions\Query\Mysql\DateDiff');
 
-$config->addCustomStringFunction('dateformat', '\DoctrineExtensions\Query\Mysql\DateFormat');
+$config->addCustomStringFunction('DATE_FORMAT', '\DoctrineExtensions\Query\Mysql\DateFormat');
 
 $conn = array(
   'driver' => 'pdo_mysql',

@@ -24,9 +24,9 @@ class VenueRepository extends EntityRepository {
   public function getStats() {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
-    $qb->select('year(v.created) as HIDDEN created_year, month(v.created) as HIDDEN created_month, dateformat(v.created, \'%b\') as month, COUNT(v) as total')
+    $qb->select('YEAR(v.created) as HIDDEN created_year, MONTH(v.created) as HIDDEN created_month, DATE_FORMAT(v.created, \'%b\') as month, COUNT(v) as total')
       ->from('\PF\Venue', 'v')
-      ->where('datediff(CURRENT_DATE(), v.created) <= 365')
+      ->where('DATEDIFF(CURRENT_DATE(), v.created) <= 365')
       ->groupBy('created_year, created_month')
       ->orderBy('created_year, created_month');
 
@@ -60,7 +60,7 @@ class VenueRepository extends EntityRepository {
         $latitude = $latlon[1];
         $longitude = $latlon[2];
 
-        $qb->add('select', '( 3959 * acos( cos( radians(:latitude) ) * cos( radians( v.latitude ) ) * cos( radians( v.longitude ) - radians(:longitude) ) + sin( radians(:latitude) ) * sin( radians( v.latitude ) ) ) ) AS HIDDEN distance', true)
+        $qb->add('select', '( 3959 * ACOS( COS( RADIANS(:latitude) ) * COS( RADIANS( v.latitude ) ) * COS( RADIANS( v.longitude ) - RADIANS(:longitude) ) + SIN( RADIANS(:latitude) ) * SIN( RADIANS( v.latitude ) ) ) ) AS HIDDEN distance', true)
           ->setParameter('latitude', $latitude)
           ->setParameter('longitude', $longitude)
           ->addOrderBy('distance', 'ASC');
