@@ -56,6 +56,12 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
     $app->responseData = array('count' => count($venues), 'venues' => $venues);
   });
 
+  $app->get('/stats', function () use ($app, $entityManager) {
+    $stats = $entityManager->getRepository('\PF\Venue')->getStats();
+
+    $app->responseData = array('stats' => $stats);
+  });
+
   $app->get('/:id', function ($id) use ($app, $entityManager) {
     $venue = $entityManager->getRepository('\PF\Venue')->find($id);
 
