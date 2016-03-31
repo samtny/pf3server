@@ -21,6 +21,18 @@ class VenueRepository extends EntityRepository {
     return $venue;
   }
 
+  public function getStats() {
+    $qb = $this->getEntityManager()->createQueryBuilder();
+
+    $qb->select('year(v.created) as HIDDEN created_year, month(v.created) as HIDDEN created_month, dateformat(v.created, \'%b\') as month, COUNT(v) as total')
+      ->from('\PF\Venue', 'v')
+      ->where('datediff(CURRENT_DATE(), v.created) <= 365')
+      ->groupBy('created_year, created_month')
+      ->orderBy('created_year, created_month');
+
+    return $qb->getQuery()->getArrayResult();
+  }
+
   public function getVenues($request) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
