@@ -23,6 +23,11 @@ $config->addCustomNumericFunction('sin', '\DoctrineExtensions\Query\Mysql\Sin');
 $config->addCustomNumericFunction('cos', '\DoctrineExtensions\Query\Mysql\Cos');
 $config->addCustomNumericFunction('acos', '\DoctrineExtensions\Query\Mysql\Acos');
 $config->addCustomNumericFunction('radians', '\DoctrineExtensions\Query\Mysql\Radians');
+$config->addCustomNumericFunction('year', '\DoctrineExtensions\Query\Mysql\Year');
+$config->addCustomNumericFunction('month', '\DoctrineExtensions\Query\Mysql\Month');
+$config->addCustomNumericFunction('datediff', '\DoctrineExtensions\Query\Mysql\DateDiff');
+
+$config->addCustomStringFunction('dateformat', '\DoctrineExtensions\Query\Mysql\DateFormat');
 
 $conn = array(
   'driver' => 'pdo_mysql',
