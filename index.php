@@ -62,16 +62,6 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
     $app->responseData = array('stats' => $stats);
   });
 
-  $app->get('/:id', function ($id) use ($app, $entityManager) {
-    $venue = $entityManager->getRepository('\PF\Venue')->find($id);
-
-    if (empty($venue)) {
-      $app->notFound();
-    }
-
-    $app->responseData = array('venue' => $venue);
-  });
-
   $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
     $venue = $entityManager->getRepository('\PF\Venue')->find($id);
 
@@ -96,6 +86,16 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
     $entityManager->flush();
 
     $app->responseMessage = 'Approved Venue with ID ' . $venue->getId();
+  });
+
+  $app->get('/:id', function ($id) use ($app, $entityManager) {
+    $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+
+    if (empty($venue)) {
+      $app->notFound();
+    }
+
+    $app->responseData = array('venue' => $venue);
   });
 
   $app->post('', function () use ($app, $entityManager, $serializer) {
@@ -197,6 +197,21 @@ $app->group('/comment', function () use ($app, $entityManager, $serializer, $adm
     $app->responseData = array('comment' => $comment);
   });
 
+  $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
+    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
+
+    if (empty($comment)) {
+      $app->notFound();
+    }
+
+    $comment->approve();
+
+    $entityManager->persist($comment);
+    $entityManager->flush();
+
+    $app->responseMessage = 'Approved Comment with ID ' . $comment->getId();
+  });
+
   $app->post('', function () use ($app, $entityManager, $serializer) {
     $json_comment_encoded = $app->request->getBody();
 
@@ -220,21 +235,6 @@ $app->group('/comment', function () use ($app, $entityManager, $serializer, $adm
     } catch (\Doctrine\ORM\EntityNotFoundException $e) {
       $app->notFound();
     }
-  });
-
-  $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
-    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
-
-    if (empty($comment)) {
-      $app->notFound();
-    }
-
-    $comment->approve();
-
-    $entityManager->persist($comment);
-    $entityManager->flush();
-
-    $app->responseMessage = 'Approved Comment with ID ' . $comment->getId();
   });
 
   $app->delete('/:id', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
