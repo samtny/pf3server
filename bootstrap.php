@@ -8,7 +8,7 @@ require_once "vendor/autoload.php";
 
 $parser = new Parser();
 
-$runmode = $parser->parse(file_get_contents('config.yml'))['pf3server_runmode'];
+$runmode = $parser->parse(file_get_contents(__DIR__ . '/config.yml'))['pf3server_runmode'];
 
 $conn = array(
   'driver' => 'pdo_mysql',
