@@ -20,7 +20,7 @@ $app->configureMode('development', function () use ($app) {
   ));
 });
 
-$app->configureMode('production', function () use ($app, $config) {
+$app->configureMode('production', function () use ($app) {
   $app->config(array(
     'cookies.lifetime' => '2 Hours',
     'debug' => false,

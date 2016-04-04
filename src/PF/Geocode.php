@@ -2,8 +2,6 @@
 
 namespace PF;
 
-use Doctrine\ORM\Mapping as ORM;
-
 class Geocode {
   protected $id;
   protected $string;

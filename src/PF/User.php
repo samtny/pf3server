@@ -2,8 +2,6 @@
 
 namespace PF;
 
-use Doctrine\ORM\Mapping as ORM;
-
 class User {
   protected $id;
   protected $username;
