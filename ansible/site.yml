@@ -12,5 +12,5 @@
   roles:
     - pf3server
   vars_files:
-    - config.yml
-    - credentials.yml
+    - ../config.yml
+    - ../credentials.yml
