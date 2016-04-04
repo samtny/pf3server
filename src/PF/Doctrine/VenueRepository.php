@@ -21,7 +21,7 @@ class VenueRepository extends EntityRepository {
     return $venue;
   }
 
-  public function getStats() {
+  public function getCreatedStats() {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select('YEAR(v.created) as HIDDEN created_year, MONTH(v.created) as HIDDEN created_month, DATE_FORMAT(v.created, \'%b\') as month, COUNT(v) as total')
@@ -29,6 +29,18 @@ class VenueRepository extends EntityRepository {
       ->where('DATEDIFF(CURRENT_DATE(), v.created) <= 365')
       ->groupBy('created_year, created_month')
       ->orderBy('created_year, created_month');
+
+    return $qb->getQuery()->getArrayResult();
+  }
+
+  public function getUpdatedStats() {
+    $qb = $this->getEntityManager()->createQueryBuilder();
+
+    $qb->select('YEAR(v.updated) as HIDDEN updated_year, MONTH(v.updated) as HIDDEN updated_month, DATE_FORMAT(v.updated, \'%b\') as month, COUNT(v) as total')
+      ->from('\PF\Venue', 'v')
+      ->where('DATEDIFF(CURRENT_DATE(), v.updated) <= 365')
+      ->groupBy('updated_year, updated_month')
+      ->orderBy('updated_year, updated_month');
 
     return $qb->getQuery()->getArrayResult();
   }
