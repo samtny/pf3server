@@ -1,5 +1,8 @@
 ---
 
+pf3server_url: local.pf3server.com
+pf3server_runmode: development
+
 php_pm_max_children: 2
 php_pm_start_servers: 1
 php_pm_min_spare_servers: 1
@@ -15,5 +18,3 @@ php_opcache_memory_consumption: 64
 php_opcache_interned_strings_buffer: 16
 php_opcache_max_accelerated_files: 16228
 php_opcache_validate_timestamps: 1
-
-pf3server_url: local.pf3server.com

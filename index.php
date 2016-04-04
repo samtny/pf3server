@@ -8,7 +8,7 @@ use Slim\Views\Twig;
 
 $app = new PinfinderApp(
   array(
-    'mode' => PF_DEBUG === true ? 'development' : 'production',
+    'mode' => $runmode,
     'view' => new Twig(),
   )
 );
@@ -36,7 +36,7 @@ $app->notFound(function () use ($app) {
   $app->render('404.html');
 });
 
-$serializer = PinfinderSerializer::create($entityManager, PF_DEBUG === true);
+$serializer = PinfinderSerializer::create($entityManager, $runmode === 'development');
 
 $app->add(new \PF\Slim\ResponseMiddleware($serializer));
 
