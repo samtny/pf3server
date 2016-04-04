@@ -1,0 +1,46 @@
+PF\Geocode:
+  type: entity
+  repositoryClass: PF\Doctrine\GeocodeRepository
+  table: geocode
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    string:
+      type: string
+    coordinate_latitude:
+      type: decimal
+      precision: 10
+      scale: 7
+      nullable: true
+    coordinate_longitude:
+      type: decimal
+      precision: 10
+      scale: 7
+      nullable: true
+    southwest_latitude:
+      type: decimal
+      precision: 10
+      scale: 7
+      nullable: true
+    southwest_longitude:
+      type: decimal
+      precision: 10
+      scale: 7
+      nullable: true
+    northeast_latitude:
+      type: decimal
+      precision: 10
+      scale: 7
+      nullable: true
+    northeast_longitude:
+      type: decimal
+      precision: 10
+      scale: 7
+      nullable: true
+    created:
+      type: datetime
+    updated:
+      type: datetime

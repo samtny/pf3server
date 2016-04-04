@@ -1,0 +1,34 @@
+PF\Geocode:
+  exclusion_policy: NONE
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, coordinate_latitude, coordinate_longitude, southwest_latitude, southwest_longitude, northeast_latitude, northeast_longitude, created, updated]
+  properties:
+    id:
+      type: integer
+      groups: [read]
+    coordinate_latitude:
+      type: double
+      groups: [create, read, update]
+    coordinate_longitude:
+      type: double
+      groups: [create, read, update]
+    southwest_latitude:
+      type: double
+      groups: [create, read, update]
+    southwest_longitude:
+      type: double
+      groups: [create, read, update]
+    northeast_latitude:
+      type: double
+      groups: [create, read, update]
+    northeast_longitude:
+      type: double
+      groups: [create, read, update]
+    created:
+      type: DateTime
+      groups: [read]
+    updated:
+      exclude: true

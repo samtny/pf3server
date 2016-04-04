@@ -4,34 +4,22 @@ namespace PF;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="GeocodeRepository")
- * @ORM\Table(name="geocode")
- **/
 class Geocode {
-  /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue **/
   protected $id;
-
-  /** @ORM\Column(type="string") **/
   protected $string;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $coordinate_latitude;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $coordinate_longitude;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $southwest_latitude;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $southwest_longitude;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $northeast_latitude;
-
-  /** @ORM\Column(type="decimal", precision=10, scale=7, nullable=true) */
   protected $northeast_longitude;
+  protected $created;
+  protected $updated;
+
+  public function __construct() {
+    $this->created = new \DateTime("now");
+    $this->updated = new \DateTime("now");
+  }
 
   public function getId() {
     return $this->id;
@@ -127,5 +115,21 @@ class Geocode {
    */
   public function setNortheastLongitude($northeast_longitude) {
     $this->northeast_longitude = $northeast_longitude;
+  }
+
+  public function getCreated() {
+    return $this->created;
+  }
+
+  public function setCreated($created) {
+    $this->created = $created;
+  }
+
+  public function getUpdated() {
+    return $this->updated;
+  }
+
+  public function setUpdated($updated) {
+    $this->updated = $updated;
   }
 }
