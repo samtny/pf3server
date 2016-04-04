@@ -1,5 +1,7 @@
 <?php
 
+use JMS\Serializer\DeserializationContext;
+
 $app->group('/venue', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
     $app->get('/search', function () use ($app, $entityManager) {
         $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
