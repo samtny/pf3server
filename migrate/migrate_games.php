@@ -5,7 +5,7 @@ require __DIR__ .  '/../bootstrap.php';
 $dom = new DOMDocument();
 libxml_use_internal_errors(true);
 
-$contents = file_get_contents("ipdb.html");
+$contents = file_get_contents(__DIR__ . "/ipdb.html");
 
 $dom->loadHTML('<?xml encoding="utf-8" ?>' . $contents);
 
