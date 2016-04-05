@@ -48,5 +48,6 @@ require 'routes/venue.php';
 require 'routes/comment.php';
 require 'routes/game.php';
 require 'routes/stats.php';
+require 'routes/geocode.php';
 
 $app->run();
