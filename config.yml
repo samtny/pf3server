@@ -1,7 +1,7 @@
 ---
 
 pf3server_url: local.pf3server.com
-pf3server_runmode: production
+pf3server_runmode: development
 
 php_pm_max_children: 2
 php_pm_start_servers: 1
