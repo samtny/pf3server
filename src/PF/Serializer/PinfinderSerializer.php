@@ -6,7 +6,7 @@ use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 
 class PinfinderSerializer extends Serializer {
-  static function create($entityManager, $debug) {
+  static function create($entityManager, $cache = true, $debug = false) {
     $pinfinder_object_constructor = new PinfinderObjectConstructor($entityManager);
 
     $serializer_builder = SerializerBuilder::create()
@@ -15,7 +15,7 @@ class PinfinderSerializer extends Serializer {
 
     $serializer_builder->setDebug($debug);
 
-    if (!$debug) {
+    if ($cache) {
       $serializer_builder->setCacheDir('/tmp');
     }
 

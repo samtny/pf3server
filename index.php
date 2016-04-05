@@ -36,7 +36,7 @@ $app->notFound(function () use ($app) {
   $app->render('404.html');
 });
 
-$serializer = PinfinderSerializer::create($entityManager, $runmode === 'development');
+$serializer = PinfinderSerializer::create($entityManager, $runmode === 'production');
 
 $app->add(new \PF\Slim\ResponseMiddleware($serializer));
 
