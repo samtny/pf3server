@@ -14,6 +14,8 @@ Vagrant.configure(2) do |config|
     vb.name = "pf3server"
   end
 
+  config.vm.synced_folder '.', '/vagrant', type: 'nfs'
+
   config.vm.provision "ansible" do |ansible|
     ansible.groups = {
       "pf3server" => [ "default" ],
