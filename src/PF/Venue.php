@@ -174,34 +174,44 @@ class Venue {
     return $this->machines;
   }
 
-  public function addMachine(Machine $machine) {
+  public function addMachine(Machine $machine, $migration = false) {
     $this->machines[] = $machine;
 
     $machine->setVenue($this);
 
-    $this->updated = new \DateTime("now");
+    if (!$migration) {
+      $this->updated = new \DateTime("now");
+    }
   }
 
   public function getComments() {
     return $this->comments;
   }
 
-  public function addComment(Comment $comment) {
+  public function addComment(Comment $comment, $migration = false) {
     $this->comments[] = $comment;
 
     $comment->setVenue($this);
 
-    $this->updated = new \DateTime("now");
+    if (!$migration) {
+      $this->updated = new \DateTime("now");
+    }
   }
 
-  public function approve() {
+  public function approve($migration = false) {
     $this->status = "APPROVED";
-    $this->updated = new \DateTime("now");
+
+    if (!$migration) {
+      $this->updated = new \DateTime("now");
+    }
   }
 
-  public function delete() {
+  public function delete($migration = false) {
     $this->status = "DELETED";
-    $this->updated = new \DateTime("now");
+
+    if (!$migration) {
+      $this->updated = new \DateTime("now");
+    }
   }
 
   public function getLegacyKey() {

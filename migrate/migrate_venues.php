@@ -51,7 +51,7 @@ function parse_pf_xml($xml, $entityManager, $approve = true) {
 
         $machine->setGame($game);
 
-        $venue->addMachine($machine);
+        $venue->addMachine($machine, true);
       } else {
         echo "missing game: " . $locmachine['key'];
       }
@@ -64,11 +64,11 @@ function parse_pf_xml($xml, $entityManager, $approve = true) {
 
       $comment->approve();
 
-      $venue->addComment($comment);
+      $venue->addComment($comment, true);
     }
 
     if ($approve === true) {
-      $venue->approve();
+      $venue->approve(true);
     }
 
     $entityManager->persist($venue);
