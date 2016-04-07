@@ -178,6 +178,8 @@ class Venue {
     $this->machines[] = $machine;
 
     $machine->setVenue($this);
+
+    $this->updated = new \DateTime("now");
   }
 
   public function getComments() {
@@ -188,14 +190,18 @@ class Venue {
     $this->comments[] = $comment;
 
     $comment->setVenue($this);
+
+    $this->updated = new \DateTime("now");
   }
 
   public function approve() {
     $this->status = "APPROVED";
+    $this->updated = new \DateTime("now");
   }
 
   public function delete() {
     $this->status = "DELETED";
+    $this->updated = new \DateTime("now");
   }
 
   public function getLegacyKey() {
