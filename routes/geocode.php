@@ -1,6 +1,6 @@
 <?php
 
-$app->group('/geocode', function () use ($app, $entityManager) {
+$app->group('/geocode', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
   $app->get('', function () use ($app, $entityManager) {
     $geocode = $entityManager->getRepository('\PF\Geocode')->findOneBy(array('string' => $app->request()->params('address')));
 
