@@ -30,7 +30,7 @@ server {
 
 	location ~ \.php$ {
 	if ($request_method = 'OPTIONS') {
-                    add_header 'Access-Control-Allow-Origin' '*';
+                    add_header 'Access-Control-Allow-Origin' 'http://local.pf3admin.com';
                     #
                     # Om nom nom cookies
                     #
@@ -39,7 +39,7 @@ server {
                     #
                     # Custom headers and headers various browsers *should* be OK with but aren't
                     #
-                    add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                    add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,X-HTTP-Method-Override';
                     #
                     # Tell client that this pre-flight info is valid for 20 days
                     #
@@ -52,7 +52,7 @@ server {
                     add_header 'Access-Control-Allow-Origin' 'http://local.pf3admin.com';
                     add_header 'Access-Control-Allow-Credentials' 'true';
                     add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-                    add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+                    add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,X-HTTP-Method-Override';
                  }
                  if ($request_method = 'GET') {
                     add_header 'Access-Control-Allow-Origin' 'http://local.pf3admin.com';
