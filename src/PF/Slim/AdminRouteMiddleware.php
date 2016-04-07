@@ -12,7 +12,8 @@ class AdminRouteMiddleware
     if (empty($_COOKIE['session'])) {
       $app = Slim::getInstance();
 
-      $app->redirect('/login', 301);
+      $app->status(401);
+      $app->render('404.html');
     }
   }
 }
