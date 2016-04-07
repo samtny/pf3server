@@ -13,7 +13,7 @@ class AdminRouteMiddleware
       $app = Slim::getInstance();
 
       $app->status(401);
-      $app->render('404.html');
+      $app->stop();
     }
   }
 }

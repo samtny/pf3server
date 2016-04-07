@@ -15,11 +15,7 @@ class AdminTest extends \PHPUnit_Framework_TestCase
 
     $response = $client->get('/admin');
 
-    $this->assertEquals(301, $response->getStatusCode());
-
-    $location = $response->getHeader('Location')[0];
-
-    $this->assertEquals($location, '/login');
+    $this->assertEquals(401, $response->getStatusCode());
   }
 
   public function testVenueApproveRouteAnonymous() {
@@ -31,11 +27,7 @@ class AdminTest extends \PHPUnit_Framework_TestCase
 
     $response = $client->post('/venue/123456/approve');
 
-    $this->assertEquals(301, $response->getStatusCode());
-
-    $location = $response->getHeader('Location')[0];
-
-    $this->assertEquals($location, '/login');
+    $this->assertEquals(401, $response->getStatusCode());
   }
 
   public function testDeleteCommentAnonymous() {
@@ -47,6 +39,18 @@ class AdminTest extends \PHPUnit_Framework_TestCase
 
     $response = $client->delete('/comment/1');
 
-    $this->assertEquals(301, $response->getStatusCode());
+    $this->assertEquals(401, $response->getStatusCode());
+  }
+
+  public function testGeocodeAnonymous() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+      'allow_redirects' => false,
+    ));
+
+    $response = $client->get('/geocode');
+
+    $this->assertEquals(401, $response->getStatusCode());
   }
 }

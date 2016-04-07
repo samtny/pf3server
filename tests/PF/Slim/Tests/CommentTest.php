@@ -152,7 +152,7 @@ class CommentTest extends \PHPUnit_Framework_TestCase
 
     $response = $client->delete('/comment/' . $id);
 
-    $this->assertEquals(301, $response->getStatusCode());
+    $this->assertEquals(401, $response->getStatusCode());
 
     return $id;
   }
