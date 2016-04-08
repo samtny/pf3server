@@ -25,6 +25,18 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     $app->responseData = array('notification' => $notification);
   });
 
+  $app->post('/all/send', function () use ($app, $entityManager) {
+    $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getAllNotifications();
+
+    $notifications = [];
+
+    foreach ($notificationsIterator as $notification) {
+      $notifications[] = $notification;
+    }
+
+    $app->responseMessage = 'Sent ' . count($notifications) . ' notification(s)';
+  });
+
   $app->post('/:id/approve', function ($id) use ($app, $entityManager) {
     $notification = $entityManager->getRepository('\PF\Notification')->find($id);
 

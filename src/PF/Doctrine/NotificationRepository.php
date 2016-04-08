@@ -7,6 +7,19 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class NotificationRepository extends EntityRepository {
+  public function getAllNotifications() {
+    $qb = $this->getEntityManager()->createQueryBuilder();
+
+    $qb->select(array('n'));
+    $qb->from('\PF\Notification', 'n');
+
+    $qb->orderBy('n.updated', 'ASC');
+
+    $query = $qb->getQuery();
+
+    return new Paginator($query);
+  }
+
   public function getNotifications($request) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
