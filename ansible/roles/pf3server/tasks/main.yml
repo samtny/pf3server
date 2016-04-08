@@ -1,9 +1,8 @@
 ---
 - name: Install pf3server composer dependencies
   composer: command=install working_dir=/vagrant
-
-#- name: Update pf3server composer dependencies
-#  composer: command=update working_dir=/vagrant
+  become: yes
+  become_user: vagrant
 
 - name: Create pf3server database
   mysql_db: name={{ pf3server_db_name }} state=present collation="utf8_general_ci" encoding="utf8"
