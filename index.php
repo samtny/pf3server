@@ -50,5 +50,6 @@ require 'routes/game.php';
 require 'routes/stats.php';
 require 'routes/geocode.php';
 require 'routes/notification.php';
+require 'routes/machine.php';
 
 $app->run();
