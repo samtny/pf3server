@@ -14,8 +14,20 @@ class APNSService {
     return empty($error) ? $client : FALSE;
   }
 
-  public static function sendMessage($client, $deviceToken, $payload) {
+  public static function sendAlert($client, $deviceToken, $alert, $queryParams) {
     $cleanDeviceToken = preg_replace('/\s|<|>/', '', $deviceToken);
+
+    $payload = array(
+      'aps' => array(
+        'alert' => $alert,
+      ),
+    );
+
+    if (!empty($queryParams)) {
+      $payload['queryparams'] = $queryParams;
+    }
+
+    $payload = json_encode($payload);
 
     $apnsMessage = chr(0); // command
     $apnsMessage .= chr(0) . chr(32); //token length

@@ -40,17 +40,10 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
 
       foreach ($notifications as $notification) {
-        $payload = json_encode(array(
-          'aps' => array(
-            'alert' => $notification->getMessage(),
-          ),
-          'queryparams' => $notification->getQueryParams(),
-        ));
-
         if ($notification->getApp() === 'apnsfree') {
-          APNSService::sendMessage($client_free, $notification->getToken(), $payload);
+          APNSService::sendAlert($client_free, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
         } else {
-          APNSService::sendMessage($client_pro, $notification->getToken(), $payload);
+          APNSService::sendAlert($client_pro, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
         }
       }
     }
