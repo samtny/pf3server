@@ -5,6 +5,7 @@ namespace PF;
 class Notification {
   protected $id;
   protected $token;
+  protected $app;
   protected $message;
   protected $status;
   protected $created;
@@ -42,6 +43,22 @@ class Notification {
    */
   public function setToken($token) {
     $this->token = $token;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getApp()
+  {
+    return $this->app;
+  }
+
+  /**
+   * @param mixed $app
+   */
+  public function setApp($app)
+  {
+    $this->app = $app;
   }
 
   /**

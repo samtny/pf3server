@@ -12,6 +12,9 @@ PF\Notification:
     token:
       type: string
       groups: [create, read, update]
+    app:
+      type: string
+      groups: [create, read, update]
     message:
       type: string
       groups: [create, read, update]

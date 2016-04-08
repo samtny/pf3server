@@ -9,6 +9,8 @@ PF\Notification:
   fields:
     token:
       type: string
+    app:
+      type: string
     message:
       type: string
     status:
