@@ -53,4 +53,28 @@ class AdminTest extends \PHPUnit_Framework_TestCase
 
     $this->assertEquals(401, $response->getStatusCode());
   }
+
+  public function testNotificationSearchAnonymous() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+      'allow_redirects' => false,
+    ));
+
+    $response = $client->get('/notification/search');
+
+    $this->assertEquals(401, $response->getStatusCode());
+  }
+
+  public function testNotificationGetAnonymous() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+      'allow_redirects' => false,
+    ));
+
+    $response = $client->get('/notification/123');
+
+    $this->assertEquals(401, $response->getStatusCode());
+  }
 }

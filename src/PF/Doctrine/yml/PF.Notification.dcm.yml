@@ -1,5 +1,6 @@
 PF\Notification:
   type: entity
+  repositoryClass: PF\Doctrine\NotificationRepository
   table: notification
   id:
     id:
