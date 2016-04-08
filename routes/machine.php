@@ -25,6 +25,10 @@ $app->group('/machine', function () use ($app, $entityManager, $serializer, $adm
 
     $machine = $serializer->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
 
+    $game = $entityManager->getRepository('\PF\Game')->find($json_machine_decoded['ipdb']);
+
+    $machine->setGame($game);
+
     try {
       $entityManager->persist($machine);
 
