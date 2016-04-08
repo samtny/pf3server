@@ -15,9 +15,11 @@ class ResponseMiddleware extends Middleware
   }
 
   public function call() {
-    $this->next->call();
-
     $app = $this->getApplication();
+
+    $app->requestAuthenticated = !empty($_COOKIE['session']);
+
+    $this->next->call();
 
     if (!empty($app->responseData) || !empty($app->responseMessage)) {
       $response = array(
@@ -34,7 +36,11 @@ class ResponseMiddleware extends Middleware
 
       $venue_serialization_context = SerializationContext::create();
 
-      $venue_serialization_context->setGroups(array('read'));
+      if ($app->requestAuthenticated) {
+        $venue_serialization_context->setGroups(array('read', 'admin'));
+      } else {
+        $venue_serialization_context->setGroups(array('read'));
+      }
 
       $response = $this->serializer->serialize($response, 'json', $venue_serialization_context);
 
