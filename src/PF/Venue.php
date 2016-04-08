@@ -22,6 +22,7 @@ class Venue {
   protected $status;
   protected $flag_reason;
   protected $created_token;
+  protected $updated_token;
   protected $created;
   protected $updated;
   protected $legacy_key;
@@ -98,6 +99,14 @@ class Venue {
     $this->created_token = $created_token;
   }
 
+  public function getUpdatedToken() {
+    return $this->updated_token;
+  }
+
+  public function setUpdatedToken($updated_token) {
+    $this->updated_token = $updated_token;
+  }
+  
   public function getUpdated() {
     return $this->updated;
   }

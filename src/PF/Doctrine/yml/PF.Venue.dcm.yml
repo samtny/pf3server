@@ -55,6 +55,9 @@ PF\Venue:
     created_token:
       type: string
       nullable: true
+    updated_token:
+      type: string
+      nullable: true
     created:
       type: datetime
     updated:

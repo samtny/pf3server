@@ -54,6 +54,9 @@ PF\Venue:
     created_token:
       type: string
       groups: [create]
+    updated_token:
+      type: string
+      groups: [update]
     created:
       type: DateTime
       groups: [read]
