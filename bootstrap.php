@@ -29,5 +29,6 @@ $config->addCustomNumericFunction('YEAR', '\DoctrineExtensions\Query\Mysql\Year'
 $config->addCustomNumericFunction('MONTH', '\DoctrineExtensions\Query\Mysql\Month');
 $config->addCustomNumericFunction('DATEDIFF', '\DoctrineExtensions\Query\Mysql\DateDiff');
 $config->addCustomStringFunction('DATE_FORMAT', '\DoctrineExtensions\Query\Mysql\DateFormat');
+$config->addCustomDatetimeFunction('LAST_DAY', '\DoctrineExtensions\Query\Mysql\LastDay');
 
 $entityManager = EntityManager::create($conn, $config);
