@@ -51,6 +51,25 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     $app->responseMessage = 'Sent ' . count($notifications) . ' notification(s)';
   });
 
+  $app->post('/:id/send', function ($id) use ($app, $entityManager) {
+    $notification = $entityManager->getRepository('\PF\Notification')->find($id);
+
+    if (empty($notification)) {
+      $app->notFound();
+    }
+
+    $client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
+    $client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
+
+    if ($notification->getApp() === 'apnsfree') {
+      APNSService::sendAlert($client_free, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
+    } else {
+      APNSService::sendAlert($client_pro, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
+    }
+
+    $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
+  });
+
   $app->post('/:id/approve', function ($id) use ($app, $entityManager) {
     $notification = $entityManager->getRepository('\PF\Notification')->find($id);
 
