@@ -18,6 +18,9 @@ PF\Notification:
     message:
       type: string
       groups: [create, read, update]
+    queryParams:
+      type: string
+      groups: [create, read, update]
     status:
       type: string
       groups: [create, update]

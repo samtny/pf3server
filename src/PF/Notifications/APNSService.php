@@ -14,7 +14,7 @@ class APNSService {
     return empty($error) ? $client : FALSE;
   }
 
-  public function sendMessage($client, $deviceToken, $payload) {
+  public static function sendMessage($client, $deviceToken, $payload) {
     $cleanDeviceToken = preg_replace('/\s|<|>/', '', $deviceToken);
 
     $apnsMessage = chr(0); // command

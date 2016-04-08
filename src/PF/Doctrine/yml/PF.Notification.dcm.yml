@@ -14,6 +14,8 @@ PF\Notification:
       type: string
     message:
       type: string
+    queryParams:
+      type: string
     status:
       type: string
     created:

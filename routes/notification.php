@@ -1,6 +1,7 @@
 <?php
 
 use JMS\Serializer\DeserializationContext;
+use PF\Notifications\APNSService;
 
 $app->group('/notification', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
   $app->get('/search', function () use ($app, $entityManager) {
@@ -32,6 +33,26 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
     foreach ($notificationsIterator as $notification) {
       $notifications[] = $notification;
+    }
+
+    if (!empty($notifications)) {
+      $client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
+      $client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
+
+      foreach ($notifications as $notification) {
+        $payload = json_encode(array(
+          'aps' => array(
+            'alert' => $notification->getMessage(),
+          ),
+          'queryparams' => $notification->getQueryParams(),
+        ));
+
+        if ($notification->getApp() === 'apnsfree') {
+          APNSService::sendMessage($client_free, $notification->getToken(), $payload);
+        } else {
+          APNSService::sendMessage($client_pro, $notification->getToken(), $payload);
+        }
+      }
     }
 
     $app->responseMessage = 'Sent ' . count($notifications) . ' notification(s)';

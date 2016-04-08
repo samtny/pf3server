@@ -7,6 +7,7 @@ class Notification {
   protected $token;
   protected $app;
   protected $message;
+  protected $queryParams;
   protected $status;
   protected $created;
   protected $updated;
@@ -73,6 +74,20 @@ class Notification {
    */
   public function setMessage($message) {
     $this->message = $message;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getQueryParams() {
+    return $this->queryParams;
+  }
+
+  /**
+   * @param mixed $queryParams
+   */
+  public function setQueryParams($queryParams) {
+    $this->queryParams = $queryParams;
   }
 
   /**
