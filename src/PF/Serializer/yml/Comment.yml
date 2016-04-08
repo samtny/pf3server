@@ -16,7 +16,7 @@ PF\Comment:
       groups: [create, read, update]
     status:
       type: string
-      groups: [create, update]
+      groups: [admin, create, update]
     created:
       type: DateTime
       groups: [read]
