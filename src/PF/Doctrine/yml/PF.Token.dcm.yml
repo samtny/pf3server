@@ -1,0 +1,17 @@
+PF\Token:
+  type: entity
+  table: token
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    token:
+      type: string
+    app:
+      type: string
+    created:
+      type: datetime
+    updated:
+      type: datetime
