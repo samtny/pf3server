@@ -54,7 +54,13 @@ PF\Venue:
     created_token:
       type: string
       groups: [create]
+    created_app:
+      type: string
+      groups: [create]
     updated_token:
+      type: string
+      groups: [update]
+    updated_app:
       type: string
       groups: [update]
     created:

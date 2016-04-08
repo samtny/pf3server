@@ -22,7 +22,9 @@ class Venue {
   protected $status;
   protected $flag_reason;
   protected $created_token;
+  protected $created_app;
   protected $updated_token;
+  protected $updated_app;
   protected $created;
   protected $updated;
   protected $legacy_key;
@@ -106,7 +108,39 @@ class Venue {
   public function setUpdatedToken($updated_token) {
     $this->updated_token = $updated_token;
   }
-  
+
+  /**
+   * @return mixed
+   */
+  public function getCreatedApp()
+  {
+    return $this->created_app;
+  }
+
+  /**
+   * @param mixed $created_app
+   */
+  public function setCreatedApp($created_app)
+  {
+    $this->created_app = $created_app;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUpdatedApp()
+  {
+    return $this->updated_app;
+  }
+
+  /**
+   * @param mixed $updated_app
+   */
+  public function setUpdatedApp($updated_app)
+  {
+    $this->updated_app = $updated_app;
+  }
+
   public function getUpdated() {
     return $this->updated;
   }
