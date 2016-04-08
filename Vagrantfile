@@ -10,7 +10,7 @@ Vagrant.configure(2) do |config|
   config.vm.network "private_network", ip: "192.168.31.10"
 
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = "512"
+    vb.memory = "384"
     vb.name = "pf3server"
   end
 
