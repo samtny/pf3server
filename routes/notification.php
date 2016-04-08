@@ -72,9 +72,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $app->notFound();
     }
 
-    $notification->delete();
-
-    $entityManager->persist($notification);
+    $entityManager->remove($notification);
 
     $entityManager->flush();
 
