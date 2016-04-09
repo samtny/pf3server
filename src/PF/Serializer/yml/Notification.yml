@@ -11,19 +11,19 @@ PF\Notification:
       groups: [read]
     token:
       type: string
-      groups: [create, read, update]
+      groups: [admin, create, update]
     app:
       type: string
-      groups: [create, read, update]
+      groups: [admin, create, update]
     message:
       type: string
-      groups: [create, read, update]
+      groups: [admin, create, update]
     queryParams:
       type: string
-      groups: [create, read, update]
+      groups: [admin, create, update]
     status:
       type: string
-      groups: [create, update]
+      groups: [admin, create, update]
     created:
       type: DateTime
       groups: [read]

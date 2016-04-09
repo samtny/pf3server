@@ -131,4 +131,12 @@ class Notification {
   public function setUpdated($updated) {
     $this->updated = $updated;
   }
+
+  public function archive($migration = false) {
+    $this->status = "DELETED";
+
+    if (!$migration) {
+      $this->updated = new \DateTime("now");
+    }
+  }
 }

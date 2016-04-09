@@ -7,11 +7,16 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class NotificationRepository extends EntityRepository {
-  public function getAllNotifications() {
+  public function getPendingNotifications() {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('n'));
     $qb->from('\PF\Notification', 'n');
+
+    $s = !empty($request->get('s')) ? $request->get('s') : 'NEW';
+
+    $qb->andWhere($qb->expr()->eq('n.status', ':status'))
+      ->setParameter('status', $s);
 
     $qb->orderBy('n.updated', 'ASC');
 
@@ -25,6 +30,11 @@ class NotificationRepository extends EntityRepository {
 
     $qb->select(array('n'));
     $qb->from('\PF\Notification', 'n');
+
+    $s = !empty($request->get('s')) ? $request->get('s') : 'NEW';
+
+    $qb->andWhere($qb->expr()->eq('n.status', ':status'))
+      ->setParameter('status', $s);
 
     $qb->orderBy('n.updated', 'DESC');
 

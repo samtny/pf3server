@@ -27,7 +27,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
   });
 
   $app->post('/all/send', function () use ($app, $entityManager) {
-    $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getAllNotifications();
+    $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getPendingNotifications();
 
     $notifications = [];
 
@@ -45,7 +45,13 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
         } else {
           APNSService::sendAlert($client_pro, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
         }
+
+        $notification->archive();
+
+        $entityManager->persist($notification);
       }
+
+      $entityManager->flush();
     }
 
     $app->responseMessage = 'Sent ' . count($notifications) . ' notification(s)';
@@ -66,6 +72,12 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     } else {
       APNSService::sendAlert($client_pro, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
     }
+
+    $notification->archive();
+
+    $entityManager->persist($notification);
+
+    $entityManager->flush();
 
     $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
   });
