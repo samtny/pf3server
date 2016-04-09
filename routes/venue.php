@@ -34,6 +34,7 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
             $notification->setToken($created_token);
             $notification->setApp($created_app);
             $notification->setMessage('The venue \'' . $venue->getName() . '\' you added was approved!  Thank you!  -The Pinfinder Team');
+            $notification->setQueryParams('q=' . $venue->getId());
 
             $entityManager->persist($notification);
         }
