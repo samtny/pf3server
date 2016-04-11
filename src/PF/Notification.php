@@ -6,6 +6,7 @@ class Notification {
   protected $id;
   protected $token;
   protected $app;
+  protected $global;
   protected $message;
   protected $queryParams;
   protected $status;
@@ -44,6 +45,22 @@ class Notification {
    */
   public function setToken($token) {
     $this->token = $token;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getGlobal()
+  {
+    return $this->global;
+  }
+
+  /**
+   * @param mixed $global
+   */
+  public function setGlobal($global)
+  {
+    $this->global = $global;
   }
 
   /**

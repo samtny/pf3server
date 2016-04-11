@@ -18,6 +18,9 @@ PF\Notification:
     message:
       type: string
       groups: [admin, create, update]
+    global:
+      type: boolean
+      groups: [admin, create, update]
     queryParams:
       type: string
       groups: [admin, create, update]

@@ -10,12 +10,18 @@ PF\Notification:
   fields:
     token:
       type: string
+      nullable: true
     app:
       type: string
+      nullable: true
+    global:
+      type: boolean
+      nullable: true
     message:
       type: string
     queryParams:
       type: string
+      nullable: true
     status:
       type: string
     created:
