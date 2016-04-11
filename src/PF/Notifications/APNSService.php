@@ -5,6 +5,7 @@ namespace PF\Notifications;
 class APNSService {
   private static $client_free;
   private static $client_pro;
+  private static $errors;
 
   public static function createClient ($host, $port, $cert_path, $passphrase) {
     $streamContext = stream_context_create();
@@ -33,10 +34,38 @@ class APNSService {
     return self::$client_pro;
   }
 
-  public static function sendNotification($notification) {
+  public static function sendUserNotification($notification) {
+    self::$errors = array();
+
     $client = $notification->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
 
-    return APNSService::sendAlert($client, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
+    $result = APNSService::sendAlert($client, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
+
+    if (!$result) {
+      self::$errors[] = $notification->getToken();
+    }
+
+    return $result;
+  }
+
+  public static function sendGlobalNotification($notification, $tokens) {
+    self::$errors = array();
+
+    foreach ($tokens as $token) {
+      $client = $token->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
+
+      $result = APNSService::sendAlert($client, $token, $notification->getMessage(), $notification->getQueryParams());
+
+      if (!$result) {
+        self::$errors[] = $token;
+      }
+    }
+
+    return empty(self::$errors);
+  }
+
+  public static function getErrors() {
+    return self::$errors;
   }
 
   public static function sendAlert($client, $deviceToken, $alert, $queryParams) {

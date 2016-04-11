@@ -6,12 +6,14 @@ class Token {
   protected $id;
   protected $token;
   protected $app;
+  protected $status;
   protected $created;
   protected $updated;
 
   public function __construct() {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
+    $this->status = 'VALID';
   }
 
   /**
@@ -53,6 +55,22 @@ class Token {
   /**
    * @return mixed
    */
+  public function getStatus()
+  {
+    return $this->status;
+  }
+
+  /**
+   * @param mixed $status
+   */
+  public function setStatus($status)
+  {
+    $this->status = $status;
+  }
+
+  /**
+   * @return mixed
+   */
   public function getCreated() {
     return $this->created;
   }
@@ -76,5 +94,9 @@ class Token {
    */
   public function setUpdated($updated) {
     $this->updated = $updated;
+  }
+
+  public function flag() {
+    $this->status = 'FLAGGED';
   }
 }

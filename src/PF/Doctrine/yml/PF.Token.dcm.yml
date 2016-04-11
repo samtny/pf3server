@@ -11,6 +11,8 @@ PF\Token:
       type: string
     app:
       type: string
+    status:
+      type: string
     created:
       type: datetime
     updated:
