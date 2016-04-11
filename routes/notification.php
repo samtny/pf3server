@@ -119,6 +119,12 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
     $notification = $serializer->deserialize($json_notification_encoded, 'PF\Notification', 'json', $notification_deserialization_context);
 
+    if (!empty($json_notification_decoded['user']['id'])) {
+      $user = $entityManager->getRepository('\PF\User')->find($json_notification_decoded['user']['id']);
+
+      $notification->setUser($user);
+    }
+
     try {
       $entityManager->persist($notification);
 
