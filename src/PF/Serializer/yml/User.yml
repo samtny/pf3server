@@ -1,0 +1,22 @@
+PF\User:
+  exclusion_policy: NONE
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, username, created, updated]
+  properties:
+    id:
+      type: integer
+      groups: [admin]
+    username:
+      type: string
+      groups: [admin]
+    password:
+      exclude: true
+    created:
+      type: DateTime
+      groups: [admin]
+    updated:
+      type: DateTime
+      groups: [admin]

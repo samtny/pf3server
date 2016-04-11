@@ -10,7 +10,8 @@ PF\Notification:
       type: integer
       groups: [read]
     user:
-      exclude: true
+      type: 'PF\User'
+      groups: [admin]
     global:
       type: boolean
       groups: [admin, create, update]
