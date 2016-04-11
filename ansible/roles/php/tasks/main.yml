@@ -4,6 +4,9 @@
   with_items:
     - python-software-properties
 
+- name: Add php apt repository
+  apt_repository: repo='ppa:ondrej/php5-5.6' update_cache=yes
+
 - name: Install php
   apt: name={{ item }} state=present
   notify: Restart php
