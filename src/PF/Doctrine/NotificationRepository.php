@@ -12,11 +12,8 @@ class NotificationRepository extends EntityRepository {
 
     $qb->select(array('n'));
     $qb->from('\PF\Notification', 'n');
-
-    $s = !empty($request->get('s')) ? $request->get('s') : 'NEW';
-
-    $qb->andWhere($qb->expr()->eq('n.status', ':status'))
-      ->setParameter('status', $s);
+    $qb->where($qb->expr()->eq('n.status', ':status'))
+      ->setParameter('status', 'NEW');
 
     $qb->orderBy('n.updated', 'ASC');
 

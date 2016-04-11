@@ -5,6 +5,8 @@ namespace PF\Notifications;
 class APNSService {
   private static $client_free;
   private static $client_pro;
+  private static $feedback_client_free;
+  private static $feedback_client_pro;
   private static $errors;
 
   private static function createClient ($host, $port, $cert_path, $passphrase) {
@@ -32,6 +34,50 @@ class APNSService {
     }
 
     return self::$client_pro;
+  }
+
+  public static function createFreeFeedbackClient() {
+    if (!self::$feedback_client_free) {
+      self::$feedback_client_free = APNSService::createClient('feedback.push.apple.com', 2196, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
+    }
+
+    return self::$feedback_client_free;
+  }
+
+  public static function createProFeedbackClient() {
+    if (!self::$feedback_client_pro) {
+      self::$feedback_client_pro = APNSService::createClient('feedback.push.apple.com', 2196, __DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
+    }
+
+    return self::$feedback_client_pro;
+  }
+
+  public static function getFeedbackTokens() {
+    $feedback_tokens = array();
+
+    $client = APNSService::createFreeFeedbackClient();
+
+    while(!feof($client)) {
+      $data = fread($client, 38);
+
+      if(strlen($data)) {
+        $feedback_tokens[] = unpack("N1timestamp/n1length/H*devtoken", $data);
+      }
+    }
+    fclose($client);
+
+    $client = APNSService::createProFeedbackClient();
+
+    while(!feof($client)) {
+      $data = fread($client, 38);
+
+      if(strlen($data)) {
+        $feedback_tokens[] = unpack("N1timestamp/n1length/H*devtoken", $data);
+      }
+    }
+    fclose($client);
+
+    return $feedback_tokens;
   }
 
   public static function sendNotification($notification, $tokens) {

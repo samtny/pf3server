@@ -29,7 +29,11 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
   $app->post('/all/send', function () use ($app, $entityManager) {
     $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getPendingNotifications();
 
+    $count = 0;
+
     foreach ($notificationsIterator as $notification) {
+      $count += 1;
+
       if ($notification->getGlobal() === true) {
         $tokensIterator = $entityManager->getRepository('\PF\Token')->getValidTokens();
 
@@ -42,24 +46,8 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
           if (!empty($tokens)) {
             APNSService::sendNotification($notification, $tokens);
-
-            foreach (APNSService::getErrors() as $tokenString) {
-              $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString));
-
-              $token->flag();
-
-              $entityManager->persist($token);
-            }
           }
         }
-      }
-
-      foreach (APNSService::getErrors() as $tokenString) {
-        $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString));
-
-        $token->flag();
-
-        $entityManager->persist($token);
       }
 
       $notification->archive();
@@ -69,7 +57,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
     $entityManager->flush();
 
-    $app->responseMessage = 'Sent ' . count($notifications) . ' notification(s)';
+    $app->responseMessage = $count > 0 ? 'Sent ' . $count . ' notification(s)' : 'Nothing to send';
   });
 
   $app->post('/:id/send', function ($id) use ($app, $entityManager) {
@@ -86,14 +74,6 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
       if (!empty($tokens)) {
         APNSService::sendNotification($notification, $tokens);
-
-        foreach (APNSService::getErrors() as $tokenString) {
-          $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString));
-
-          $token->flag();
-
-          $entityManager->persist($token);
-        }
       }
     }
 
@@ -104,6 +84,27 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     $entityManager->flush();
 
     $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
+  });
+
+  $app->post('/feedback', function () use ($app, $entityManager, $serializer) {
+    $feedback_tokens = APNSService::getFeedbackTokens();
+
+    foreach ($feedback_tokens as $feedback_token) {
+      if (!empty($feedback_token['devtoken'])) {
+        $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $feedback_token['devtoken']));
+
+        if (!empty($token)) {
+          $token->flag();
+
+          $entityManager->persist($token);
+        }
+      }
+    }
+
+    $entityManager->flush();
+
+    $app->responseMessage = !empty($feedback_tokens) ? 'Flagged ' . count($feedback_tokens) . ' tokens' : 'No tokens were flagged';
+    $app->responseData = array('feedback_tokens' => $feedback_tokens);
   });
 
   $app->post('', function () use ($app, $entityManager, $serializer) {
