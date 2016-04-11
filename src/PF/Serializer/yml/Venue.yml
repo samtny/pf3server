@@ -52,7 +52,8 @@ PF\Venue:
       type: string
       groups: [admin]
     created_user:
-      exclude: true
+      type: 'PF\User'
+      groups: [admin]
     created:
       type: DateTime
       groups: [read]

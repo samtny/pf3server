@@ -2,20 +2,21 @@ PF\User:
   type: entity
   table: user
   id:
-      id:
-        type: integer
-        generator:
-          strategy: AUTO
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
   fields:
     username:
       type: string
+      nullable: true
     password:
       type: string
+      nullable: true
     created:
       type: datetime
     updated:
       type: datetime
-
   oneToMany:
     tokens:
       targetEntity: PF\Token
