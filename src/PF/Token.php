@@ -116,4 +116,8 @@ class Token {
   public function flag() {
     $this->status = 'FLAGGED';
   }
+
+  public function isFlagged() {
+    return $this->status === 'FLAGGED';
+  }
 }

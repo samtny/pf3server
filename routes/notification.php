@@ -33,9 +33,25 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       if ($notification->getGlobal() === true) {
         $tokensIterator = $entityManager->getRepository('\PF\Token')->getValidTokens();
 
-        APNSService::sendGlobalNotification($notification, $tokensIterator);
+        APNSService::sendNotification($notification, $tokensIterator);
       } else {
-        APNSService::sendUserNotification($notification);
+        $user = $notification->getUser();
+
+        if (!empty($user)) {
+          $tokens = $user->getTokens();
+
+          if (!empty($tokens)) {
+            APNSService::sendNotification($notification, $tokens);
+
+            foreach (APNSService::getErrors() as $tokenString) {
+              $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString));
+
+              $token->flag();
+
+              $entityManager->persist($token);
+            }
+          }
+        }
       }
 
       foreach (APNSService::getErrors() as $tokenString) {
@@ -63,14 +79,22 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $app->notFound();
     }
 
-    APNSService::sendUserNotification($notification);
+    $user = $notification->getUser();
 
-    foreach (APNSService::getErrors() as $tokenString) {
-      $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString));
+    if (!empty($user)) {
+      $tokens = $user->getTokens();
 
-      $token->flag();
+      if (!empty($tokens)) {
+        APNSService::sendNotification($notification, $tokens);
 
-      $entityManager->persist($token);
+        foreach (APNSService::getErrors() as $tokenString) {
+          $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString));
+
+          $token->flag();
+
+          $entityManager->persist($token);
+        }
+      }
     }
 
     $notification->archive();

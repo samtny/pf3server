@@ -7,7 +7,7 @@ class APNSService {
   private static $client_pro;
   private static $errors;
 
-  public static function createClient ($host, $port, $cert_path, $passphrase) {
+  private static function createClient ($host, $port, $cert_path, $passphrase) {
     $streamContext = stream_context_create();
 
     stream_context_set_option($streamContext, 'ssl', 'local_cert', $cert_path);
@@ -20,7 +20,7 @@ class APNSService {
 
   public static function createFreeClient() {
     if (!self::$client_free) {
-      self::$client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
+      self::$client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
     }
 
     return self::$client_free;
@@ -28,36 +28,24 @@ class APNSService {
 
   public static function createProClient() {
     if (!self::$client_pro) {
-      self::$client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
+      self::$client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
     }
 
     return self::$client_pro;
   }
 
-  public static function sendUserNotification($notification) {
-    self::$errors = array();
-
-    $client = $notification->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
-
-    $result = APNSService::sendAlert($client, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
-
-    if (!$result) {
-      self::$errors[] = $notification->getToken();
-    }
-
-    return $result;
-  }
-
-  public static function sendGlobalNotification($notification, $tokens) {
+  public static function sendNotification($notification, $tokens) {
     self::$errors = array();
 
     foreach ($tokens as $token) {
-      $client = $token->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
+      if (!$token->isFlagged()) {
+        $client = $token->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
 
-      $result = APNSService::sendAlert($client, $token, $notification->getMessage(), $notification->getQueryParams());
+        $result = APNSService::sendAlert($client, $token->getToken(), $notification->getMessage(), $notification->getQueryParams());
 
-      if (!$result) {
-        self::$errors[] = $token;
+        if (!$result) {
+          self::$errors[] = $token;
+        }
       }
     }
 

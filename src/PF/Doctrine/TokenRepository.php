@@ -6,7 +6,7 @@ use Doctrine;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class NotificationRepository extends EntityRepository {
+class TokenRepository extends EntityRepository {
   public function getValidTokens() {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
