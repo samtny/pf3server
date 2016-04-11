@@ -2,10 +2,13 @@
 
 namespace PF;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class User {
   protected $id;
   protected $username;
   protected $password;
+  protected $tokens;
   protected $created;
   protected $updated;
 
@@ -13,6 +16,7 @@ class User {
   {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
+    $this->tokens = new ArrayCollection();
   }
 
   /**
@@ -61,6 +65,22 @@ class User {
   public function setPassword($password)
   {
     $this->password = $password;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getTokens()
+  {
+    return $this->tokens;
+  }
+
+  /**
+   * @param mixed $tokens
+   */
+  public function setTokens($tokens)
+  {
+    $this->tokens = $tokens;
   }
 
   /**

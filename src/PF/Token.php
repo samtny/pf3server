@@ -4,6 +4,7 @@ namespace PF;
 
 class Token {
   protected $id;
+  protected $user;
   protected $token;
   protected $app;
   protected $status;
@@ -28,6 +29,22 @@ class Token {
    */
   public function setId($id) {
     $this->id = $id;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUser()
+  {
+    return $this->user;
+  }
+
+  /**
+   * @param mixed $user
+   */
+  public function setUser($user)
+  {
+    $this->user = $user;
   }
 
   /**

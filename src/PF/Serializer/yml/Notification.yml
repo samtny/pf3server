@@ -9,17 +9,13 @@ PF\Notification:
     id:
       type: integer
       groups: [read]
-    token:
-      type: string
-      groups: [admin, create, update]
-    app:
-      type: string
+    user:
+      exclude: true
+    global:
+      type: boolean
       groups: [admin, create, update]
     message:
       type: string
-      groups: [admin, create, update]
-    global:
-      type: boolean
       groups: [admin, create, update]
     queryParams:
       type: string

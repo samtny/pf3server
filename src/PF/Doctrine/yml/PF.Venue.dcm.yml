@@ -52,18 +52,6 @@ PF\Venue:
     flag_reason:
       type: string
       nullable: true
-    created_token:
-      type: string
-      nullable: true
-    created_app:
-      type: string
-      nullable: true
-    updated_token:
-      type: string
-      nullable: true
-    updated_app:
-      type: string
-      nullable: true
     created:
       type: datetime
     updated:
@@ -78,6 +66,10 @@ PF\Venue:
       mappedBy: venue
       cascade: ["persist", "remove", "merge"]
     comments:
-         targetEntity: PF\Comment
-         mappedBy: venue
-         cascade: ["persist", "remove", "merge"]
+       targetEntity: PF\Comment
+       mappedBy: venue
+       cascade: ["persist", "remove", "merge"]
+
+  manyToOne:
+    created_user:
+      targetEntity: PF\User

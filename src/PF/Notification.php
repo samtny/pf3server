@@ -4,8 +4,7 @@ namespace PF;
 
 class Notification {
   protected $id;
-  protected $token;
-  protected $app;
+  protected $user;
   protected $global;
   protected $message;
   protected $queryParams;
@@ -36,15 +35,17 @@ class Notification {
   /**
    * @return mixed
    */
-  public function getToken() {
-    return $this->token;
+  public function getUser()
+  {
+    return $this->user;
   }
 
   /**
-   * @param mixed $token
+   * @param mixed $user
    */
-  public function setToken($token) {
-    $this->token = $token;
+  public function setUser($user)
+  {
+    $this->user = $user;
   }
 
   /**
@@ -61,22 +62,6 @@ class Notification {
   public function setGlobal($global)
   {
     $this->global = $global;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getApp()
-  {
-    return $this->app;
-  }
-
-  /**
-   * @param mixed $app
-   */
-  public function setApp($app)
-  {
-    $this->app = $app;
   }
 
   /**

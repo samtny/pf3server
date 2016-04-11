@@ -17,3 +17,8 @@ PF\Token:
       type: datetime
     updated:
       type: datetime
+
+  manyToOne:
+    user:
+      targetEntity: PF\User
+      inversedBy: tokens

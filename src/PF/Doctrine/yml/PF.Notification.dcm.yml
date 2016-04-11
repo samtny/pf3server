@@ -8,12 +8,6 @@ PF\Notification:
       generator:
         strategy: AUTO
   fields:
-    token:
-      type: string
-      nullable: true
-    app:
-      type: string
-      nullable: true
     global:
       type: boolean
       nullable: true
@@ -28,3 +22,8 @@ PF\Notification:
       type: datetime
     updated:
       type: datetime
+
+  manyToOne:
+    user:
+      targetEntity: PF\User
+      nullable: true

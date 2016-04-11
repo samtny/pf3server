@@ -21,10 +21,7 @@ class Venue {
   protected $url;
   protected $status;
   protected $flag_reason;
-  protected $created_token;
-  protected $created_app;
-  protected $updated_token;
-  protected $updated_app;
+  protected $created_user;
   protected $created;
   protected $updated;
   protected $legacy_key;
@@ -93,52 +90,14 @@ class Venue {
     $this->created = $created;
   }
 
-  public function getCreatedToken() {
-    return $this->created_token;
-  }
-
-  public function setCreatedToken($created_token) {
-    $this->created_token = $created_token;
-  }
-
-  public function getUpdatedToken() {
-    return $this->updated_token;
-  }
-
-  public function setUpdatedToken($updated_token) {
-    $this->updated_token = $updated_token;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getCreatedApp()
+  public function getCreatedUser()
   {
-    return $this->created_app;
+    return $this->created_user;
   }
 
-  /**
-   * @param mixed $created_app
-   */
-  public function setCreatedApp($created_app)
+  public function setCreatedUser($created_user)
   {
-    $this->created_app = $created_app;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getUpdatedApp()
-  {
-    return $this->updated_app;
-  }
-
-  /**
-   * @param mixed $updated_app
-   */
-  public function setUpdatedApp($updated_app)
-  {
-    $this->updated_app = $updated_app;
+    $this->created_user = $created_user;
   }
 
   public function getUpdated() {

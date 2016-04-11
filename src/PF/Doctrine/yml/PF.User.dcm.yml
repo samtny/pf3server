@@ -15,3 +15,9 @@ PF\User:
       type: datetime
     updated:
       type: datetime
+
+  oneToMany:
+    tokens:
+      targetEntity: PF\Token
+      mappedBy: user
+      cascade: ["persist", "remove", "merge"]
