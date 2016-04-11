@@ -3,6 +3,9 @@
 namespace PF\Notifications;
 
 class APNSService {
+  private static $client_free;
+  private static $client_pro;
+
   public static function createClient ($host, $port, $cert_path, $passphrase) {
     $streamContext = stream_context_create();
 
@@ -12,6 +15,28 @@ class APNSService {
     $client = stream_socket_client('ssl://' . $host . ':' . $port, $error, $errorString, 2, STREAM_CLIENT_CONNECT, $streamContext);
 
     return empty($error) ? $client : FALSE;
+  }
+
+  public static function createFreeClient() {
+    if (!self::$client_free) {
+      self::$client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
+    }
+
+    return self::$client_free;
+  }
+
+  public static function createProClient() {
+    if (!self::$client_pro) {
+      self::$client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
+    }
+
+    return self::$client_pro;
+  }
+
+  public static function sendNotification($notification) {
+    $client = $notification->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
+
+    return APNSService::sendAlert($client, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
   }
 
   public static function sendAlert($client, $deviceToken, $alert, $queryParams) {

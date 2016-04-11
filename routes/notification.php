@@ -29,30 +29,15 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
   $app->post('/all/send', function () use ($app, $entityManager) {
     $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getPendingNotifications();
 
-    $notifications = [];
-
     foreach ($notificationsIterator as $notification) {
-      $notifications[] = $notification;
+      APNSService::sendNotification($notification);
+
+      $notification->archive();
+
+      $entityManager->persist($notification);
     }
 
-    if (!empty($notifications)) {
-      $client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
-      $client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
-
-      foreach ($notifications as $notification) {
-        if ($notification->getApp() === 'apnsfree') {
-          APNSService::sendAlert($client_free, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
-        } else {
-          APNSService::sendAlert($client_pro, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
-        }
-
-        $notification->archive();
-
-        $entityManager->persist($notification);
-      }
-
-      $entityManager->flush();
-    }
+    $entityManager->flush();
 
     $app->responseMessage = 'Sent ' . count($notifications) . ' notification(s)';
   });
@@ -64,14 +49,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $app->notFound();
     }
 
-    $client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
-    $client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
-
-    if ($notification->getApp() === 'apnsfree') {
-      APNSService::sendAlert($client_free, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
-    } else {
-      APNSService::sendAlert($client_pro, $notification->getToken(), $notification->getMessage(), $notification->getQueryParams());
-    }
+    APNSService::sendNotification($notification);
 
     $notification->archive();
 
