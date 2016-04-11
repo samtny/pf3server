@@ -82,21 +82,6 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
   });
 
-  $app->post('/:id/approve', function ($id) use ($app, $entityManager) {
-    $notification = $entityManager->getRepository('\PF\Notification')->find($id);
-
-    if (empty($notification)) {
-      $app->notFound();
-    }
-
-    $notification->approve();
-
-    $entityManager->persist($notification);
-    $entityManager->flush();
-
-    $app->responseMessage = 'Approved Notification with ID ' . $notification->getId();
-  });
-
   $app->post('', function () use ($app, $entityManager, $serializer) {
     $json_notification_encoded = $app->request->getBody();
 

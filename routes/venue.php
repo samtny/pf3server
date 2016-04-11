@@ -25,18 +25,14 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
         $venue->approve();
         $entityManager->persist($venue);
 
-        $created_token = $venue->getCreatedToken();
-        $created_app = $venue->getCreatedApp();
+        if (!empty($venue->getCreatedUser())) {
+          $notification = new \PF\Notification();
 
-        if (!empty($created_token) && !empty($created_app)) {
-            $notification = new \PF\Notification();
+          $notification->setUser($venue->getCreatedUser());
+          $notification->setMessage('The venue \'' . $venue->getName() . '\' you added was approved!  Thank you!  -The Pinfinder Team');
+          $notification->setQueryParams('q=' . $venue->getId());
 
-            $notification->setToken($created_token);
-            $notification->setApp($created_app);
-            $notification->setMessage('The venue \'' . $venue->getName() . '\' you added was approved!  Thank you!  -The Pinfinder Team');
-            $notification->setQueryParams('q=' . $venue->getId());
-
-            $entityManager->persist($notification);
+          $entityManager->persist($notification);
         }
 
         $entityManager->flush();
