@@ -1,6 +1,10 @@
 PF\Token:
   type: entity
+  repositoryClass: PF\Doctrine\TokenRepository
   table: token
+  indexes:
+    token_app_idx:
+      columns: [ token, app ]
   id:
     id:
       type: integer

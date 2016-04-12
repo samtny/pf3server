@@ -67,13 +67,19 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $app->notFound();
     }
 
-    $user = $notification->getUser();
+    if ($notification->getGlobal() === true) {
+      $tokensIterator = $entityManager->getRepository('\PF\Token')->getValidTokens();
 
-    if (!empty($user)) {
-      $tokens = $user->getTokens();
+      APNSService::sendNotification($notification, $tokensIterator);
+    } else {
+      $user = $notification->getUser();
 
-      if (!empty($tokens)) {
-        APNSService::sendNotification($notification, $tokens);
+      if (!empty($user)) {
+        $tokens = $user->getTokens();
+
+        if (!empty($tokens)) {
+          APNSService::sendNotification($notification, $tokens);
+        }
       }
     }
 

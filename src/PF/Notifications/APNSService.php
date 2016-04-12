@@ -85,12 +85,10 @@ class APNSService {
 
     foreach ($tokens as $token) {
       if (!$token->isFlagged()) {
-        $client = $token->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
+        if ($token->getToken() == 'apnsfree' || $token->getToken() == 'apnspro') {
+          $client = $token->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
 
-        $result = APNSService::sendAlert($client, $token->getToken(), $notification->getMessage(), $notification->getQueryParams());
-
-        if (!$result) {
-          self::$errors[] = $token;
+          $result = APNSService::sendAlert($client, $token->getToken(), $notification->getMessage(), $notification->getQueryParams());
         }
       }
     }
@@ -123,7 +121,13 @@ class APNSService {
     $apnsMessage .= chr(0) . chr(mb_strlen($payload)); // payload length
     $apnsMessage .= $payload;
 
-    $result = fwrite($client, $apnsMessage);
+    try {
+      $result = fwrite($client, $apnsMessage);
+    } catch (\ErrorException $e) {
+      fclose($client);
+
+      usleep(500000);
+    }
 
     return ($result == FALSE || $client == FALSE) ? FALSE : $result;
   }

@@ -12,7 +12,7 @@ class TokenRepository extends EntityRepository {
 
     $qb->select(array('t'));
     $qb->from('\PF\Token', 't');
-    $qb->where($qb->expr()->eq('n.status', ':status'))
+    $qb->where($qb->expr()->eq('t.status', ':status'))
       ->setParameter('status', 'VALID');
 
     $query = $qb->getQuery();
