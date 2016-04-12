@@ -1,6 +1,6 @@
 <?php
 
-namespace PF\Notifications;
+namespace PF\APNS;
 
 class PinfinderAPNS {
   private static $client_free;
