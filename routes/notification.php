@@ -1,7 +1,7 @@
 <?php
 
 use JMS\Serializer\DeserializationContext;
-use PF\Notifications\PinfinderAPNS;
+use PF\APNS\PinfinderAPNS;
 
 $app->group('/notification', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
   $app->get('/search', function () use ($app, $entityManager) {
@@ -95,11 +95,15 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
   $app->post('/feedback', function () use ($app, $entityManager, $serializer) {
     $feedback_tokens = PinfinderAPNS::getFeedbackTokens();
 
+    $flagged = 0;
+
     foreach ($feedback_tokens as $feedback_token) {
       if (!empty($feedback_token['devtoken'])) {
         $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $feedback_token['devtoken']));
 
         if (!empty($token)) {
+          $flagged += 1;
+
           $token->flag();
 
           $entityManager->persist($token);
@@ -109,7 +113,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
     $entityManager->flush();
 
-    $app->responseMessage = !empty($feedback_tokens) ? 'Flagged ' . count($feedback_tokens) . ' tokens' : 'No tokens were flagged';
+    $app->responseMessage = ($flagged > 0) ? 'Flagged ' . $flagged . ' tokens' : 'No tokens were flagged';
     $app->responseData = array('feedback_tokens' => $feedback_tokens);
   });
 
