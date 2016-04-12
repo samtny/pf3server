@@ -29,6 +29,14 @@ $app->group('/machine', function () use ($app, $entityManager, $serializer, $adm
 
     $machine->setGame($game);
 
+    if (!$is_new_machine) {
+      $venue = $machine->getVenue();
+
+      $venue->touch();
+
+      $entityManager->persist($venue);
+    }
+
     try {
       $entityManager->persist($machine);
 
