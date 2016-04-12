@@ -2,7 +2,7 @@
 
 namespace PF\Notifications;
 
-class APNSService {
+class PinfinderAPNS {
   private static $client_free;
   private static $client_pro;
   private static $feedback_client_free;
@@ -22,7 +22,7 @@ class APNSService {
 
   public static function createFreeClient() {
     if (!self::$client_free) {
-      self::$client_free = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
+      self::$client_free = PinfinderAPNS::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
     }
 
     return self::$client_free;
@@ -30,7 +30,7 @@ class APNSService {
 
   public static function createProClient() {
     if (!self::$client_pro) {
-      self::$client_pro = APNSService::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
+      self::$client_pro = PinfinderAPNS::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
     }
 
     return self::$client_pro;
@@ -38,7 +38,7 @@ class APNSService {
 
   public static function createFreeFeedbackClient() {
     if (!self::$feedback_client_free) {
-      self::$feedback_client_free = APNSService::createClient('feedback.push.apple.com', 2196, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
+      self::$feedback_client_free = PinfinderAPNS::createClient('feedback.push.apple.com', 2196, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
     }
 
     return self::$feedback_client_free;
@@ -46,7 +46,7 @@ class APNSService {
 
   public static function createProFeedbackClient() {
     if (!self::$feedback_client_pro) {
-      self::$feedback_client_pro = APNSService::createClient('feedback.push.apple.com', 2196, __DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
+      self::$feedback_client_pro = PinfinderAPNS::createClient('feedback.push.apple.com', 2196, __DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
     }
 
     return self::$feedback_client_pro;
@@ -55,7 +55,7 @@ class APNSService {
   public static function getFeedbackTokens() {
     $feedback_tokens = array();
 
-    $client = APNSService::createFreeFeedbackClient();
+    $client = PinfinderAPNS::createFreeFeedbackClient();
 
     while(!feof($client)) {
       $data = fread($client, 38);
@@ -66,7 +66,7 @@ class APNSService {
     }
     fclose($client);
 
-    $client = APNSService::createProFeedbackClient();
+    $client = PinfinderAPNS::createProFeedbackClient();
 
     while(!feof($client)) {
       $data = fread($client, 38);
@@ -83,12 +83,14 @@ class APNSService {
   public static function sendNotification($notification, $tokens) {
     self::$errors = array();
 
+    $expiry = (new \DateTime('+24 hours'))->getTimestamp();
+
     foreach ($tokens as $token) {
       if (!$token->isFlagged()) {
         if ($token->getToken() == 'apnsfree' || $token->getToken() == 'apnspro') {
           $client = $token->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
 
-          $result = APNSService::sendAlert($client, $token->getToken(), $notification->getMessage(), $notification->getQueryParams());
+          $result = PinfinderAPNS::sendAlert($client, $token->getToken(), $token->getId(), $expiry, $notification->getMessage(), $notification->getQueryParams());
         }
       }
     }
@@ -100,7 +102,7 @@ class APNSService {
     return self::$errors;
   }
 
-  public static function sendAlert($client, $deviceToken, $alert, $queryParams) {
+  public static function sendAlert($client, $deviceToken, $identifier, $expiry, $alert, $queryParams) {
     $cleanDeviceToken = preg_replace('/\s|<|>/', '', $deviceToken);
 
     $payload = array(
@@ -115,7 +117,9 @@ class APNSService {
 
     $payload = json_encode($payload);
 
-    $apnsMessage = chr(0); // command
+    $apnsMessage = chr(1); // command (enhanced notification format)
+    $apnsMessage .= pack('N', $identifier); // 4-byte identifier
+    $apnsMessage .= pack('N', $expiry); // 4-byte expiry
     $apnsMessage .= chr(0) . chr(32); //token length
     $apnsMessage .= pack('H*', $cleanDeviceToken); // token
     $apnsMessage .= chr(0) . chr(mb_strlen($payload)); // payload length
@@ -123,10 +127,44 @@ class APNSService {
 
     try {
       $result = fwrite($client, $apnsMessage);
-    } catch (\ErrorException $e) {
-      fclose($client);
+    } catch (\Exception $e) {
+      try {
+        // try again
+        $result = fwrite($client, $apnsMessage);
+      } catch (\Exception $e) {
+        while(!feof($client)) {
+          $data = fread($client, 6);
 
-      usleep(500000);
+          if (!strlen($data)) {
+            // connection closed
+            fclose($client);
+
+            var_dump('connection closed');exit;
+          } else if(strlen($data) === 6) {
+            $error = unpack("C1command/C1status/N1identifier", $data);
+
+            switch ($error['status']) {
+              case 8:
+                // bad token
+                var_dump($error);exit;
+
+                break;
+              case 10:
+                // connection 'closed'
+                fclose($client);
+
+                var_dump($error);exit;
+
+                break;
+              default:
+                // other error (token not necessarily bad)
+                var_dump($error);exit;
+
+                break;
+            }
+          }
+        }
+      }
     }
 
     return ($result == FALSE || $client == FALSE) ? FALSE : $result;

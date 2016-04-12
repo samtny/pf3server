@@ -1,7 +1,7 @@
 <?php
 
 use JMS\Serializer\DeserializationContext;
-use PF\Notifications\APNSService;
+use PF\Notifications\PinfinderAPNS;
 
 $app->group('/notification', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
   $app->get('/search', function () use ($app, $entityManager) {
@@ -35,9 +35,9 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $count += 1;
 
       if ($notification->getGlobal() === true) {
-        $tokensIterator = $entityManager->getRepository('\PF\Token')->getValidTokens();
+        $tokensIterator = $entityManager->getRepository('\PF\Token')->getValidTokens(true);
 
-        APNSService::sendNotification($notification, $tokensIterator);
+        PinfinderAPNS::sendNotification($notification, $tokensIterator);
       } else {
         $user = $notification->getUser();
 
@@ -45,7 +45,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
           $tokens = $user->getTokens();
 
           if (!empty($tokens)) {
-            APNSService::sendNotification($notification, $tokens);
+            PinfinderAPNS::sendNotification($notification, $tokens);
           }
         }
       }
@@ -70,7 +70,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     if ($notification->getGlobal() === true) {
       $tokensIterator = $entityManager->getRepository('\PF\Token')->getValidTokens();
 
-      APNSService::sendNotification($notification, $tokensIterator);
+      PinfinderAPNS::sendNotification($notification, $tokensIterator);
     } else {
       $user = $notification->getUser();
 
@@ -78,7 +78,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
         $tokens = $user->getTokens();
 
         if (!empty($tokens)) {
-          APNSService::sendNotification($notification, $tokens);
+          PinfinderAPNS::sendNotification($notification, $tokens);
         }
       }
     }
@@ -93,7 +93,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
   });
 
   $app->post('/feedback', function () use ($app, $entityManager, $serializer) {
-    $feedback_tokens = APNSService::getFeedbackTokens();
+    $feedback_tokens = PinfinderAPNS::getFeedbackTokens();
 
     foreach ($feedback_tokens as $feedback_token) {
       if (!empty($feedback_token['devtoken'])) {
