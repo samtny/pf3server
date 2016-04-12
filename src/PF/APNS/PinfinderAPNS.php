@@ -125,18 +125,29 @@ class PinfinderAPNS {
     $apnsMessage .= chr(0) . chr(mb_strlen($payload)); // payload length
     $apnsMessage .= $payload;
 
+    $result = PinfinderAPNS::writeMessage($client, $apnsMessage);
+
+    return ($result == FALSE || $client == FALSE) ? FALSE : $result;
+  }
+
+  public static function writeMessage($client, $apnsMessage) {
+    $result = FALSE;
+
     try {
       $result = fwrite($client, $apnsMessage);
     } catch (\Exception $e) {
       try {
+        usleep(10000);
+
         // try again
         $result = fwrite($client, $apnsMessage);
       } catch (\Exception $e) {
+        $identifiers = array();
+
         while(!feof($client)) {
           $data = fread($client, 6);
 
           if (!strlen($data)) {
-            // connection closed
             fclose($client);
 
             var_dump('connection closed');exit;
@@ -145,28 +156,29 @@ class PinfinderAPNS {
 
             switch ($error['status']) {
               case 8:
-                // bad token
-                var_dump($error);exit;
+                $identifiers[] = $error['identifier'];
 
                 break;
               case 10:
-                // connection 'closed'
                 fclose($client);
 
-                var_dump($error);exit;
-
+                $identifiers[] = $error['identifier'];
                 break;
               default:
-                // other error (token not necessarily bad)
-                var_dump($error);exit;
+                $identifiers[] = $error['identifier'];
 
                 break;
             }
           }
         }
+
+        if (!empty($identifiers)) {
+          // needs rewind...
+          var_dump($identifiers);exit;
+        }
       }
     }
 
-    return ($result == FALSE || $client == FALSE) ? FALSE : $result;
+    return $result;
   }
 }
