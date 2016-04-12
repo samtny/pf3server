@@ -62,6 +62,10 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
 
         $venue = $serializer->deserialize($json_venue_encoded, 'PF\Venue', 'json', $venue_deserialization_context);
 
+        if (!$is_new_venue) {
+          $venue->touch();
+        }
+
         if (!empty($json_venue_decoded['machines'])) {
             foreach ($json_venue_decoded['machines'] as $json_machine_decoded) {
                 $json_machine_encoded = json_encode($json_machine_decoded);

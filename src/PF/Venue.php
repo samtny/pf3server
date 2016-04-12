@@ -223,4 +223,8 @@ class Venue {
   public function setLegacyKey($legacy_key) {
     $this->legacy_key = $legacy_key;
   }
+
+  public function touch() {
+    $this->updated = new \DateTime("now");
+  }
 }
