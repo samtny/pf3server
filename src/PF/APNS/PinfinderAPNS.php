@@ -7,7 +7,9 @@ class PinfinderAPNS {
   private static $client_pro;
   private static $feedback_client_free;
   private static $feedback_client_pro;
-  private static $errors;
+  private static $error_identifiers;
+
+  const APNS_WRITE_RETRIES = 1;
 
   private static function createClient ($host, $port, $cert_path, $passphrase) {
     $streamContext = stream_context_create();
@@ -18,22 +20,6 @@ class PinfinderAPNS {
     $client = stream_socket_client('ssl://' . $host . ':' . $port, $error, $errorString, 2, STREAM_CLIENT_CONNECT, $streamContext);
 
     return empty($error) ? $client : FALSE;
-  }
-
-  public static function createFreeClient() {
-    if (!self::$client_free) {
-      self::$client_free = PinfinderAPNS::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
-    }
-
-    return self::$client_free;
-  }
-
-  public static function createProClient() {
-    if (!self::$client_pro) {
-      self::$client_pro = PinfinderAPNS::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem', '');
-    }
-
-    return self::$client_pro;
   }
 
   public static function createFreeFeedbackClient() {
@@ -80,26 +66,44 @@ class PinfinderAPNS {
     return $feedback_tokens;
   }
 
+  /**
+   * @param $notification
+   * @param \Iterator $tokens
+   * @return bool
+   */
   public static function sendNotification($notification, $tokens) {
-    self::$errors = array();
+    self::$error_identifiers = array();
 
     $expiry = (new \DateTime('+24 hours'))->getTimestamp();
 
-    foreach ($tokens as $token) {
-      if (!$token->isFlagged()) {
-        if ($token->getToken() == 'apnsfree' || $token->getToken() == 'apnspro') {
-          $client = $token->getApp() === 'apnsfree' ? self::createFreeClient() : self::createProClient();
+    $client = PinfinderAPNS::createClient('gateway.push.apple.com', 2195, __DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem', '');
 
-          $result = PinfinderAPNS::sendAlert($client, $token->getToken(), $token->getId(), $expiry, $notification->getMessage(), $notification->getQueryParams());
+    foreach ($tokens as $token) {
+      if (!$token->isFlagged() && $token->getApp() === 'apnspro2') {
+        if (!$client) {
+          $client = self::createProClient();
         }
+
+        $result = PinfinderAPNS::sendAlert($client, $token->getToken(), $token->getId(), $expiry, $notification->getMessage(), $notification->getQueryParams());
       }
     }
 
-    return empty(self::$errors);
+    $read = array($client);
+    $write = NULL;
+    $except = NULL;
+
+    stream_select($read, $write, $except, 5);
+
+    if (!empty($read)) {
+      PinfinderAPNS::readBadTokens($client);
+    }
+
+    return empty(self::$error_identifiers);
   }
 
-  public static function getErrors() {
-    return self::$errors;
+  public static function getErrorIdentifiers()
+  {
+    return self::$error_identifiers;
   }
 
   public static function sendAlert($client, $deviceToken, $identifier, $expiry, $alert, $queryParams) {
@@ -130,55 +134,39 @@ class PinfinderAPNS {
     return ($result == FALSE || $client == FALSE) ? FALSE : $result;
   }
 
-  public static function writeMessage($client, $apnsMessage) {
+  public static function writeMessage($client, $apnsMessage, $nestLevel = 0) {
     $result = FALSE;
 
     try {
       $result = fwrite($client, $apnsMessage);
     } catch (\Exception $e) {
-      try {
-        usleep(10000);
+      $read = array($client);
+      $write = array($client);
+      $except = NULL;
 
-        // try again
-        $result = fwrite($client, $apnsMessage);
-      } catch (\Exception $e) {
-        $identifiers = array();
+      stream_select($read, $write, $except, 5);
 
-        while(!feof($client)) {
-          $data = fread($client, 6);
-
-          if (!strlen($data)) {
-            fclose($client);
-
-            var_dump('connection closed');exit;
-          } else if(strlen($data) === 6) {
-            $error = unpack("C1command/C1status/N1identifier", $data);
-
-            switch ($error['status']) {
-              case 8:
-                $identifiers[] = $error['identifier'];
-
-                break;
-              case 10:
-                fclose($client);
-
-                $identifiers[] = $error['identifier'];
-                break;
-              default:
-                $identifiers[] = $error['identifier'];
-
-                break;
-            }
-          }
-        }
-
-        if (!empty($identifiers)) {
-          // needs rewind...
-          var_dump($identifiers);exit;
-        }
+      if (!empty($write) && $nestLevel < PinfinderAPNS::APNS_WRITE_RETRIES) {
+        $result = PinfinderAPNS::writeMessage($client, $apnsMessage, $nestLevel + 1);
+      } else if (!empty($read)) {
+        PinfinderAPNS::readBadTokens($client);
+      } else {
+        fclose($client);
       }
     }
 
     return $result;
+  }
+
+  public static function readBadTokens($client) {
+    while($client && !feof($client)) {
+      $data = fread($client, 6);
+
+      if(strlen($data) === 6) {
+        $error = unpack("C1command/C1status/N1identifier", $data);
+
+        self::$error_identifiers[] = $error['identifier'];
+      }
+    }
   }
 }
