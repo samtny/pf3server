@@ -32,7 +32,6 @@ class Client {
     $this->passphrase = $passphrase;
     $this->host = $host;
     $this->port = $port;
-    $this->badTokens = array();
   }
 
   public function connect() {
@@ -43,7 +42,9 @@ class Client {
 
     $this->stream_socket_client = stream_socket_client('ssl://' . $this->host . ':' . $this->port, $error, $errorString, 2, STREAM_CLIENT_CONNECT, $streamContext);
 
-    !empty($error) && throw new \Exception('Error creating stream socket client: ' . $errorString);
+     if (!empty($error)) {
+       throw new \Exception('Error creating stream socket client: ' . $errorString);
+     }
   }
 
   public function disconnect() {
@@ -56,16 +57,17 @@ class Client {
     }
 
     $this->payload = is_array($payload) ? json_encode($payload) : $payload;
-    $this->payload_length = mb_strlen($payload);
+    $this->payload_length = mb_strlen($this->payload);
     $this->tokenIterator = $tokenIterator;
     $this->expiry = $expiry;
 
     $this->tokenBatch = array();
     $this->tokenBatchCount = 0;
     $this->tokensSent = 0;
+    $this->badTokens = array();
 
     foreach ($tokenIterator as $token) {
-      $this->tokenBatch[] = preg_replace('/\s|<|>/', '', $token);
+      $this->tokenBatch[] = $token;
       $this->tokenBatchCount += 1;
 
       if ($this->tokenBatchCount === Client::FASTAPNS_BATCH_SIZE) {
@@ -80,6 +82,10 @@ class Client {
     }
   }
 
+  public function getBadTokens() {
+    return $this->badTokens;
+  }
+
   private function _sendTokenBatch() {
     $this->tokenBatchPointer = 0;
 
@@ -87,11 +93,13 @@ class Client {
       $token = $this->tokenBatch[$this->tokenBatchPointer];
 
       if (!$this->tokenBatchPointerBadToken) {
+        $cleanToken = preg_replace('/\s|<|>/', '', $token);
+
         $notification_bytes = chr(1);
         $notification_bytes .= pack('N', $this->tokenBatchPointer);
         $notification_bytes .= pack('N', $this->expiry);
         $notification_bytes .= chr(0) . chr(32);
-        $notification_bytes .= pack('H*', $token);
+        $notification_bytes .= pack('H*', $cleanToken);
         $notification_bytes .= chr(0) . chr($this->payload_length);
         $notification_bytes .= $this->payload;
 
@@ -165,20 +173,20 @@ class Client {
 
     switch ($error['status']) {
       case 10:
-        $this->_rewind($bytes['identifier']);
+        $this->_rewind($error['identifier'] - 1);
         $this->_reconnect();
 
         break;
       case 8:
-        $this->_rewind($bytes['identifier']);
+        $this->_rewind($error['identifier'] - 1);
         $this->tokenBatchPointerBadToken = TRUE;
 
         break;
       default:
-        if ($bytes['identifier'] === 0) {
+        if ($error['identifier'] === 0) {
           throw new \Exception('Could not send any notifications; check your payload for correctness');
         } else {
-          $this->_rewind($bytes['identifier']);
+          $this->_rewind($error['identifier'] - 1);
           $this->_reconnect();
         }
 
