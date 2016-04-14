@@ -14,7 +14,7 @@
   "autoload": {
     "psr-4": {
       "PF\\": "src/PF/",
-      "FastAPNS\\" : "src/samtny/src/FastAPNS"
+      "FastAPNS\\" : "src/samtny/fastapns/src/FastAPNS"
     }
   },
   "require-dev": {
