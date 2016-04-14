@@ -1,0 +1,22 @@
+{
+  "name": "samtny/fastapns",
+  "type": "library",
+  "description": "Library for pushing APNs notifications to Apple's servers at warp speed",
+  "keywords": ["apns", "ios", "xcode", "apple"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sam Thompson",
+      "email": "samtny@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "FastAPNS\\" : "src/FastAPNS"
+    }
+  }
+}
