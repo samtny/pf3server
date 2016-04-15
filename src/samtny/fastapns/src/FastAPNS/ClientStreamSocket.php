@@ -3,6 +3,9 @@
 namespace FastAPNS;
 
 class ClientStreamSocket {
+  const FASTAPNS_CONNECTION_TIMEOUT = 5;
+  const FASTAPNS_WRITE_RETRIES = 2;
+
   private $local_cert;
   private $passphrase;
   private $host;
@@ -20,7 +23,7 @@ class ClientStreamSocket {
   }
 
   public function getError() {
-    return $error;
+    return $this->error;
   }
 
   public function connect() {
@@ -40,90 +43,76 @@ class ClientStreamSocket {
     fclose($this->stream_socket_client);
   }
 
+  private function reconnect() {
+    $this->disconnect();
+    $this->connect();
+  }
+
   public function isConnected() {
     return $this->stream_socket_client !== FALSE;
   }
 
-  public function write($notification_bytes, $nestLevel = 0) {
+  /**
+   * @param $notification_bytes
+   * @return bool
+   */
+  public function write($notification_bytes) {
+    $this->error = NULL;
+
     try {
-      fwrite($this->stream_socket_client, $notification_bytes);
+      return fwrite($this->stream_socket_client, $notification_bytes);
     } catch (\Exception $e) {
-      $read = array($this->stream_socket_client);
-      $write = array($this->stream_socket_client);
-      $except = NULL;
-
-      stream_select($read, $write, $except, Client::FASTAPNS_CONNECTION_TIMEOUT);
-
-      if (!empty($write) && $nestLevel < Client::FASTAPNS_WRITE_RETRIES) {
-        $this->write($notification_bytes, $nestLevel + 1);
-      } else if (!empty($read)) {
-        $this->read();
-      } else {
-        $this->_reconnect();
-      }
+      return FALSE;
     }
   }
 
-  public function finish() {
+  public function retry($notification_bytes) {
     $read = array($this->stream_socket_client);
-    // TODO: implement batch rewind and be prepared to write immediately;
+    $write = array($this->stream_socket_client);
+    $except = NULL;
+
+    stream_select($read, $write, $except, ClientStreamSocket::FASTAPNS_CONNECTION_TIMEOUT);
+
+    if (!empty($write)) {
+      return $this->write($notification_bytes);
+    }
+
+    if (!empty($read)) {
+      $this->error = $this->parseError();
+
+      if (empty($this->error['status']) || $this->error['status'] === 10) {
+        $this->reconnect();
+      }
+    }
+
+    if (empty($write) && empty($read)) {
+      $this->reconnect();
+    }
+
+    return FALSE;
+  }
+
+  public function confirm() {
+    $read = array($this->stream_socket_client);
     $write = NULL;
     $except = NULL;
 
-    stream_select($read, $write, $except, Client::FASTAPNS_CONNECTION_TIMEOUT);
+    stream_select($read, $write, $except, ClientStreamSocket::FASTAPNS_CONNECTION_TIMEOUT);
 
     if (!empty($read)) {
-      $this->read();
+      $this->error = $this->parseError();
+
+      if (empty($this->error['status']) || $this->error['status'] === 10) {
+        $this->reconnect();
+      }
     }
+
+    return FALSE;
   }
 
-  public function read() {
+  public function parseError() {
     $bytes = fread($this->stream_socket_client, 6);
 
-    switch (strlen($bytes)) {
-      case 0:
-        $this->_reconnect();
-
-        break;
-      case 6:
-        $this->_parseErrorResponse($bytes);
-
-        break;
-      default:
-        $this->_reconnect();
-
-        break;
-    }
-  }
-
-  private function _parseErrorResponse($bytes) {
-    $this->error = unpack("C1command/C1status/N1identifier", $bytes);
-
-    switch ($this->error['status']) {
-      case 10:
-        //$this->_rewind($this->error['identifier']);
-        $this->_reconnect();
-
-        break;
-      case 8:
-        //$this->_rewind($this->error['identifier']);
-        $this->tokenBatchPointerBadToken = TRUE;
-
-        break;
-      default:
-        if ($this->error['identifier'] === 0) {
-          throw new \Exception('Could not send any notifications; check your payload for correctness');
-        } else {
-          //$this->_rewind($this->error['identifier']);
-          $this->_reconnect();
-        }
-
-        break;
-    }
-  }
-
-  private function _reconnect() {
-    $this->disconnect();
-    $this->connect();
+    return unpack("C1command/C1status/N1identifier", $bytes);
   }
 }

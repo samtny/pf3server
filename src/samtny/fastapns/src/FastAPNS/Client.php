@@ -6,23 +6,11 @@ class Client {
   const FASTAPNS_GATEWAY_HOST = 'gateway.push.apple.com';
   const FASTAPNS_GATEWAY_PORT = 2195;
   const FASTAPNS_BATCH_SIZE = 1700;
-  const FASTAPNS_CONNECTION_TIMEOUT = 5;
-  const FASTAPNS_WRITE_RETRIES = 2;
 
   /**
    * @var ClientStreamSocket
    */
   private $client_stream_socket;
-
-  private $payload;
-  private $payload_length;
-  private $tokenIterator;
-  private $expiry;
-
-  private $tokenBatch;
-  private $tokenBatchCount;
-  private $tokenBatchPointer = 0;
-  private $tokenBatchPointerBadToken = FALSE;
 
   private $tokensSent;
   private $badTokens;
@@ -40,72 +28,70 @@ class Client {
       $this->client_stream_socket->connect();
     }
 
-    $this->payload = is_array($payload) ? json_encode($payload) : $payload;
-    $this->payload_length = mb_strlen($this->payload);
-    $this->tokenIterator = $tokenIterator;
-    $this->expiry = $expiry;
+    $payload = is_array($payload) ? json_encode($payload) : $payload;
+    $payload_length = mb_strlen($payload);
 
-    $this->tokenBatch = array();
-    $this->tokenBatchCount = 0;
+    $tokenBatch = array();
+    $tokenBatchCount = 0;
+
     $this->tokensSent = 0;
     $this->badTokens = array();
 
     foreach ($tokenIterator as $token) {
-      $this->tokenBatch[] = $token;
-      $this->tokenBatchCount += 1;
+      $tokenBatch[] = $token;
+      $tokenBatchCount += 1;
 
-      if ($this->tokenBatchCount === Client::FASTAPNS_BATCH_SIZE) {
-        $this->_sendTokenBatch();
+      if ($tokenBatchCount === Client::FASTAPNS_BATCH_SIZE) {
+        $this->_sendTokenBatch($tokenBatch, $expiry, $payload, $payload_length);
 
-        $this->tokenBatchCount = 0;
+        $tokenBatch = array();
+        $tokenBatchCount = 0;
       }
     }
 
-    if ($this->tokenBatchCount > 0) {
-      $this->_sendTokenBatch();
+    if ($tokenBatchCount > 0) {
+      $this->_sendTokenBatch($tokenBatch, $expiry, $payload, $payload_length);
     }
   }
 
-  private function _sendTokenBatch() {
-    $this->tokenBatchPointer = 0;
+  private function _sendTokenBatch($tokenBatch, $expiry, $payload, $payload_length) {
+    $tokenBatchCount = count($tokenBatch);
+    $tokenBatchPointer = 0;
 
-    while ($this->tokenBatchPointer < $this->tokenBatchCount) {
-      $token = $this->tokenBatch[$this->tokenBatchPointer];
+    $socket = $this->client_stream_socket;
+
+    while ($tokenBatchPointer < $tokenBatchCount) {
+      $token = $tokenBatch[$tokenBatchPointer];
 
       $notification_bytes = chr(1);
-      $notification_bytes .= pack('N', $this->tokenBatchPointer);
-      $notification_bytes .= pack('N', $this->expiry);
+      $notification_bytes .= pack('N', $tokenBatchPointer);
+      $notification_bytes .= pack('N', $expiry);
       $notification_bytes .= chr(0) . chr(32);
       $notification_bytes .= pack('H*', $token);
-      $notification_bytes .= chr(0) . chr($this->payload_length);
-      $notification_bytes .= $this->payload;
+      $notification_bytes .= chr(0) . chr($payload_length);
+      $notification_bytes .= $payload;
 
-      $this->client_stream_socket->write($notification_bytes);
+      $result = $socket->write($notification_bytes);
 
-      if (!$this->client_stream_socket->getError()) {
-        $this->tokensSent += 1;
-
-        if ($this->tokenBatchPointer === $this->tokenBatchCount - 1) {
-          $this->client_stream_socket->finish();
-        }
-
-
-      } else {
-        $this->_rewind($identifier)
-        $identifier = $this->client_stream_socket->getError()['identifier'];
-
-        $this->badTokens[] = $this->tokenBatch[$identifier];
-
-        $this->tokenBatchPointer = $identifier;
+      if (!$result) {
+        $result = $socket->retry($notification_bytes);
       }
 
-      $this->tokenBatchPointer += 1;
+      if (!$result) {
+        $error = $socket->getError();
+
+        if (!empty($error['identifier'])) {
+          $tokenBatchPointer = $error['identifier'];
+
+          if ($error['status'] === 8) {
+            $this->badTokens[] = $tokenBatch[$tokenBatchPointer];
+
+            $tokenBatchPointer += 1;
+          }
+        }
+      }
+
+      $tokenBatchPointer += 1;
     }
-  }
-
-  private function _rewind($pointer) {
-    $this->tokensSent -= $this->tokenBatchPointer - $pointer;
-
-    $this->tokenBatchPointer = $pointer - 1;
   }
 }
