@@ -74,18 +74,20 @@ class ClientStreamSocket {
     stream_select($read, $write, $except, ClientStreamSocket::FASTAPNS_CONNECTION_TIMEOUT);
 
     if (!empty($write)) {
-      return $this->write($notification_bytes);
-    }
+      if ($this->write($notification_bytes)) {
+        return TRUE;
+      } else {
+        $this->reconnect();
 
-    if (!empty($read)) {
+        return FALSE;
+      }
+    } else if (!empty($read)) {
       $this->error = $this->parseError();
 
       if (empty($this->error['status']) || $this->error['status'] === 10) {
         $this->reconnect();
       }
-    }
-
-    if (empty($write) && empty($read)) {
+    } else {
       $this->reconnect();
     }
 
