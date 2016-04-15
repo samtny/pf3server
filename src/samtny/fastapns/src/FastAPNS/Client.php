@@ -23,13 +23,12 @@ class Client {
     return $this->badTokens;
   }
 
-  public function send($payload, $tokenIterator, $expiry = 0) {
+  public function send($payload, $tokens, $expiry = 0) {
     if (!$this->client_stream_socket->isConnected()) {
       $this->client_stream_socket->connect();
     }
 
     $payload = is_array($payload) ? json_encode($payload) : $payload;
-    $payload_length = mb_strlen($payload);
 
     $tokenBatch = array();
     $tokenBatchCount = 0;
@@ -37,12 +36,12 @@ class Client {
     $this->tokensSent = 0;
     $this->badTokens = array();
 
-    foreach ($tokenIterator as $token) {
+    foreach ($tokens as $token) {
       $tokenBatch[] = $token;
       $tokenBatchCount += 1;
 
       if ($tokenBatchCount === Client::FASTAPNS_BATCH_SIZE) {
-        $this->_sendTokenBatch($tokenBatch, $expiry, $payload, $payload_length);
+        $this->sendBatch($payload, $tokenBatch, $expiry);
 
         $tokenBatch = array();
         $tokenBatchCount = 0;
@@ -50,25 +49,25 @@ class Client {
     }
 
     if ($tokenBatchCount > 0) {
-      $this->_sendTokenBatch($tokenBatch, $expiry, $payload, $payload_length);
+      $this->sendBatch($payload, $tokenBatch, $expiry);
     }
   }
 
-  private function _sendTokenBatch($tokenBatch, $expiry, $payload, $payload_length) {
-    $tokenBatchCount = count($tokenBatch);
+  public function sendBatch($payload, $tokens, $expiry) {
+    $tokenBatchCount = count($tokens);
     $tokenBatchPointer = 0;
 
     $socket = $this->client_stream_socket;
 
     while ($tokenBatchPointer < $tokenBatchCount) {
-      $token = $tokenBatch[$tokenBatchPointer];
+      $token = $tokens[$tokenBatchPointer];
 
       $notification_bytes = chr(1);
       $notification_bytes .= pack('N', $tokenBatchPointer);
       $notification_bytes .= pack('N', $expiry);
       $notification_bytes .= chr(0) . chr(32);
       $notification_bytes .= pack('H*', $token);
-      $notification_bytes .= chr(0) . chr($payload_length);
+      $notification_bytes .= chr(0) . chr(mb_strlen($payload));
       $notification_bytes .= $payload;
 
       $result = $socket->write($notification_bytes);
@@ -84,7 +83,7 @@ class Client {
           $tokenBatchPointer = $error['identifier'];
 
           if ($error['status'] === 8) {
-            $this->badTokens[] = $tokenBatch[$tokenBatchPointer];
+            $this->badTokens[] = $tokens[$tokenBatchPointer];
 
             $tokenBatchPointer += 1;
           }
