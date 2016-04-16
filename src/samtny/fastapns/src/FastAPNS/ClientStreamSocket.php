@@ -5,8 +5,12 @@ namespace FastAPNS;
 class ClientStreamSocket {
   const FASTAPNS_DEFAULT_GATEWAY_HOST = 'gateway.push.apple.com';
   const FASTAPNS_DEFAULT_GATEWAY_PORT = 2195;
-  const FASTAPNS_CONNECTION_TIMEOUT = 5;
-  const FASTAPNS_WRITE_RETRIES = 2;
+  const FASTAPNS_STATUS_TIMEOUT = 3;
+
+  const FASTAPNS_WRITE_SUCCESS = 1;
+  const FASTAPNS_WRITE_FAILED_WRITABLE = 2;
+  const FASTAPNS_WRITE_FAILED_READABLE = 3;
+  const FASTAPNS_WRITE_FAILED_EXCEPTION = 4;
 
   private $local_cert;
   private $passphrase;
@@ -15,17 +19,11 @@ class ClientStreamSocket {
 
   private $stream_socket_client;
 
-  private $error;
-
   public function __construct($local_cert, $passphrase = '', $host = ClientStreamSocket::FASTAPNS_DEFAULT_GATEWAY_HOST, $port = ClientStreamSocket::FASTAPNS_DEFAULT_GATEWAY_PORT) {
     $this->local_cert = $local_cert;
     $this->passphrase = $passphrase;
     $this->host = $host;
     $this->port = $port;
-  }
-
-  public function getError() {
-    return $this->error;
   }
 
   public function connect() {
@@ -45,7 +43,7 @@ class ClientStreamSocket {
     fclose($this->stream_socket_client);
   }
 
-  private function reconnect() {
+  public function reconnect() {
     $this->disconnect();
     $this->connect();
   }
@@ -59,66 +57,36 @@ class ClientStreamSocket {
    * @return bool
    */
   public function write($notification_bytes) {
-    $this->error = NULL;
-
     try {
-      return fwrite($this->stream_socket_client, $notification_bytes);
+      fwrite($this->stream_socket_client, $notification_bytes);
+
+      return ClientStreamSocket::FASTAPNS_WRITE_SUCCESS;
     } catch (\Exception $e) {
-      return FALSE;
+      return $this->status();
     }
   }
 
-  public function retry($notification_bytes) {
-    $read = array($this->stream_socket_client);
-    $write = array($this->stream_socket_client);
-    $except = NULL;
-
-    stream_select($read, $write, $except, ClientStreamSocket::FASTAPNS_CONNECTION_TIMEOUT);
-
-    if (!empty($write)) {
-      if ($this->write($notification_bytes)) {
-        return TRUE;
-      } else {
-        $this->reconnect();
-
-        return FALSE;
-      }
-    } else if (!empty($read)) {
-      $this->error = $this->parseError();
-
-      if (empty($this->error['status']) || $this->error['status'] === 10) {
-        $this->reconnect();
-      }
-    } else {
-      $this->reconnect();
-    }
-
-    return FALSE;
-  }
-
-  public function confirm() {
-    $read = array($this->stream_socket_client);
-    $write = NULL;
-    $except = NULL;
-
-    stream_select($read, $write, $except, ClientStreamSocket::FASTAPNS_CONNECTION_TIMEOUT);
-
-    if (!empty($read)) {
-      $this->error = $this->parseError();
-
-      if (empty($this->error['status']) || $this->error['status'] === 10) {
-        $this->reconnect();
-      }
-
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  public function parseError() {
+  public function read() {
     $bytes = fread($this->stream_socket_client, 6);
 
     return unpack("C1command/C1status/N1identifier", $bytes);
+  }
+
+  public function status($readOnly = FALSE) {
+    $read = array($this->stream_socket_client);
+    $write = $readOnly ? NULL : array($this->stream_socket_client);
+    $except = NULL;
+
+    stream_select($read, $write, $except, ClientStreamSocket::FASTAPNS_STATUS_TIMEOUT);
+
+    if (!empty($write)) {
+      return ClientStreamSocket::FASTAPNS_WRITE_FAILED_WRITABLE;
+    }
+
+    if (!empty($read)) {
+      return ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE;
+    }
+
+    return ClientStreamSocket::FASTAPNS_WRITE_FAILED_EXCEPTION;
   }
 }

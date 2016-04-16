@@ -70,33 +70,41 @@ class Client {
 
       $result = $socket->write($notification_bytes);
 
-      if (!$result) {
-        $result = $socket->retry($notification_bytes);
+      if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_WRITABLE) {
+        continue;
       }
 
-      if (!$result) {
-        $error = $socket->getError();
+      if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE) {
+        $error = $socket->read();
 
-        if (!empty($error['identifier'])) {
+        if (!empty($error)) {
           $tokenBatchPointer = $error['identifier'];
 
           if ($error['status'] === 8) {
             $this->badTokens[] = $tokens[$tokenBatchPointer];
 
             $tokenBatchPointer += 1;
+          } else if ($error['status'] === 10) {
+            $socket->reconnect();
+          } else {
+            throw new \Exception('Unrecoverable error sending notification: please check your payload.');
           }
+
+          continue;
+        } else {
+          $socket->reconnect();
 
           continue;
         }
       }
 
       if ($tokenBatchPointer == $tokenBatchCount - 1) {
-        $result = $socket->confirm();
+        $result = $socket->status(TRUE);
 
-        if (!$result) {
-          $error = $socket->getError();
+        if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE) {
+          $error = $socket->read();
 
-          if (!empty($error['command'])) {
+          if (!empty($error)) {
             $tokenBatchPointer = $error['identifier'];
 
             if ($error['status'] === 8) {
@@ -104,6 +112,10 @@ class Client {
 
               $tokenBatchPointer += 1;
             }
+
+            continue;
+          } else {
+            $socket->reconnect();
 
             continue;
           }
