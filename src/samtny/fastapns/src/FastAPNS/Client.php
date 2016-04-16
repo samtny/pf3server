@@ -3,8 +3,6 @@
 namespace FastAPNS;
 
 class Client {
-  const FASTAPNS_GATEWAY_HOST = 'gateway.push.apple.com';
-  const FASTAPNS_GATEWAY_PORT = 2195;
   const FASTAPNS_BATCH_SIZE = 1700;
 
   /**
@@ -86,6 +84,28 @@ class Client {
             $this->badTokens[] = $tokens[$tokenBatchPointer];
 
             $tokenBatchPointer += 1;
+          }
+
+          continue;
+        }
+      }
+
+      if ($tokenBatchPointer == $tokenBatchCount - 1) {
+        $result = $socket->confirm();
+
+        if (!$result) {
+          $error = $socket->getError();
+
+          if (!empty($error['command'])) {
+            $tokenBatchPointer = $error['identifier'];
+
+            if ($error['status'] === 8) {
+              $this->badTokens[] = $tokens[$tokenBatchPointer];
+
+              $tokenBatchPointer += 1;
+            }
+
+            continue;
           }
         }
       }

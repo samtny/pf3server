@@ -58,7 +58,7 @@ class Token {
    * @param mixed $token
    */
   public function setToken($token) {
-    $this->token = $token;
+    $this->token = preg_replace('/\s|<|>/', '', $token);
   }
 
   public function getApp() {

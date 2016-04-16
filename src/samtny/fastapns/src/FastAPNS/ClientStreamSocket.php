@@ -3,6 +3,8 @@
 namespace FastAPNS;
 
 class ClientStreamSocket {
+  const FASTAPNS_DEFAULT_GATEWAY_HOST = 'gateway.push.apple.com';
+  const FASTAPNS_DEFAULT_GATEWAY_PORT = 2195;
   const FASTAPNS_CONNECTION_TIMEOUT = 5;
   const FASTAPNS_WRITE_RETRIES = 2;
 
@@ -15,7 +17,7 @@ class ClientStreamSocket {
 
   private $error;
 
-  public function __construct($local_cert, $passphrase = '', $host = Client::FASTAPNS_GATEWAY_HOST, $port = Client::FASTAPNS_GATEWAY_PORT) {
+  public function __construct($local_cert, $passphrase = '', $host = ClientStreamSocket::FASTAPNS_DEFAULT_GATEWAY_HOST, $port = ClientStreamSocket::FASTAPNS_DEFAULT_GATEWAY_PORT) {
     $this->local_cert = $local_cert;
     $this->passphrase = $passphrase;
     $this->host = $host;
@@ -49,7 +51,7 @@ class ClientStreamSocket {
   }
 
   public function isConnected() {
-    return $this->stream_socket_client !== FALSE;
+    return !empty($this->stream_socket_client);
   }
 
   /**
@@ -107,9 +109,11 @@ class ClientStreamSocket {
       if (empty($this->error['status']) || $this->error['status'] === 10) {
         $this->reconnect();
       }
+
+      return FALSE;
     }
 
-    return FALSE;
+    return TRUE;
   }
 
   public function parseError() {

@@ -102,7 +102,9 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
           }
 
           if (!empty($tokens_free)) {
-            $client = new FastAPNS\Client(__DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem');
+            $client = FastAPNS\ClientBuilder::create()
+              ->setStreamSocketClient(new FastAPNS\ClientStreamSocket(__DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem'))
+              ->build();
 
             $client->send($payload, $tokens_free, (new \DateTime('+24 hours'))->getTimestamp());
 
@@ -123,12 +125,12 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
                 }
               }
             }
-
-            $client->disconnect();
           }
 
           if (!empty($tokens_pro)) {
-            $client = new FastAPNS\Client(__DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem');
+            $client = FastAPNS\ClientBuilder::create()
+              ->setStreamSocketClient(new FastAPNS\ClientStreamSocket(__DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem'))
+              ->build();
 
             $client->send($payload, $tokens_pro, (new \DateTime('+24 hours'))->getTimestamp());
 
@@ -149,8 +151,6 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
                 }
               }
             }
-
-            $client->disconnect();
           }
         }
       }
