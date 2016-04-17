@@ -3,8 +3,7 @@
 namespace FastAPNS;
 
 class Client {
-  const FASTAPNS_BATCH_SIZE = 1700;
-
+  const FASTAPNS_BATCH_SIZE_DEFAULT = 1700;
   const FASTAPNS_BATCH_SUCCESS = 1;
   const FASTAPNS_BATCH_NEEDS_REWIND = 2;
 
@@ -13,12 +12,15 @@ class Client {
    */
   private $client_stream_socket;
 
+  private $batch_size;
+
   private $batches;
 
   private $badTokens;
 
-  public function __construct($stream_socket_client) {
+  public function __construct($stream_socket_client, $batch_size = Client::FASTAPNS_BATCH_SIZE_DEFAULT) {
     $this->client_stream_socket = $stream_socket_client;
+    $this->batch_size = $batch_size;
   }
 
   public function getBadTokens() {
@@ -43,7 +45,7 @@ class Client {
     for ($i = 0; $i < $total; $i += 1) {
       $batch[] = $tokens[$i];
 
-      if (count($batch) === Client::FASTAPNS_BATCH_SIZE || $i === $total - 1) {
+      if (count($batch) === $this->batch_size || $i === $total - 1) {
         $this->batches[] = $batch;
 
         $this->_processBatches($currentBatchIndex, $payload, $expiry, $total);
@@ -61,14 +63,14 @@ class Client {
     while ($batchProcessIndex <= $currentBatchIndex) {
       $batch = $this->batches[$batchProcessIndex];
 
-      $isFinalBatch = $batchProcessIndex == floor($total / Client::FASTAPNS_BATCH_SIZE);
+      $isFinalBatch = $batchProcessIndex == floor($total / $this->batch_size);
 
       $tokensSent = $this->_sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch);
 
       if ($tokensSent < count($batch)) {
-        $rewind = $this->_rewind($batchProcessIndex * Client::FASTAPNS_BATCH_SIZE + $tokensSent);
+        $rewind = $this->_rewind($batchProcessIndex * $this->batch_size + $tokensSent);
 
-        $batchProcessIndex = floor($rewind / Client::FASTAPNS_BATCH_SIZE);
+        $batchProcessIndex = floor($rewind / $this->batch_size);
         $offset = $rewind - $batchProcessIndex;
 
         continue;
@@ -131,8 +133,8 @@ class Client {
       $rewind = $error['identifier'];
 
       if ($error['status'] === 8) {
-        $batchIndex = floor($rewind / Client::FASTAPNS_BATCH_SIZE);
-        $tokenIndex = $rewind % Client::FASTAPNS_BATCH_SIZE;
+        $batchIndex = floor($rewind / $this->batch_size);
+        $tokenIndex = $rewind % $this->batch_size;
 
         $this->badTokens[] = $this->batches[$batchIndex][$tokenIndex];
 
