@@ -41,6 +41,75 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     $this->assertEmpty($client->getBadTokens());
   }
 
+  public function testWrite1GoodTokenBatchSize1() {
+    $this->_client_stream_socket->method('write')
+      ->willReturn(ClientStreamSocket::FASTAPNS_WRITE_SUCCESS);
+
+    $this->_client_stream_socket->expects($this->once())
+      ->method('write');
+
+    $this->_client_stream_socket->method('status')
+      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_OTHER);
+
+    $this->_client_stream_socket->expects($this->once())
+      ->method('status');
+
+    $client = ClientBuilder::create()
+      ->setStreamSocketClient($this->_client_stream_socket)
+      ->setBatchSize(1)
+      ->build();
+
+    $client->send('foo', array('ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b'), 0);
+
+    $this->assertEmpty($client->getBadTokens());
+  }
+
+  public function testWrite1GoodTokenBatchSize2() {
+    $this->_client_stream_socket->method('write')
+      ->willReturn(ClientStreamSocket::FASTAPNS_WRITE_SUCCESS);
+
+    $this->_client_stream_socket->expects($this->once())
+      ->method('write');
+
+    $this->_client_stream_socket->method('status')
+      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_OTHER);
+
+    $this->_client_stream_socket->expects($this->once())
+      ->method('status');
+
+    $client = ClientBuilder::create()
+      ->setStreamSocketClient($this->_client_stream_socket)
+      ->setBatchSize(2)
+      ->build();
+
+    $client->send('foo', array('ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b'), 0);
+
+    $this->assertEmpty($client->getBadTokens());
+  }
+
+  public function testWrite1GoodTokenBatchSize1700() {
+    $this->_client_stream_socket->method('write')
+      ->willReturn(ClientStreamSocket::FASTAPNS_WRITE_SUCCESS);
+
+    $this->_client_stream_socket->expects($this->once())
+      ->method('write');
+
+    $this->_client_stream_socket->method('status')
+      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_OTHER);
+
+    $this->_client_stream_socket->expects($this->once())
+      ->method('status');
+
+    $client = ClientBuilder::create()
+      ->setStreamSocketClient($this->_client_stream_socket)
+      ->setBatchSize(1700)
+      ->build();
+
+    $client->send('foo', array('ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b'), 0);
+
+    $this->assertEmpty($client->getBadTokens());
+  }
+
   public function testWrite1BadToken() {
     $this->_client_stream_socket->method('write')
       ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_READABLE);
