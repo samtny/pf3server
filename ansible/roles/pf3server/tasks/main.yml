@@ -1,6 +1,6 @@
 ---
 - name: Install pf3server composer dependencies
-  composer: command=install working_dir=/vagrant
+  composer: command=install working_dir=/vagrant no_dev=no
   become: yes
   become_user: vagrant
 

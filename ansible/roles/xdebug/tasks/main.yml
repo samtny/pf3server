@@ -1,0 +1,14 @@
+---
+- name: Install xdebug
+  pear: name=pecl/xdebug state=present
+
+- name: Create /etc/php5/mods-available/xdebug.ini
+  template: src=xdebug.ini.j2 dest=/etc/php5/mods-available/xdebug.ini owner=root group=root mode=0644
+  notify: Restart php
+
+- name: Symlink /etc/php5/fpm/conf.d/xdebug.ini
+  file: src=/etc/php5/mods-available/xdebug.ini dest=/etc/php5/fpm/conf.d/30-xdebug.ini state=link owner=root group=root mode=0644
+  notify: Restart php
+
+- name: Symlink /etc/php5/cli/conf.d/xdebug.ini
+  file: src=/etc/php5/mods-available/xdebug.ini dest=/etc/php5/cli/conf.d/30-xdebug.ini state=link owner=root group=root mode=0644

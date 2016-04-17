@@ -2,6 +2,7 @@
 dependencies:
   - { role: php }
   - { role: xhprof }
+  - { role: xdebug }
   - { role: composer }
   - { role: mysql }
   - { role: nginx }
