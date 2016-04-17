@@ -5,12 +5,16 @@ namespace FastAPNS;
 class Client {
   const FASTAPNS_BATCH_SIZE = 1700;
 
+  const FASTAPNS_BATCH_SUCCESS = 1;
+  const FASTAPNS_BATCH_NEEDS_REWIND = 2;
+
   /**
    * @var ClientStreamSocket
    */
   private $client_stream_socket;
 
-  private $tokensSent;
+  private $batches;
+
   private $badTokens;
 
   public function __construct($stream_socket_client) {
@@ -28,37 +32,63 @@ class Client {
 
     $payload = is_array($payload) ? json_encode($payload) : $payload;
 
-    $tokenBatch = array();
-    $tokenBatchCount = 0;
-
-    $this->tokensSent = 0;
+    $this->batches = array();
     $this->badTokens = array();
 
+    $batch = array();
+    $currentBatchIndex = 0;
+
     foreach ($tokens as $token) {
-      $tokenBatch[] = $token;
-      $tokenBatchCount += 1;
+      $batch[] = $token;
 
-      if ($tokenBatchCount === Client::FASTAPNS_BATCH_SIZE) {
-        $this->sendBatch($payload, $tokenBatch, $expiry);
+      if (count($batch) === Client::FASTAPNS_BATCH_SIZE) {
+        $this->batches[] = $batch;
 
-        $tokenBatch = array();
-        $tokenBatchCount = 0;
+        $this->_processBatches($currentBatchIndex, $payload, $expiry);
+
+        $batch = array();
+        $currentBatchIndex += 1;
       }
     }
 
-    if ($tokenBatchCount > 0) {
-      $this->sendBatch($payload, $tokenBatch, $expiry);
+    if (count($batch) > 0) {
+      $this->batches[] = $batch;
+
+      $this->_processBatches($currentBatchIndex, $payload, $expiry);
     }
   }
 
-  public function sendBatch($payload, $tokens, $expiry) {
-    $tokenBatchCount = count($tokens);
-    $tokenBatchPointer = 0;
+  private function _processBatches($currentBatchIndex, $payload, $expiry) {
+    $batchProcessIndex = $currentBatchIndex;
+    $offset = 0;
 
+    while ($batchProcessIndex <= $currentBatchIndex) {
+      $batch = $this->batches[$batchProcessIndex];
+
+      $tokensSent = $this->_sendBatch($batch, $payload, $expiry, $offset);
+
+      if ($tokensSent < count($batch)) {
+        $rewind = $this->_rewind($batchProcessIndex * Client::FASTAPNS_BATCH_SIZE + $tokensSent);
+
+        $batchProcessIndex = floor($rewind / Client::FASTAPNS_BATCH_SIZE);
+        $offset = $rewind - $batchProcessIndex;
+
+        continue;
+      }
+
+      $batchProcessIndex += 1;
+    }
+  }
+
+  private function _sendBatch($batch, $payload, $expiry, $offset) {
     $socket = $this->client_stream_socket;
 
+    $tokenBatchPointer = $offset;
+
+    $tokenBatchCount = count($batch);
+
     while ($tokenBatchPointer < $tokenBatchCount) {
-      $token = $tokens[$tokenBatchPointer];
+      $token = $batch[$tokenBatchPointer];
 
       $notification_bytes = chr(1);
       $notification_bytes .= pack('N', $tokenBatchPointer);
@@ -75,54 +105,49 @@ class Client {
       }
 
       if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE) {
-        $error = $socket->read();
-
-        if (!empty($error)) {
-          $tokenBatchPointer = $error['identifier'];
-
-          if ($error['status'] === 8) {
-            $this->badTokens[] = $tokens[$tokenBatchPointer];
-
-            $tokenBatchPointer += 1;
-          } else if ($error['status'] === 10) {
-            $socket->reconnect();
-          } else {
-            throw new \Exception('Unrecoverable error sending notification: please check your payload.');
-          }
-
-          continue;
-        } else {
-          $socket->reconnect();
-
-          continue;
-        }
+        return $tokenBatchPointer;
       }
 
       if ($tokenBatchPointer == $tokenBatchCount - 1) {
         $result = $socket->status(TRUE);
 
         if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE) {
-          $error = $socket->read();
-
-          if (!empty($error)) {
-            $tokenBatchPointer = $error['identifier'];
-
-            if ($error['status'] === 8) {
-              $this->badTokens[] = $tokens[$tokenBatchPointer];
-
-              $tokenBatchPointer += 1;
-            }
-
-            continue;
-          } else {
-            $socket->reconnect();
-
-            continue;
-          }
+          return $tokenBatchPointer;
         }
       }
 
       $tokenBatchPointer += 1;
     }
+
+    return $tokenBatchPointer;
+  }
+
+  private function _rewind($currentPointer) {
+    $rewind = $currentPointer;
+
+    $socket = $this->client_stream_socket;
+
+    $error = $socket->read();
+
+    if (!empty($error)) {
+      $rewind = $error['identifier'];
+
+      if ($error['status'] === 8) {
+        $batchIndex = floor($rewind / Client::FASTAPNS_BATCH_SIZE);
+        $tokenIndex = $rewind % Client::FASTAPNS_BATCH_SIZE;
+
+        $this->badTokens[] = $this->batches[$batchIndex][$tokenIndex];
+
+        $rewind += 1;
+      } else if ($error['status'] === 10) {
+        $socket->reconnect();
+      } else {
+        throw new \Exception('Unrecoverable error sending notification: please check your payload.');
+      }
+    } else {
+      $socket->reconnect();
+    }
+
+    return $rewind;
   }
 }
