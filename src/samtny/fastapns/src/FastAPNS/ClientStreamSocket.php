@@ -8,9 +8,9 @@ class ClientStreamSocket {
   const FASTAPNS_STATUS_TIMEOUT = 3;
 
   const FASTAPNS_WRITE_SUCCESS = 1;
-  const FASTAPNS_WRITE_FAILED_WRITABLE = 2;
-  const FASTAPNS_WRITE_FAILED_READABLE = 3;
-  const FASTAPNS_WRITE_FAILED_EXCEPTION = 4;
+  const FASTAPNS_STATUS_WRITABLE = 2;
+  const FASTAPNS_STATUS_READABLE = 3;
+  const FASTAPNS_STATUS_OTHER = 4;
 
   private $local_cert;
   private $passphrase;
@@ -80,13 +80,13 @@ class ClientStreamSocket {
     stream_select($read, $write, $except, ClientStreamSocket::FASTAPNS_STATUS_TIMEOUT);
 
     if (!empty($write)) {
-      return ClientStreamSocket::FASTAPNS_WRITE_FAILED_WRITABLE;
+      return ClientStreamSocket::FASTAPNS_STATUS_WRITABLE;
     }
 
     if (!empty($read)) {
-      return ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE;
+      return ClientStreamSocket::FASTAPNS_STATUS_READABLE;
     }
 
-    return ClientStreamSocket::FASTAPNS_WRITE_FAILED_EXCEPTION;
+    return ClientStreamSocket::FASTAPNS_STATUS_OTHER;
   }
 }

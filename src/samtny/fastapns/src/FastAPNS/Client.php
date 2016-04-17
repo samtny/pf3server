@@ -98,18 +98,18 @@ class Client {
 
       $result = $socket->write($notification_bytes);
 
-      if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_WRITABLE) {
+      if ($result == ClientStreamSocket::FASTAPNS_STATUS_WRITABLE) {
         continue;
       }
 
-      if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE) {
+      if ($result == ClientStreamSocket::FASTAPNS_STATUS_READABLE) {
         return $tokenBatchPointer;
       }
 
       if ($isFinalBatch && $tokenBatchPointer == $tokenBatchCount - 1) {
         $result = $socket->status(TRUE);
 
-        if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE) {
+        if ($result == ClientStreamSocket::FASTAPNS_STATUS_READABLE) {
           return $tokenBatchPointer;
         }
       }
