@@ -63,7 +63,7 @@ class Client {
     while ($batchProcessIndex <= $currentBatchIndex) {
       $batch = $this->batches[$batchProcessIndex];
 
-      $isFinalBatch = $batchProcessIndex == floor($total / $this->batch_size);
+      $isFinalBatch = $batchProcessIndex == floor($total / ($this->batch_size + 1));
 
       $tokensSent = $this->_sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch);
 

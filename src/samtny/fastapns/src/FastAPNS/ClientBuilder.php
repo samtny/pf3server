@@ -20,6 +20,8 @@ class ClientBuilder {
 
   public function setBatchSize($batch_size) {
     $this->batch_size = $batch_size;
+
+    return $this;
   }
 
   public function build() {
