@@ -38,34 +38,32 @@ class Client {
     $batch = array();
     $currentBatchIndex = 0;
 
-    foreach ($tokens as $token) {
-      $batch[] = $token;
+    $total = count($tokens);
 
-      if (count($batch) === Client::FASTAPNS_BATCH_SIZE) {
+    for ($i = 0; $i < $total; $i += 1) {
+      $batch[] = $tokens[$i];
+
+      if (count($batch) === Client::FASTAPNS_BATCH_SIZE || $i === $total - 1) {
         $this->batches[] = $batch;
 
-        $this->_processBatches($currentBatchIndex, $payload, $expiry);
+        $this->_processBatches($currentBatchIndex, $payload, $expiry, $total);
 
         $batch = array();
         $currentBatchIndex += 1;
       }
     }
-
-    if (count($batch) > 0) {
-      $this->batches[] = $batch;
-
-      $this->_processBatches($currentBatchIndex, $payload, $expiry);
-    }
   }
 
-  private function _processBatches($currentBatchIndex, $payload, $expiry) {
+  private function _processBatches($currentBatchIndex, $payload, $expiry, $total) {
     $batchProcessIndex = $currentBatchIndex;
     $offset = 0;
 
     while ($batchProcessIndex <= $currentBatchIndex) {
       $batch = $this->batches[$batchProcessIndex];
 
-      $tokensSent = $this->_sendBatch($batch, $payload, $expiry, $offset);
+      $isFinalBatch = $batchProcessIndex == floor($total / Client::FASTAPNS_BATCH_SIZE);
+
+      $tokensSent = $this->_sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch);
 
       if ($tokensSent < count($batch)) {
         $rewind = $this->_rewind($batchProcessIndex * Client::FASTAPNS_BATCH_SIZE + $tokensSent);
@@ -80,7 +78,7 @@ class Client {
     }
   }
 
-  private function _sendBatch($batch, $payload, $expiry, $offset) {
+  private function _sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch = FALSE) {
     $socket = $this->client_stream_socket;
 
     $tokenBatchPointer = $offset;
@@ -108,7 +106,7 @@ class Client {
         return $tokenBatchPointer;
       }
 
-      if ($tokenBatchPointer == $tokenBatchCount - 1) {
+      if ($isFinalBatch && $tokenBatchPointer == $tokenBatchCount - 1) {
         $result = $socket->status(TRUE);
 
         if ($result == ClientStreamSocket::FASTAPNS_WRITE_FAILED_READABLE) {
