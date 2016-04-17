@@ -27,7 +27,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
       ->method('write');
 
     $this->_client_stream_socket->method('status')
-      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_OTHER);
+      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_NONE);
 
     $this->_client_stream_socket->expects($this->once())
       ->method('status');
@@ -49,7 +49,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
       ->method('write');
 
     $this->_client_stream_socket->method('status')
-      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_OTHER);
+      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_NONE);
 
     $this->_client_stream_socket->expects($this->once())
       ->method('status');
@@ -72,7 +72,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
       ->method('write');
 
     $this->_client_stream_socket->method('status')
-      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_OTHER);
+      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_NONE);
 
     $this->_client_stream_socket->expects($this->once())
       ->method('status');
@@ -95,7 +95,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
       ->method('write');
 
     $this->_client_stream_socket->method('status')
-      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_OTHER);
+      ->willReturn(ClientStreamSocket::FASTAPNS_STATUS_NONE);
 
     $this->_client_stream_socket->expects($this->once())
       ->method('status');
@@ -124,5 +124,49 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     $client->send('foo', array('ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b'), 0);
 
     $this->assertEquals(1, count($client->getBadTokens()));
+  }
+
+  public function testRewind() {
+    $this->_client_stream_socket->method('write')
+      ->willReturnOnConsecutiveCalls(
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_STATUS_READABLE,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS
+      );
+
+    $this->_client_stream_socket->expects($this->exactly(6))
+      ->method('write');
+
+    $this->_client_stream_socket->method('status')
+      ->willReturnOnConsecutiveCalls(
+        ClientStreamSocket::FASTAPNS_STATUS_NONE
+      );
+
+    $this->_client_stream_socket->expects($this->exactly(1))
+      ->method('status');
+
+    $this->_client_stream_socket->method('read')
+      ->willReturn(array('command' => 8, 'status' => 8, 'identifier' => 4));
+
+    $this->_client_stream_socket->expects($this->exactly(1))
+      ->method('read');
+
+    $client = ClientBuilder::create()
+      ->setStreamSocketClient($this->_client_stream_socket)
+      ->build();
+
+    $client->send('foo', array(
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b',
+      'bad',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b'
+    ), 0);
+
+    $this->assertEquals(array('bad'), $client->getBadTokens());
   }
 }

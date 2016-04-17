@@ -10,7 +10,7 @@ class ClientStreamSocket {
   const FASTAPNS_WRITE_SUCCESS = 1;
   const FASTAPNS_STATUS_WRITABLE = 2;
   const FASTAPNS_STATUS_READABLE = 3;
-  const FASTAPNS_STATUS_OTHER = 4;
+  const FASTAPNS_STATUS_NONE = 4;
 
   private $local_cert;
   private $passphrase;
@@ -87,6 +87,6 @@ class ClientStreamSocket {
       return ClientStreamSocket::FASTAPNS_STATUS_READABLE;
     }
 
-    return ClientStreamSocket::FASTAPNS_STATUS_OTHER;
+    return ClientStreamSocket::FASTAPNS_STATUS_NONE;
   }
 }
