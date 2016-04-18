@@ -48,7 +48,7 @@ class Client {
       if (count($batch) === $this->batch_size || $i === $total - 1) {
         $this->batches[] = $batch;
 
-        $this->_processBatches($currentBatchIndex, $payload, $expiry, $total);
+        $this->_processBatches($payload, $expiry, $total);
 
         $batch = array();
         $currentBatchIndex += 1;
@@ -56,16 +56,13 @@ class Client {
     }
   }
 
-  private function _processBatches($currentBatchIndex, $payload, $expiry, $total) {
-    $batchOffset = $currentBatchIndex;
+  private function _processBatches($payload, $expiry, $total) {
+    $maxBatchOffset = count($this->batches) - 1;
+    $batchOffset = $maxBatchOffset;
     $tokenOffset = 0;
 
-    $finalBatchProcessIndex = ceil($total / $this->batch_size);
-
-    while ($batchOffset <= $currentBatchIndex) {
-      $isFinalBatch = $batchOffset == $finalBatchProcessIndex - 1;
-
-      $tokenOffset = $this->_sendBatch($payload, $expiry, $batchOffset, $tokenOffset, $isFinalBatch);
+    while ($batchOffset <= $maxBatchOffset) {
+      $tokenOffset = $this->_sendBatch($payload, $expiry, $total, $batchOffset, $tokenOffset);
 
       if ($tokenOffset < count($this->batches[$batchOffset])) {
         $rewind = $this->_rewind($batchOffset * $this->batch_size + $tokenOffset);
@@ -81,9 +78,10 @@ class Client {
     }
   }
 
-  private function _sendBatch($payload, $expiry, $batchOffset, $tokenOffset, $isFinalBatch = FALSE) {
+  private function _sendBatch($payload, $expiry, $total, $batchOffset, $tokenOffset) {
     $batch = $this->batches[$batchOffset];
     $batchSize = count($batch);
+    $confirm = $batchOffset == ceil($total / $this->batch_size) - 1;
 
     while ($tokenOffset < $batchSize) {
       $token = $batch[$tokenOffset];
@@ -106,7 +104,7 @@ class Client {
         return $tokenOffset;
       }
 
-      if ($isFinalBatch && $tokenOffset == $batchSize - 1) {
+      if ($confirm && $tokenOffset == $batchSize - 1) {
         $result = $this->client_stream_socket->status(TRUE);
 
         if ($result == ClientStreamSocket::FASTAPNS_STATUS_READABLE) {
