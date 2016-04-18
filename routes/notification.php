@@ -103,7 +103,8 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
           if (!empty($tokens_free)) {
             $client = FastAPNS\ClientBuilder::create()
-              ->setStreamSocketClient(new FastAPNS\ClientStreamSocket(__DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem'))
+              ->setLocalCert(__DIR__ . '/../ssl/PinfinderFreePushDist.includesprivatekey.pem')
+              ->setPassphrase('')
               ->build();
 
             $client->send($payload, $tokens_free, (new \DateTime('+24 hours'))->getTimestamp());
@@ -129,7 +130,8 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
           if (!empty($tokens_pro)) {
             $client = FastAPNS\ClientBuilder::create()
-              ->setStreamSocketClient(new FastAPNS\ClientStreamSocket(__DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem'))
+              ->setLocalCert(__DIR__ . '/../ssl/PinfinderProPushDist.includesprivatekey.pem')
+              ->setPassphrase('')
               ->build();
 
             $client->send($payload, $tokens_pro, (new \DateTime('+24 hours'))->getTimestamp());
