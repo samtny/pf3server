@@ -30,33 +30,35 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
     $count = 0;
 
+    $client = new PF\Notifications\NotificationClient($entityManager);
+
+    $data = array(
+      'num_tokens' => 0,
+      'num_bad_tokens' => 0,
+    );
+
     foreach ($notificationsIterator as $notification) {
       $count += 1;
 
-      if ($notification->getGlobal() === true) {
-        $tokensIterator = $entityManager->getRepository('\PF\Token')->getValidTokens(true);
+      $result = $client->sendNotification($notification);
 
-        PinfinderAPNS::sendNotification($notification, $tokensIterator);
-      } else {
-        $user = $notification->getUser();
+      $data['num_tokens'] += $result['num_tokens'];
+      $data['num_bad_tokens'] += $result['num_bad_tokens'];
 
-        if (!empty($user)) {
-          $tokens = $user->getTokens();
-
-          if (!empty($tokens)) {
-            PinfinderAPNS::sendNotification($notification, $tokens);
-          }
-        }
-      }
-
-      $notification->archive();
+      //$notification->archive();
 
       $entityManager->persist($notification);
     }
 
-    $entityManager->flush();
+    if ($data['num_tokens'] > 0) {
+      $app->responseMessage = 'Sent ' . $count . ' Notifications';
 
-    $app->responseMessage = $count > 0 ? 'Sent ' . $count . ' notification(s)' : 'Nothing to send';
+      if (!empty($data['num_bad_tokens'])) {
+        $app->responseMessage .= ' (Flagged ' . $data['num_bad_tokens'] . ' tokens)';
+      }
+    }
+
+    $entityManager->flush();
   });
 
   $app->post('/:id/send', function ($id) use ($app, $entityManager) {
