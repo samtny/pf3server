@@ -60,23 +60,26 @@ class Client {
     $batchProcessIndex = $currentBatchIndex;
     $offset = 0;
 
+    $finalBatchProcessIndex = ceil($total / $this->batch_size);
+
     while ($batchProcessIndex <= $currentBatchIndex) {
       $batch = $this->batches[$batchProcessIndex];
 
-      $isFinalBatch = $batchProcessIndex == floor($total / ($this->batch_size + 1));
+      $isFinalBatch = $batchProcessIndex == $finalBatchProcessIndex - 1;
 
-      $tokensSent = $this->_sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch);
+      $index = $this->_sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch);
 
-      if ($tokensSent < count($batch)) {
-        $rewind = $this->_rewind($batchProcessIndex * $this->batch_size + $tokensSent);
+      if ($index < count($batch)) {
+        $rewind = $this->_rewind($batchProcessIndex * $this->batch_size + $index);
 
         $batchProcessIndex = floor($rewind / $this->batch_size);
-        $offset = $rewind - $batchProcessIndex;
+        $offset = $rewind - ($batchProcessIndex * $this->batch_size);
 
         continue;
       }
 
       $batchProcessIndex += 1;
+      $offset = 0;
     }
   }
 
