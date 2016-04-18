@@ -16,6 +16,24 @@ while ($line !== false) {
     $app = $parts[1];
     $tokenString = $parts[0];
 
+    switch ($app) {
+      case 'apns':
+      case 'apnsfree':
+      case 'apnsfree2':
+        $app = 'apnsfree';
+
+        break;
+      case 'apnspro':
+      case 'apnspro2':
+        $app = 'apnspro';
+
+        break;
+      default:
+        $app = 'unknown';
+
+        break;
+    }
+
     if ($app == 'apnsfree' || $app == 'apnspro') {
       $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => $app));
 
