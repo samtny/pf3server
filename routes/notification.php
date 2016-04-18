@@ -73,7 +73,6 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     if ($result['num_tokens'] > 0) {
       $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
 
-
       if (!empty($result['num_bad_tokens'])) {
         $app->responseMessage .= ' (Tokens Flagged: ' . $result['num_bad_tokens'] . ')';
       }
