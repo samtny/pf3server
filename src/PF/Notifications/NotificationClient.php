@@ -118,4 +118,54 @@ class NotificationClient {
       'num_bad_tokens' => $num_bad_tokens,
     );
   }
+
+  public function processFeedback() {
+    $flagged = array();
+
+    $client = FastAPNS\ClientBuilder::create()
+      ->setHost('feedback.push.apple.com')
+      ->setPort(2196)
+      ->setLocalCert(__DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem')
+      ->setPassphrase('')
+      ->build();
+
+    $tokens = $client->getFeedbackTokens();
+
+    foreach ($tokens as $tokenString) {
+      $flagged[] = $tokenString;
+
+      $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnsfree'));
+
+      if (!empty($token)) {
+        $token->flag();
+
+        $this->entityManager->persist($token);
+      }
+    }
+
+    $client = FastAPNS\ClientBuilder::create()
+      ->setHost('feedback.push.apple.com')
+      ->setPort(2196)
+      ->setLocalCert(__DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem')
+      ->setPassphrase('')
+      ->build();
+
+    $tokens = $client->getFeedbackTokens();
+
+    foreach ($tokens as $tokenString) {
+      $flagged[] = $tokenString;
+
+      $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnspro'));
+
+      if (!empty($token)) {
+        $token->flag();
+
+        $this->entityManager->persist($token);
+      }
+    }
+
+    $this->entityManager->flush();
+
+    return $flagged;
+  }
 }

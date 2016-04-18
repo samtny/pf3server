@@ -88,28 +88,12 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
   });
 
   $app->post('/feedback', function () use ($app, $entityManager, $serializer) {
-    $feedback_tokens = PinfinderAPNS::getFeedbackTokens();
+    $client = new PF\Notifications\NotificationClient($entityManager);
 
-    $flagged = 0;
+    $flagged = $client->processFeedback();
 
-    foreach ($feedback_tokens as $feedback_token) {
-      if (!empty($feedback_token['devtoken'])) {
-        $token = $entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $feedback_token['devtoken']));
-
-        if (!empty($token)) {
-          $flagged += 1;
-
-          $token->flag();
-
-          $entityManager->persist($token);
-        }
-      }
-    }
-
-    $entityManager->flush();
-
-    $app->responseMessage = ($flagged > 0) ? 'Flagged ' . $flagged . ' tokens' : 'No tokens were flagged';
-    $app->responseData = array('feedback_tokens' => $feedback_tokens);
+    $app->responseMessage = (count($flagged) > 0) ? 'Flagged ' . count($flagged) . ' tokens' : 'No tokens were flagged';
+    $app->responseData = array('tokens' => $flagged);
   });
 
   $app->post('', function () use ($app, $entityManager, $serializer) {
