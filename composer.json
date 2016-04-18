@@ -9,12 +9,12 @@
     "twig/twig": "1.*",
     "beberlei/DoctrineExtensions": "^1.0",
     "jms/serializer": "^1.1",
-    "symfony/yaml": "^3.0"
+    "symfony/yaml": "^3.0",
+    "samtny/fastapns": "^1.0"
   },
   "autoload": {
     "psr-4": {
-      "PF\\": "src/PF/",
-      "FastAPNS\\" : "src/samtny/fastapns/src/FastAPNS"
+      "PF\\": "src/PF/"
     }
   },
   "require-dev": {

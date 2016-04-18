@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "db01dd7cb9afa7e67ac3cb56e038012c",
-    "content-hash": "4c4b536cb4fe75a43b3da58459076a74",
+    "hash": "639593b28571defe773fe8b63399cee5",
+    "content-hash": "6682d9d3d09003e25a8aa78727b3370b",
     "packages": [
         {
             "name": "beberlei/DoctrineExtensions",
@@ -927,6 +927,48 @@
                 "type"
             ],
             "time": "2015-07-25 16:39:46"
+        },
+        {
+            "name": "samtny/fastapns",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/samtny/fastapns.git",
+                "reference": "c86b325bc2367cc91edec8112175a360e36d4748"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/samtny/fastapns/zipball/c86b325bc2367cc91edec8112175a360e36d4748",
+                "reference": "c86b325bc2367cc91edec8112175a360e36d4748",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FastAPNS\\": "src/FastAPNS"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sam Thompson",
+                    "email": "samtny@gmail.com"
+                }
+            ],
+            "description": "Library for pushing APNs notifications to Apple's servers at warp speed",
+            "keywords": [
+                "apns",
+                "apple",
+                "ios",
+                "xcode"
+            ],
+            "time": "2016-04-18 03:29:58"
         },
         {
             "name": "slim/slim",
