@@ -57,72 +57,67 @@ class Client {
   }
 
   private function _processBatches($currentBatchIndex, $payload, $expiry, $total) {
-    $batchProcessIndex = $currentBatchIndex;
-    $offset = 0;
+    $batchOffset = $currentBatchIndex;
+    $tokenOffset = 0;
 
     $finalBatchProcessIndex = ceil($total / $this->batch_size);
 
-    while ($batchProcessIndex <= $currentBatchIndex) {
-      $batch = $this->batches[$batchProcessIndex];
+    while ($batchOffset <= $currentBatchIndex) {
+      $isFinalBatch = $batchOffset == $finalBatchProcessIndex - 1;
 
-      $isFinalBatch = $batchProcessIndex == $finalBatchProcessIndex - 1;
+      $tokenOffset = $this->_sendBatch($payload, $expiry, $batchOffset, $tokenOffset, $isFinalBatch);
 
-      $index = $this->_sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch);
+      if ($tokenOffset < count($this->batches[$batchOffset])) {
+        $rewind = $this->_rewind($batchOffset * $this->batch_size + $tokenOffset);
 
-      if ($index < count($batch)) {
-        $rewind = $this->_rewind($batchProcessIndex * $this->batch_size + $index);
-
-        $batchProcessIndex = floor($rewind / $this->batch_size);
-        $offset = $rewind - ($batchProcessIndex * $this->batch_size);
+        $batchOffset = floor($rewind / $this->batch_size);
+        $tokenOffset = $rewind - ($batchOffset * $this->batch_size);
 
         continue;
       }
 
-      $batchProcessIndex += 1;
-      $offset = 0;
+      $batchOffset += 1;
+      $tokenOffset = 0;
     }
   }
 
-  private function _sendBatch($batch, $payload, $expiry, $offset, $isFinalBatch = FALSE) {
-    $socket = $this->client_stream_socket;
+  private function _sendBatch($payload, $expiry, $batchOffset, $tokenOffset, $isFinalBatch = FALSE) {
+    $batch = $this->batches[$batchOffset];
+    $batchSize = count($batch);
 
-    $tokenBatchPointer = $offset;
-
-    $tokenBatchCount = count($batch);
-
-    while ($tokenBatchPointer < $tokenBatchCount) {
-      $token = $batch[$tokenBatchPointer];
+    while ($tokenOffset < $batchSize) {
+      $token = $batch[$tokenOffset];
 
       $notification_bytes = chr(1);
-      $notification_bytes .= pack('N', $tokenBatchPointer);
+      $notification_bytes .= pack('N', ($batchOffset * $this->batch_size) + $tokenOffset);
       $notification_bytes .= pack('N', $expiry);
       $notification_bytes .= chr(0) . chr(32);
       $notification_bytes .= pack('H*', $token);
       $notification_bytes .= chr(0) . chr(mb_strlen($payload));
       $notification_bytes .= $payload;
 
-      $result = $socket->write($notification_bytes);
+      $result = $this->client_stream_socket->write($notification_bytes);
 
       if ($result == ClientStreamSocket::FASTAPNS_STATUS_WRITABLE) {
         continue;
       }
 
       if ($result == ClientStreamSocket::FASTAPNS_STATUS_READABLE) {
-        return $tokenBatchPointer;
+        return $tokenOffset;
       }
 
-      if ($isFinalBatch && $tokenBatchPointer == $tokenBatchCount - 1) {
-        $result = $socket->status(TRUE);
+      if ($isFinalBatch && $tokenOffset == $batchSize - 1) {
+        $result = $this->client_stream_socket->status(TRUE);
 
         if ($result == ClientStreamSocket::FASTAPNS_STATUS_READABLE) {
-          return $tokenBatchPointer;
+          return $tokenOffset;
         }
       }
 
-      $tokenBatchPointer += 1;
+      $tokenOffset += 1;
     }
 
-    return $tokenBatchPointer;
+    return $tokenOffset;
   }
 
   private function _rewind($currentPointer) {
