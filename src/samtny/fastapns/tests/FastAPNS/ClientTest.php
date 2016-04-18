@@ -485,4 +485,145 @@ class ClientTest extends \PHPUnit_Framework_TestCase
       'BAD60e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914c'
     ), $client->getBadTokens());
   }
+
+  public function testMultipleBadTokensEarlierBatches() {
+    $payload = 'foo';
+    $expiry = 0;
+
+    $tokens = array(
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914a',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914b',
+      'BAD60e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914c',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914d',
+      'BAD60e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914e',
+
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914f',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79150',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79151',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79152',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79153',
+
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79154',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79155',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79156',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79157',
+      'ca360e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b79158',
+    );
+
+    $this->_client_stream_socket->method('write')
+      ->willReturnOnConsecutiveCalls(
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_STATUS_READABLE,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_STATUS_READABLE,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS,
+        ClientStreamSocket::FASTAPNS_WRITE_SUCCESS
+      );
+
+    $this->_client_stream_socket->expects($this->exactly(32))
+      ->method('write')
+      ->withConsecutive(
+        array($this->equalTo(chr(1) . pack('N', 0) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[0]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 1) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[1]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 2) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[2]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 3) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[3]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 4) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[4]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+
+        array($this->equalTo(chr(1) . pack('N', 5) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[5]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 6) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[6]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 7) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[7]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 8) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[8]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 9) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[9]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+
+        array($this->equalTo(chr(1) . pack('N', 10) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[10]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 11) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[11]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 12) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[12]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 13) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[13]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 3) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[3]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+
+        array($this->equalTo(chr(1) . pack('N', 4) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[4]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 5) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[5]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 6) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[6]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 7) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[7]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 8) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[8]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+
+        array($this->equalTo(chr(1) . pack('N', 9) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[9]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 10) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[10]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 5) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[5]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 6) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[6]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 7) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[7]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+
+        array($this->equalTo(chr(1) . pack('N', 8) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[8]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 9) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[9]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 10) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[10]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 11) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[11]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 12) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[12]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+
+        array($this->equalTo(chr(1) . pack('N', 13) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[13]) . chr(0) . chr(mb_strlen($payload)) . $payload)),
+        array($this->equalTo(chr(1) . pack('N', 14) . pack('N', $expiry) .  chr(0) . chr(32) . pack('H*', $tokens[14]) . chr(0) . chr(mb_strlen($payload)) . $payload))
+      );
+
+    // read
+    $this->_client_stream_socket->method('read')
+      ->willReturnOnConsecutiveCalls(
+        array('command' => 8, 'status' => 8, 'identifier' => 2),
+        array('command' => 8, 'status' => 8, 'identifier' => 4)
+      );
+
+    $this->_client_stream_socket->expects($this->exactly(2))
+      ->method('read');
+
+    // status
+    $this->_client_stream_socket->method('status')
+      ->willReturnOnConsecutiveCalls(
+        ClientStreamSocket::FASTAPNS_STATUS_NONE
+      );
+
+    $this->_client_stream_socket->expects($this->exactly(1))
+      ->method('status');
+
+    $client = ClientBuilder::create()
+      ->setStreamSocketClient($this->_client_stream_socket)
+      ->setBatchSize(5)
+      ->build();
+
+    $client->send($payload, $tokens, 0);
+
+    $this->assertEquals(array(
+      'BAD60e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914c',
+      'BAD60e9029938b9ed8ed435640f3760620526bd72037017d3c50cfa264b7914e',
+    ), $client->getBadTokens());
+  }
 }
