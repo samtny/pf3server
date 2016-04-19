@@ -53,6 +53,17 @@ $app->group('/legacy', function () use ($app, $entityManager, $serializer) {
         $legacy_venue->addGame($legacy_game);
       }
 
+      foreach ($venue->getComments() as $comment) {
+        $legacy_comment = new Comment();
+
+        $legacy_comment->id = $comment->getId();
+
+        $legacy_comment->text = $comment->getText();
+        $legacy_comment->date = $comment->getCreated()->format('c');
+
+        $legacy_venue->addComment($legacy_comment);
+      }
+
       $result->addVenue($legacy_venue);
     }
 
