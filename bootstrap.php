@@ -9,10 +9,12 @@ require_once "vendor/autoload.php";
 class Bootstrap {
   private static $entityManager;
 
+  private static $runmode;
+
   public static function go() {
     $parser = new Parser();
 
-    $runmode = $parser->parse(file_get_contents(__DIR__ . '/config.yml'))['pf3server_runmode'];
+    self::$runmode = $parser->parse(file_get_contents(__DIR__ . '/config.yml'))['pf3server_runmode'];
 
     $conn = array(
       'driver' => 'pdo_mysql',
@@ -22,9 +24,9 @@ class Bootstrap {
       'host' => 'localhost',
     );
 
-    $cache_impl = $runmode === 'production' ? new \Doctrine\Common\Cache\ApcCache() : null;
+    $cache_impl = self::$runmode === 'production' ? new \Doctrine\Common\Cache\ApcCache() : null;
 
-    $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), $runmode === 'development', null, $cache_impl);
+    $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), self::$runmode === 'development', null, $cache_impl);
     $config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');
     $config->addCustomNumericFunction('COS', '\DoctrineExtensions\Query\Mysql\Cos');
     $config->addCustomNumericFunction('ACOS', '\DoctrineExtensions\Query\Mysql\Acos');
@@ -40,6 +42,10 @@ class Bootstrap {
 
   public static function getEntityManager() {
     return static::$entityManager;
+  }
+
+  public static function getRunmode() {
+    return static::$runmode;
   }
 }
 
