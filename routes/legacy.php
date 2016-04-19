@@ -2,9 +2,7 @@
 
 include __DIR__ . '/../src/pf2server/pf-class.php';
 
-use JMS\Serializer\DeserializationContext;
-
-$app->group('/legacy', function () use ($app, $entityManager, $serializer) {
+$app->group('/legacy', function () use ($app, $entityManager,) {
   $app->get('/', function () use ($app, $entityManager) {
     /*
     $q = $_GET["q"]; // query
@@ -17,7 +15,7 @@ $app->group('/legacy', function () use ($app, $entityManager, $serializer) {
     */
     $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
 
-    $result = new Result();
+    $legacy_result = new Result();
 
     foreach ($venuesIterator as $venue) {
       $legacy_venue = new Venue();
@@ -44,11 +42,13 @@ $app->group('/legacy', function () use ($app, $entityManager, $serializer) {
 
         $legacy_game->abbr = $abbr;
 
-        $result->meta->gamedict->en[$abbr] = $machine->getGame()->getName();
+        $legacy_result->meta->gamedict->en[$abbr] = $machine->getGame()->getName();
 
         $legacy_game->cond = $machine->getCondition();
         $legacy_game->price = $machine->getPrice();
         $legacy_game->ipdb = $machine->getIpdb();
+        $legacy_game->new = $machine->getGame()->getNew();
+        $legacy_game->rare = $machine->getGame()->getRare();
 
         $legacy_venue->addGame($legacy_game);
       }
@@ -64,16 +64,16 @@ $app->group('/legacy', function () use ($app, $entityManager, $serializer) {
         $legacy_venue->addComment($legacy_comment);
       }
 
-      $result->addVenue($legacy_venue);
+      $legacy_result->addVenue($legacy_venue);
     }
 
-    if (!empty($result->meta->gamedict->en)) {
-      asort($result->meta->gamedict->en);
+    if (!empty($legacy_result->meta->gamedict->en)) {
+      asort($legacy_result->meta->gamedict->en);
     }
 
     $status = new Status();
     $status->status = 'success';
-    $result->status = $status;
+    $legacy_result->status = $status;
 
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -81,7 +81,104 @@ $app->group('/legacy', function () use ($app, $entityManager, $serializer) {
 
     header('Content-type: application/xml');
 
-    echo $result->saveXML();
+    echo $legacy_result->saveXML();
+
+    exit;
+  });
+
+  $app->post('/', function () use ($app, $entityManager) {
+    $xml = $app->request->getBody();
+
+    $legacy_request = new Request();
+
+    $legacy_request->loadXML($xml);
+
+    foreach ($legacy_request->venues as $legacy_venue) {
+      $is_new_venue = empty($legacy_venue->id);
+
+      $venue = NULL;
+
+      if ($is_new_venue) {
+        $venue = new \PF\Venue();
+      } else {
+        $venue = $entityManager->find('PF\Venue', $legacy_venue->id);
+      }
+
+      if (!empty($venue)) {
+        $venue->touch();
+
+        $venue->setName($legacy_venue->name);
+        $venue->setStreet($legacy_venue->street);
+        $venue->setCity($legacy_venue->city);
+        $venue->setState($legacy_venue->state);
+        $venue->setZipcode($legacy_venue->zipcode);
+        $venue->setLatitude($legacy_venue->lat);
+        $venue->setLongitude($legacy_venue->lon);
+        $venue->setPhone($legacy_venue->phone);
+        $venue->setUrl($legacy_venue->url);
+
+        //$flag = $legacy_venue->flag;
+
+        foreach ($legacy_venue->games as $legacy_game) {
+          $machine = NULL;
+
+          if (!empty($legacy_game->id)) {
+            $machine = $entityManager->find('PF\Game', $legacy_game->id);
+
+            $machine->setCondition($legacy_game->cond);
+            $machine->setPrice($legacy_game->price);
+
+            if ($legacy_game->deleted) {
+              $entityManager->remove($machine);
+            } else {
+              $entityManager->persist($machine);
+            }
+          } else {
+            $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation', $legacy_game->abbr));
+
+            if (!empty($game)) {
+              $machine = new \PF\Machine();
+
+              $machine->setCondition($legacy_game->cond);
+              $machine->setPrice($legacy_game->price);
+              $machine->setGame($game);
+
+              $venue->addMachine($machine);
+            }
+          }
+        }
+
+        foreach ($legacy_venue->comments as $legacy_comment) {
+          if (empty($legacy_comment->id)) {
+            $comment = new \PF\Comment();
+
+            $comment->setText($legacy_comment->text);
+
+            $venue->addComment($comment);
+          }
+        }
+
+        $entityManager->persist($venue);
+
+        $entityManager->flush();
+      }
+    }
+
+    $legacy_result = new Result();
+
+    $status = new Status();
+    $status->status = 'success';
+
+    $legacy_result->status = $status;
+
+    header('HTTP/1.1 200 OK');
+
+    $resultXml = $result->saveXML();
+
+    header('Content-Length: ' . strlen($resultXml));
+    header('Content-Type: application/xml;type=result;charset="utf-8"');
+
+    echo $resultXml;
 
     exit;
   });
