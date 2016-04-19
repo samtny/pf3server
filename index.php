@@ -10,7 +10,7 @@ $entityManager = Bootstrap::getEntityManager();
 
 $app = new PinfinderApp(
   array(
-    'mode' => $runmode,
+    'mode' => Bootstrap::getRunmode(),
     'view' => new Twig(),
   )
 );
@@ -38,7 +38,7 @@ $app->notFound(function () use ($app) {
   $app->render('404.html');
 });
 
-$serializer = PinfinderSerializer::create($entityManager, $runmode === 'production');
+$serializer = PinfinderSerializer::create($entityManager, Bootstrap::getRunmode() === 'production');
 
 $app->add(new \PF\Slim\ResponseMiddleware($serializer));
 
