@@ -71,9 +71,9 @@ $app->group('/legacy', function () use ($app, $entityManager,) {
       asort($legacy_result->meta->gamedict->en);
     }
 
-    $status = new Status();
-    $status->status = 'success';
-    $legacy_result->status = $status;
+    $legacy_status = new Status();
+    $legacy_status->status = 'success';
+    $legacy_result->status = $legacy_status;
 
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -166,19 +166,17 @@ $app->group('/legacy', function () use ($app, $entityManager,) {
 
     $legacy_result = new Result();
 
-    $status = new Status();
-    $status->status = 'success';
+    $legacy_status = new Status();
+    $legacy_status->status = 'success';
 
-    $legacy_result->status = $status;
+    $legacy_result->status = $legacy_status;
 
     header('HTTP/1.1 200 OK');
 
-    $resultXml = $result->saveXML();
-
-    header('Content-Length: ' . strlen($resultXml));
+    header('Content-Length: ' . strlen($legacy_result_xml));
     header('Content-Type: application/xml;type=result;charset="utf-8"');
 
-    echo $resultXml;
+    echo $legacy_result->saveXML();
 
     exit;
   });
