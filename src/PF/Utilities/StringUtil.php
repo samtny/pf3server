@@ -75,4 +75,18 @@ class StringUtil {
 
     return implode(" ", $dm_parts);
   }
+
+  public static function abbrName($name) {
+    $abbr = '';
+
+    $name_clean = self::cleanName($name);
+
+    $words = explode(' ', $name_clean);
+
+    foreach ($words as $word) {
+      $abbr .= $word[0];
+    }
+
+    return $abbr;
+  }
 }
