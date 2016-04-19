@@ -6,6 +6,8 @@ use PF\Serializer\PinfinderSerializer;
 use PF\Slim\PinfinderApp;
 use Slim\Views\Twig;
 
+$entityManager = Bootstrap::getEntityManager();
+
 $app = new PinfinderApp(
   array(
     'mode' => $runmode,
