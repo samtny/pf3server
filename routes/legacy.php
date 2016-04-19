@@ -24,17 +24,40 @@ $app->group('/legacy', function () use ($app, $entityManager, $serializer) {
 
       $legacy_venue->id = $venue->getId();
       $legacy_venue->name = $venue->getName();
+      $legacy_venue->street = $venue->getStreet();
+      $legacy_venue->city = $venue->getCity();
+      $legacy_venue->state = $venue->getState();
+      $legacy_venue->zipcode = $venue->getZipcode();
+      $legacy_venue->phone = $venue->getPhone();
+      $legacy_venue->lat = $venue->getLatitude();
+      $legacy_venue->lon = $venue->getLongitude();
+      $legacy_venue->updated = $venue->getUpdated()->format('Y-m-d');
+      $legacy_venue->created = $venue->getCreated()->format('Y-m-d');
+      $legacy_venue->url = $venue->getUrl();
 
       foreach ($venue->getMachines() as $machine) {
         $legacy_game = new Game();
 
         $legacy_game->id = $machine->getId();
-        $legacy_game->abbr = $machine->getName();
+
+        $abbr = $machine->getGame()->getAbbreviation();
+
+        $legacy_game->abbr = $abbr;
+
+        $result->meta->gamedict->en[$abbr] = $machine->getGame()->getName();
+
+        $legacy_game->cond = $machine->getCondition();
+        $legacy_game->price = $machine->getPrice();
+        $legacy_game->ipdb = $machine->getIpdb();
 
         $legacy_venue->addGame($legacy_game);
       }
 
       $result->addVenue($legacy_venue);
+    }
+
+    if (!empty($result->meta->gamedict->en)) {
+      asort($result->meta->gamedict->en);
     }
 
     $status = new Status();
