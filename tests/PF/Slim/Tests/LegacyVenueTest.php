@@ -21,4 +21,14 @@ class LegacyVenueTest extends \PHPUnit_Framework_TestCase {
 
     $this->assertEquals(200, $response->getStatusCode());
   }
+
+  public static function tearDownAfterClass() {
+    $entityManager = \Bootstrap::getEntityManager();
+
+    $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('name' => 'TEST - Modern Pinball NYC'));
+
+    $entityManager->remove($venue);
+
+    $entityManager->flush();
+  }
 }
