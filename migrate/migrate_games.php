@@ -52,4 +52,25 @@ foreach ($dom->getElementsByTagName("tr") as $tr) {
 
 $entityManager->flush();
 
+$legacy_gamedict = file_get_contents(__DIR__ . "/gamedict.txt");
+$legacy_games = explode('\g', $legacy_gamedict);
+
+foreach ($legacy_games as $legacy_game) {
+  $parts = explode('\f', $legacy_game);
+
+  $legacy_abbr = $parts[0];
+  $legacy_name = $parts[1];
+  $legacy_ipdb = $parts[2];
+
+  $game = $entityManager->getRepository('\PF\Game')->find($legacy_ipdb);
+
+  if (!empty($game)) {
+    $game->setAbbreviation($legacy_abbr);
+
+    $entityManager->persist($game);
+  }
+}
+
+$entityManager->flush();
+
 echo "Generated " . $new . ' new games' . "\n";
