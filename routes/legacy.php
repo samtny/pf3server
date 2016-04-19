@@ -2,7 +2,7 @@
 
 include __DIR__ . '/../src/pf2server/pf-class.php';
 
-$app->group('/legacy', function () use ($app, $entityManager,) {
+$app->group('/legacy', function () use ($app, $entityManager) {
   $app->get('/', function () use ($app, $entityManager) {
     /*
     $q = $_GET["q"]; // query
@@ -119,28 +119,28 @@ $app->group('/legacy', function () use ($app, $entityManager,) {
 
         //$flag = $legacy_venue->flag;
 
-        foreach ($legacy_venue->games as $legacy_game) {
+        foreach ($legacy_venue->games as $legacy_machine) {
           $machine = NULL;
 
-          if (!empty($legacy_game->id)) {
-            $machine = $entityManager->find('PF\Game', $legacy_game->id);
+          if (!empty($legacy_machine->id)) {
+            $machine = $entityManager->find('PF\Machine', $legacy_machine->id);
 
-            $machine->setCondition($legacy_game->cond);
-            $machine->setPrice($legacy_game->price);
+            $machine->setCondition($legacy_machine->cond);
+            $machine->setPrice($legacy_machine->price);
 
-            if ($legacy_game->deleted) {
+            if ($legacy_machine->deleted) {
               $entityManager->remove($machine);
             } else {
               $entityManager->persist($machine);
             }
           } else {
-            $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation', $legacy_game->abbr));
+            $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('abbreviation' => $legacy_machine->abbr));
 
             if (!empty($game)) {
               $machine = new \PF\Machine();
 
-              $machine->setCondition($legacy_game->cond);
-              $machine->setPrice($legacy_game->price);
+              $machine->setCondition($legacy_machine->cond);
+              $machine->setPrice($legacy_machine->price);
               $machine->setGame($game);
 
               $venue->addMachine($machine);
@@ -173,10 +173,12 @@ $app->group('/legacy', function () use ($app, $entityManager,) {
 
     header('HTTP/1.1 200 OK');
 
+    $legacy_result_xml = $legacy_result->saveXML();
+
     header('Content-Length: ' . strlen($legacy_result_xml));
     header('Content-Type: application/xml;type=result;charset="utf-8"');
 
-    echo $legacy_result->saveXML();
+    echo $legacy_result_xml;
 
     exit;
   });
