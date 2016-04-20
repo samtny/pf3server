@@ -93,6 +93,54 @@ $app->group('/legacy', function () use ($app, $entityManager) {
 
     $legacy_request->loadXML($xml);
 
+    $user = NULL;
+
+    if (!empty($legacy_request->user)) {
+      $legacy_user = $legacy_request->user;
+
+      if (!empty($legacy_user->tokens)) {
+        $legacy_token = $legacy_user->tokens[0];
+
+        $legacy_service = $legacy_token->service;
+        $legacy_token_string = $legacy_token->token;
+
+        if (!empty($legacy_service) && !empty($legacy_token_string)) {
+          $tokenApp = $legacy_service;
+          $tokenString = preg_replace('/\s|<|>/', '', $legacy_token_string);
+
+          switch ($tokenApp) {
+            case 'apns':
+            case 'apnsfree':
+            case 'apnsfree2':
+              $tokenApp = 'apnsfree';
+
+                break;
+            default:
+              $tokenApp = 'apnspro';
+
+              break;
+          }
+
+          $token = $entityManager->getRepository('PF\Token')->findOneBy(array('app' => $tokenApp, 'token' => $tokenString));
+
+          if (empty($token)) {
+            $token = new PF\Token();
+
+            $token->setApp($tokenApp);
+            $token->setToken($tokenString);
+
+            $user = new PF\User();
+
+            $user->addToken($token);
+
+            $entityManager->persist($user);
+          } else {
+            $user = $token->getUser();
+          }
+        }
+      }
+    }
+
     foreach ($legacy_request->venues as $legacy_venue) {
       $is_new_venue = empty($legacy_venue->id);
 
@@ -100,6 +148,8 @@ $app->group('/legacy', function () use ($app, $entityManager) {
 
       if ($is_new_venue) {
         $venue = new \PF\Venue();
+
+        $venue->setCreatedUser($user);
       } else {
         $venue = $entityManager->find('PF\Venue', $legacy_venue->id);
       }
@@ -159,10 +209,10 @@ $app->group('/legacy', function () use ($app, $entityManager) {
         }
 
         $entityManager->persist($venue);
-
-        $entityManager->flush();
       }
     }
+
+    $entityManager->flush();
 
     $legacy_result = new Result();
 
