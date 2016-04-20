@@ -8,6 +8,8 @@ php_pm_start_servers: 1
 php_pm_min_spare_servers: 1
 php_pm_max_spare_servers: 2
 
+php_fpm_user: vagrant
+php_fpm_group: vagrant
 php_memory_limit: 16M
 php_upload_max_filesize: 2M
 php_post_max_size: 8M
