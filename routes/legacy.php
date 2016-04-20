@@ -87,7 +87,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
   });
 
   $app->post('/', function () use ($app, $entityManager) {
-    $xml = $app->request->getBody();
+    $xml = $app->request->post('doc');
 
     $legacy_request = new Request();
 
