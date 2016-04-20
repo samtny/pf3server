@@ -1,6 +1,6 @@
 #!/bin/bash
 
-vagrant ssh -c '/vagrant/vendor/bin/phpunit /vagrant/tests;'
+vagrant ssh -c 'cd /vagrant;./vendor/bin/phpunit;'
 
 exit 0
 
