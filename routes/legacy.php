@@ -33,7 +33,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       $legacy_venue->created = $venue->getCreated()->format('Y-m-d');
       $legacy_venue->url = $venue->getUrl();
 
-      foreach ($venue->getMachines() as $machine) {
+      foreach ($venue->getActiveMachines() as $machine) {
         $legacy_game = new Game();
 
         $legacy_game->id = $machine->getId();
@@ -53,7 +53,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
         $legacy_venue->addGame($legacy_game);
       }
 
-      foreach ($venue->getComments() as $comment) {
+      foreach ($venue->getActiveComments() as $comment) {
         $legacy_comment = new Comment();
 
         $legacy_comment->id = $comment->getId();
