@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . '/../src/pf2server/pf-class.php';
+use PF\Legacy;
 
 $app->group('/legacy', function () use ($app, $entityManager) {
   $app->get('/', function () use ($app, $entityManager) {
@@ -15,10 +15,10 @@ $app->group('/legacy', function () use ($app, $entityManager) {
     */
     $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
 
-    $legacy_result = new Result();
+    $legacy_result = new PF\Legacy\Result();
 
     foreach ($venuesIterator as $venue) {
-      $legacy_venue = new Venue();
+      $legacy_venue = new PF\Legacy\Venue();
 
       $legacy_venue->id = $venue->getId();
       $legacy_venue->name = $venue->getName();
@@ -34,7 +34,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       $legacy_venue->url = $venue->getUrl();
 
       foreach ($venue->getActiveMachines() as $machine) {
-        $legacy_game = new Game();
+        $legacy_game = new PF\Legacy\Game();
 
         $legacy_game->id = $machine->getId();
 
@@ -54,7 +54,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       }
 
       foreach ($venue->getActiveComments() as $comment) {
-        $legacy_comment = new Comment();
+        $legacy_comment = new PF\Legacy\Comment();
 
         $legacy_comment->id = $comment->getId();
 
@@ -71,7 +71,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       asort($legacy_result->meta->gamedict->en);
     }
 
-    $legacy_status = new Status();
+    $legacy_status = new PF\Legacy\Status();
     $legacy_status->status = 'success';
     $legacy_result->status = $legacy_status;
 
@@ -89,7 +89,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
   $app->post('/', function () use ($app, $entityManager) {
     $xml = $app->request->post('doc');
 
-    $legacy_request = new Request();
+    $legacy_request = new PF\Legacy\Request();
 
     $legacy_request->loadXML($xml);
 
@@ -214,9 +214,9 @@ $app->group('/legacy', function () use ($app, $entityManager) {
 
     $entityManager->flush();
 
-    $legacy_result = new Result();
+    $legacy_result = new PF\Legacy\Result();
 
-    $legacy_status = new Status();
+    $legacy_status = new PF\Legacy\Status();
     $legacy_status->status = 'success';
 
     $legacy_result->status = $legacy_status;

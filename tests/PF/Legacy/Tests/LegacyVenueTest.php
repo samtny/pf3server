@@ -1,6 +1,6 @@
 <?php
 
-namespace PF\Slim\Tests;
+namespace PF\Legacy\Tests;
 
 use GuzzleHttp\Client;
 
