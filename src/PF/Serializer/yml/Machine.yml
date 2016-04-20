@@ -36,9 +36,9 @@ PF\Machine:
     price:
       type: string
       groups: [create, read, update]
-    deleted:
-      type: boolean
-      groups: [create, update]
+    status:
+      type: string
+      groups: [admin, create, update]
     created:
       exclude: true
     updated:

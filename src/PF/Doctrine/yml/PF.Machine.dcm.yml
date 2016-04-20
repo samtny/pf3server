@@ -14,8 +14,8 @@ PF\Machine:
     price:
       type: string
       nullable: true
-    deleted:
-      type: boolean
+    status:
+      type: string
     created:
       type: datetime
     updated:

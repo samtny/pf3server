@@ -7,6 +7,15 @@ PF\Venue:
   access_type: property
   accessor_order: custom
   custom_accessor_order: [id, name, street, city, state, zipcode, phone, latitude, longitude, url, created, updated, machines, comments]
+  virtual_properties:
+    getActiveMachines:
+      serialized_name: machines
+      type: ArrayCollection<PF\Machine>
+      groups: [read]
+    getActiveComments:
+      serialized_name: comments
+      type: ArrayCollection<PF\Comment>
+      groups: [read]
   properties:
     id:
       type: integer
@@ -62,9 +71,3 @@ PF\Venue:
       groups: [read]
     legacy_key:
       exclude: true
-    machines:
-      type: ArrayCollection<PF\Machine>
-      groups: [read]
-    comments:
-      type: ArrayCollection<PF\Comment>
-      groups: [read]
