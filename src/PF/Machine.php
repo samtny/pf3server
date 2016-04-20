@@ -101,6 +101,10 @@ class Machine {
     $this->price = $price;
   }
 
+  public function touch() {
+    $this->updated = new \DateTime("now");
+  }
+
   public function delete() {
     $this->status = 'DELETED';
   }
