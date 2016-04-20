@@ -9,6 +9,8 @@ $line = strtok($contents, $separator);
 
 $new = 0;
 
+$entityManager = Bootstrap::getEntityManager();
+
 while ($line !== false) {
   $parts = explode(',', $line);
 

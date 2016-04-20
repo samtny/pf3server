@@ -2,6 +2,8 @@
 
 require __DIR__ .  '/../bootstrap.php';
 
+$entityManager = Bootstrap::getEntityManager();
+
 function parse_pf_xml($xml, $entityManager, $approve = true) {
   $num = 0;
 

@@ -14,6 +14,8 @@ $dom->loadHTML('<?xml encoding="utf-8" ?>' . $contents);
 
 $new = 0;
 
+$entityManager = Bootstrap::getEntityManager();
+
 foreach ($dom->getElementsByTagName("tr") as $tr) {
   $fields = $tr->getElementsByTagName("td");
 
