@@ -4,6 +4,8 @@ use PF\Legacy;
 
 $app->group('/legacy', function () use ($app, $entityManager) {
   $app->get('/', function () use ($app, $entityManager) {
+    $legacy_request = $app->request();
+    $legacy_request_proxy = new Legacy\LegacyRequestProxy();
     /*
     $q = $_GET["q"]; // query
     $t = $_GET["t"]; // query type (venue, game, gamelist, special)
@@ -13,7 +15,15 @@ $app->group('/legacy', function () use ($app, $entityManager) {
     $o = $_GET["o"]; // order
     $f = $_GET["f"]; // format (xml, json)
     */
-    $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
+
+    $legacy_request_proxy->set('n', $legacy_request->get('n'));
+    $legacy_request_proxy->set('l', $legacy_request->get('l'));
+
+    if ($legacy_request->get('t') === 'special' && $legacy_request->get('q') === 'recent') {
+      // do nothing
+    }
+
+    $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy);
 
     $legacy_result = new PF\Legacy\Result();
 
