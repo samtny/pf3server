@@ -62,6 +62,21 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals(200, $response->getStatusCode());
   }
 
+  private function haversineGreatCircleDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000) {
+    // convert from degrees to radians
+    $latFrom = deg2rad($latitudeFrom);
+    $lonFrom = deg2rad($longitudeFrom);
+    $latTo = deg2rad($latitudeTo);
+    $lonTo = deg2rad($longitudeTo);
+
+    $latDelta = $latTo - $latFrom;
+    $lonDelta = $lonTo - $lonFrom;
+
+    $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+        cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+    return $angle * $earthRadius;
+  }
+
   public function testLegacyDownloadVenuesNearLocation() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
@@ -80,7 +95,17 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
 
     $this->assertNotEmpty($locs->item(0));
 
-    foreach ($locs as $loc) {
+    foreach ($locs as $index => $loc) {
+      if ($index === 0) {
+        $resultLat = $loc->getElementsByTagName("lat")->item(0)->nodeValue;
+        $resultLon = $loc->getElementsByTagName("lon")->item(0)->nodeValue;
+
+        $dist = $this->haversineGreatCircleDistance($resultLat, $resultLon, 40.759211, -73.984638);
+
+        $this->assertGreaterThanOrEqual(1, $dist);
+        $this->assertLessThan(1000, $dist);
+      }
+
       $this->assertNotEmpty($loc->getElementsByTagName("name")->item(0)->nodeValue);
     }
   }
@@ -107,6 +132,7 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
   public function testLegacyGetSpecialRecent() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
     ));
 
     $response = $client->get('/legacy?q=recent&t=special');
