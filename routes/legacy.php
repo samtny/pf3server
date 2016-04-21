@@ -37,6 +37,10 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       $legacy_request_proxy->set('g', $legacy_request->get('q'));
     }
 
+    if ($legacy_request->get('t') === 'venue' && !empty($legacy_request->get('q'))) {
+      $legacy_request_proxy->set('q', $legacy_request->get('q'));
+    }
+
     $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy);
 
     $legacy_result = new PF\Legacy\Result();
