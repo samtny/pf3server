@@ -20,7 +20,21 @@ $app->group('/legacy', function () use ($app, $entityManager) {
     $legacy_request_proxy->set('l', $legacy_request->get('l'));
 
     if ($legacy_request->get('t') === 'special' && $legacy_request->get('q') === 'recent') {
-      // do nothing
+      switch ($legacy_request->get('q')) {
+        case 'recent':
+        case 'upcomingtournaments':
+        case 'mecca':
+        case 'newgame':
+        case 'raregame':
+        case 'museum':
+        default:
+          // do nothing
+          break;
+      }
+    }
+
+    if ($legacy_request->get('t') === 'game' && !empty($legacy_request->get('q'))) {
+      $legacy_request_proxy->set('g', $legacy_request->get('q'));
     }
 
     $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy);
