@@ -54,5 +54,6 @@ require 'routes/geocode.php';
 require 'routes/notification.php';
 require 'routes/machine.php';
 require 'routes/legacy.php';
+require 'routes/user.php';
 
 $app->run();
