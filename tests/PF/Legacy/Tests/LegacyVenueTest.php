@@ -153,6 +153,48 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
     }
   }
 
+  public function testLegacyGetPopeye() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $response = $client->get('/legacy?q=Popeye&t=game');
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $xml = $response->getBody();
+
+    $doc = new \DOMDocument();
+    $doc->loadXML($xml);
+
+    $locs = $doc->getElementsByTagName("loc");
+
+    $this->assertNotEmpty($locs->item(0));
+
+    foreach ($locs as $loc) {
+      $this->assertNotEmpty($loc->getElementsByTagName("name")->item(0)->nodeValue);
+
+      $popeye = array();
+
+      $games = $loc->getElementsByTagName("game");
+
+      foreach ($games as $g) {
+        if (!empty($g->getElementsByTagName("abbr")->item(0)->nodeValue)) {
+          if ($g->getElementsByTagName("abbr")->item(0)->nodeValue === 'P') {
+            $popeye[] = 'P';
+
+            break;
+          }
+        }
+      }
+
+      $this->assertEquals(array('P'), $popeye);
+
+      break;
+    }
+  }
+
   public static function tearDownAfterClass() {
     $entityManager = \Bootstrap::getEntityManager();
 
