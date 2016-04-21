@@ -40,19 +40,57 @@ class Request {
 
       $venue = new Venue();
 
-      $venue->id = $loc->getAttribute("key");
-      $venue->flag = $loc->getAttribute("flag");
-      $venue->name = $loc->getElementsByTagName("name")->item(0)->nodeValue;
-      $venue->street = $loc->getElementsByTagName("addr")->item(0)->nodeValue;
-      $venue->city = $loc->getElementsByTagName("city")->item(0)->nodeValue;
-      $venue->state = $loc->getElementsByTagName("state")->item(0)->nodeValue;
-      $venue->zipcode = $loc->getElementsByTagName("zipcode")->item(0)->nodeValue;
-      $venue->phone = $loc->getElementsByTagName("phone")->item(0)->nodeValue;
-      $venue->lat = $loc->getElementsByTagName("lat")->item(0)->nodeValue;
-      $venue->lon = $loc->getElementsByTagName("lon")->item(0)->nodeValue;
-      $venue->updated = $loc->getElementsByTagName("date")->item(0)->nodeValue;
-      $venue->source = $loc->getElementsByTagName("source")->item(0)->nodeValue;
-      $venue->url = $loc->getElementsByTagName("url")->item(0)->nodeValue;
+      if (!empty($loc->getAttribute("key"))) {
+        $venue->id = $loc->getAttribute("key");
+      }
+
+      if (!empty($loc->getAttribute("flag"))) {
+        $venue->flag = $loc->getAttribute("flag");
+      }
+
+      if (!empty($loc->getElementsByTagName("name")->item(0)->nodeValue)) {
+        $venue->name = $loc->getElementsByTagName("name")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("addr")->item(0)->nodeValue)) {
+        $venue->street = $loc->getElementsByTagName("addr")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("city")->item(0)->nodeValue)) {
+        $venue->city = $loc->getElementsByTagName("city")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("state")->item(0)->nodeValue)) {
+        $venue->state = $loc->getElementsByTagName("state")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("zipcode")->item(0)->nodeValue)) {
+        $venue->zipcode = $loc->getElementsByTagName("zipcode")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("phone")->item(0)->nodeValue)) {
+        $venue->phone = $loc->getElementsByTagName("phone")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("lat")->item(0)->nodeValue)) {
+        $venue->lat = $loc->getElementsByTagName("lat")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("lon")->item(0)->nodeValue)) {
+        $venue->lon = $loc->getElementsByTagName("lon")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("date")->item(0)->nodeValue)) {
+        $venue->updated = $loc->getElementsByTagName("date")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("source")->item(0)->nodeValue)) {
+        $venue->source = $loc->getElementsByTagName("source")->item(0)->nodeValue;
+      }
+
+      if (!empty($loc->getElementsByTagName("url")->item(0)->nodeValue)) {
+        $venue->url = $loc->getElementsByTagName("url")->item(0)->nodeValue;
+      }
 
       $games = $loc->getElementsByTagName("game");
 
@@ -62,13 +100,24 @@ class Request {
 
         $game->id = $g->getAttribute("key");
         $game->deleted = $g->getAttribute("deleted");
-        $game->abbr = $g->getElementsByTagName("abbr")->item(0)->nodeValue;
-        $game->cond = $g->getElementsByTagName("cond")->item(0)->nodeValue;
-        $game->price = $g->getElementsByTagName("price")->item(0)->nodeValue;
-        $game->ipdb = $g->getElementsByTagName("ipdb")->item(0)->nodeValue;
+
+        if (!empty($g->getElementsByTagName("abbr")->item(0)->nodeValue)) {
+          $game->abbr = $g->getElementsByTagName("abbr")->item(0)->nodeValue;
+        }
+
+        if (!empty($g->getElementsByTagName("cond")->item(0)->nodeValue)) {
+          $game->cond = $g->getElementsByTagName("cond")->item(0)->nodeValue;
+        }
+
+        if (!empty($g->getElementsByTagName("price")->item(0)->nodeValue)) {
+          $game->price = $g->getElementsByTagName("price")->item(0)->nodeValue;
+        }
+
+        if (!empty($g->getElementsByTagName("ipdb")->item(0)->nodeValue)) {
+          $game->ipdb = $g->getElementsByTagName("ipdb")->item(0)->nodeValue;
+        }
 
         $venue->games[] = $game;
-
       }
 
       $comments = $loc->getElementsByTagName("comment");
@@ -78,16 +127,19 @@ class Request {
         $comment = new Comment();
 
         $comment->id = $c->getAttribute("key");
-        $comment->text = $c->getElementsByTagName("ctext")->item(0)->nodeValue;
-        $comment->date = $c->getElementsByTagName("cdate")->item(0)->nodeValue;
+
+        if (!empty($c->getElementsByTagName("ctext")->item(0)->nodeValue)) {
+          $comment->text = $c->getElementsByTagName("ctext")->item(0)->nodeValue;
+        }
+
+        if (!empty($c->getElementsByTagName("cdate")->item(0)->nodeValue)) {
+          $comment->date = $c->getElementsByTagName("cdate")->item(0)->nodeValue;
+        }
 
         $venue->comments[] = $comment;
-
       }
 
       $this->venues[] = $venue;
-
     }
-
   }
 }
