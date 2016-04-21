@@ -195,6 +195,32 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
     }
   }
 
+  public function testLegacySearchSunshineLaundromat() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $response = $client->get('/legacy?q=sunshine%20laundromat&t=venue');
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $xml = $response->getBody();
+
+    $doc = new \DOMDocument();
+    $doc->loadXML($xml);
+
+    $locs = $doc->getElementsByTagName("loc");
+
+    $this->assertNotEmpty($locs->item(0));
+
+    foreach ($locs as $loc) {
+      $this->assertEquals('Sunshine Laundromat', $loc->getElementsByTagName("name")->item(0)->nodeValue);
+
+      break;
+    }
+  }
+
   public static function tearDownAfterClass() {
     $entityManager = \Bootstrap::getEntityManager();
 
