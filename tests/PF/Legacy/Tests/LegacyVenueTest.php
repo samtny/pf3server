@@ -62,6 +62,71 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals(200, $response->getStatusCode());
   }
 
+  public function testLegacyDownloadVenuesNearLocation() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+    ));
+
+    $response = $client->get('/legacy?n=40.759211,-73.984638');
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $xml = $response->getBody();
+
+    $doc = new \DOMDocument();
+    $doc->loadXML($xml);
+
+    $locs = $doc->getElementsByTagName("loc");
+
+    $this->assertNotEmpty($locs->item(0));
+
+    foreach ($locs as $loc) {
+      $this->assertNotEmpty($loc->getElementsByTagName("name")->item(0)->nodeValue);
+    }
+  }
+
+  public function testLegacyDeleteGame() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    $xml .= '<!DOCTYPE pinfinderapp SYSTEM "http://www.pinballfinder.org/pinfinderapp.dtd">';
+    $xml .= '<pinfinderapp version="2.2.2"><locations><loc key="11606"><game deleted="1" /></loc></locations></pinfinderapp>';
+
+    $response = $client->post('/legacy', array(
+      'form_params' => array(
+        'doc' => $xml,
+      ),
+    ));
+
+    $this->assertEquals(200, $response->getStatusCode());
+  }
+
+  public function testLegacyGetSpecialRecent() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+    ));
+
+    $response = $client->get('/legacy?q=recent&t=special');
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $xml = $response->getBody();
+
+    $doc = new \DOMDocument();
+    $doc->loadXML($xml);
+
+    $locs = $doc->getElementsByTagName("loc");
+
+    $this->assertNotEmpty($locs->item(0));
+
+    foreach ($locs as $loc) {
+      $this->assertNotEmpty($loc->getElementsByTagName("name")->item(0)->nodeValue);
+    }
+  }
+
   public static function tearDownAfterClass() {
     $entityManager = \Bootstrap::getEntityManager();
 
