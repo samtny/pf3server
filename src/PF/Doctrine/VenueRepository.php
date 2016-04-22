@@ -52,16 +52,19 @@ class VenueRepository extends EntityRepository {
     $qb->from('\PF\Venue', 'v')
       ->leftJoin('v.comments', 'c')
       ->leftJoin('v.machines', 'm')
-      ->leftJoin('m.game', 'g')
-      ->where($qb->expr()->andX(
-        $qb->expr()->isNotNull('v.latitude'),
-        $qb->expr()->isNotNull('v.longitude')
-      ));
+      ->leftJoin('m.game', 'g');
 
     $s = !empty($request->get('s')) ? $request->get('s') : 'APPROVED';
 
     $qb->andWhere($qb->expr()->eq('v.status', ':status'))
       ->setParameter('status', $s);
+
+    if ($s === 'APPROVED') {
+      $qb->andWhere($qb->expr()->andX(
+        $qb->expr()->isNotNull('v.latitude'),
+        $qb->expr()->isNotNull('v.longitude')
+      ));
+    }
 
     if (!empty($request->get('n'))) {
       $n = $request->get('n');
