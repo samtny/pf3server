@@ -31,7 +31,7 @@ CONFIG_FILE="./config/config.${CONFIG}.yml"
 
 eval $(parse_yaml ${CONFIG_FILE} "config_")
 
-HOST=$config_pf3server_url
+HOST=$config_pf3server_deploy_host
 USER=$config_pf3server_deploy_user
 DOCROOT=$config_pf3server_docroot
 
