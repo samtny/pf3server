@@ -9,24 +9,33 @@ require_once "vendor/autoload.php";
 class Bootstrap {
   private static $entityManager;
 
+  private static $config;
   private static $runmode;
 
   public static function go() {
     $parser = new Parser();
 
-    self::$runmode = $parser->parse(file_get_contents(__DIR__ . '/config.yml'))['pf3server_runmode'];
+    $config = $parser->parse(file_get_contents(__DIR__ . '/config.yml'));
+
+    self::$config = $config;
+
+    self::$runmode = $config['pf3server_runmode'];
+
+    $credentials = $parser->parse(file_get_contents(__DIR__ . '/credentials.yml'));
 
     $conn = array(
       'driver' => 'pdo_mysql',
-      'dbname' => 'pf3server',
-      'user' => 'pf3server',
-      'password' => 'pf3server',
-      'host' => 'localhost',
+      'dbname' => $credentials['pf3server_db_name'],
+      'user' => $credentials['pf3server_db_user'],
+      'password' => $credentials['pf3server_db_password'],
+      'host' => $credentials['pf3server_db_host'],
     );
 
     $cache_impl = self::$runmode === 'production' ? new \Doctrine\Common\Cache\ApcCache() : null;
 
-    $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), self::$runmode === 'development', null, $cache_impl);
+    $proxy_dir = self::$runmode === 'production' ? __DIR__ . '/cache' : null;
+    
+    $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), self::$runmode === 'development', $proxy_dir, $cache_impl);
     $config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');
     $config->addCustomNumericFunction('COS', '\DoctrineExtensions\Query\Mysql\Cos');
     $config->addCustomNumericFunction('ACOS', '\DoctrineExtensions\Query\Mysql\Acos');
