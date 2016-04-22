@@ -53,6 +53,10 @@ class Bootstrap {
     return static::$entityManager;
   }
 
+  public static function getConfig() {
+    return static::$config;
+  }
+
   public static function getRunmode() {
     return static::$runmode;
   }
