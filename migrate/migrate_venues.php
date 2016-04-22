@@ -6,10 +6,16 @@ $entityManager = Bootstrap::getEntityManager();
 
 echo "Migrating venues\n";
 
+/**
+ * @param $xml
+ * @param \Doctrine\ORM\EntityManager $entityManager
+ * @param bool $approve
+ * @return int
+ */
 function parse_pf_xml($xml, $entityManager, $approve = true) {
   $num = 0;
 
-  foreach ($xml->locations->loc as $loc) {
+  foreach ($xml->locations->loc as $loc_index => $loc) {
     $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('legacy_key' => $loc['key']));
 
     if (empty($venue)) {
@@ -82,6 +88,14 @@ function parse_pf_xml($xml, $entityManager, $approve = true) {
 
       $num++;
     }
+
+    if ($loc_index % 100 === 0) {
+      $entityManager->flush();
+
+      $entityManager->clear();
+    }
+
+    $venue = NULL;
   }
 
   $entityManager->flush();
