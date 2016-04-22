@@ -31,10 +31,10 @@ class Bootstrap {
       'host' => $credentials['pf3server_db_host'],
     );
 
+    $proxy_dir = __DIR__ . '/cache';
+
     $cache_impl = self::$runmode === 'production' ? new \Doctrine\Common\Cache\ApcCache() : null;
 
-    $proxy_dir = self::$runmode === 'production' ? __DIR__ . '/cache' : null;
-    
     $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), self::$runmode === 'development', $proxy_dir, $cache_impl);
     $config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');
     $config->addCustomNumericFunction('COS', '\DoctrineExtensions\Query\Mysql\Cos');
