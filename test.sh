@@ -38,6 +38,6 @@ DOCROOT=$config_pf3server_docroot
 rsync -rv ./tests "${USER}@${HOST}:${DOCROOT}"
 rsync -rv "phpunit.xml" "${USER}@${HOST}:${DOCROOT}/"
 
-ssh ${USER}@${HOST} "cd ${DOCROOT} && composer install && ./vendor/bin/phpunit"
+ssh ${USER}@${HOST} "php -d allow_url_fopen=On composer.phar install --working-dir=${DOCROOT} && ${DOCROOT}/vendor/bin/phpunit --configuration ${DOCROOT}/phpunit.xml"
 
 exit 0
