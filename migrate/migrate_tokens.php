@@ -11,12 +11,14 @@ $new = 0;
 
 $entityManager = Bootstrap::getEntityManager();
 
+echo "Migrating tokens\n";
+
 while ($line !== false) {
   $parts = explode(',', $line);
 
   if (count($parts) == 2) {
     $app = $parts[1];
-    $tokenString = $parts[0];
+    $tokenString = preg_replace('/\s|<|>/', '', $parts[0]);
 
     switch ($app) {
       case 'apns':

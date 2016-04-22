@@ -16,6 +16,8 @@ $new = 0;
 
 $entityManager = Bootstrap::getEntityManager();
 
+echo "Migrating games\n";
+
 foreach ($dom->getElementsByTagName("tr") as $tr) {
   $fields = $tr->getElementsByTagName("td");
 
