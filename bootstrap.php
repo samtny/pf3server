@@ -33,7 +33,7 @@ class Bootstrap {
 
     $proxy_dir = __DIR__ . '/cache';
 
-    $cache_impl = self::$runmode === 'production' ? new \Doctrine\Common\Cache\ApcCache() : null;
+    $cache_impl = (self::$runmode === 'production' && extension_loaded('apc')) ? new \Doctrine\Common\Cache\ApcCache() : null;
 
     $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), self::$runmode === 'development', $proxy_dir, $cache_impl);
     $config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');

@@ -40,7 +40,7 @@ ssh ${USER}@${HOST} "mkdir -p $DOCROOT/cache"
 rsync -rv ./routes "${USER}@${HOST}:${DOCROOT}"
 rsync -rv ./src "${USER}@${HOST}:${DOCROOT}"
 rsync -rv ./templates "${USER}@${HOST}:${DOCROOT}"
-rsync -rv --include="bootstrap.php" --include="cli-config.php" --include="index.php" --include="composer.*" --exclude="*" ./* "${USER}@${HOST}:${DOCROOT}/"
+rsync -rv --include=".htaccess" --include="bootstrap.php" --include="cli-config.php" --include="index.php" --include="composer.*" --exclude="*" . "${USER}@${HOST}:${DOCROOT}/"
 rsync -v ${CONFIG_FILE} "${USER}@${HOST}:${DOCROOT}/config.yml"
 rsync -v --ignore-existing "./credentials.yml.EXAMPLE" "${USER}@${HOST}:${DOCROOT}/credentials.yml"
 
