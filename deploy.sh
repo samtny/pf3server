@@ -2,26 +2,48 @@
 
 set -e
 
-USAGE="deploy.sh [host] [docroot] [config]"
+USAGE="deploy.sh [config]"
 
-if [ "$#" -ne 3 ]; then
+if [ "$#" -ne 1 ]; then
   echo "$USAGE"
   exit 1
 fi
 
-HOST=$1
-DOCROOT=$2
-CONFIG=$3
+CONFIG=$1
 
-ssh $HOST "mkdir -p $DOCROOT/cache"
+parse_yaml() {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
+   }'
+}
 
-rsync -rv ./routes "${HOST}:${DOCROOT}"
-rsync -rv ./src "${HOST}:${DOCROOT}"
-rsync -rv ./templates "${HOST}:${DOCROOT}"
-rsync -rv --include="bootstrap.php" --include="cli-config.php" --include="index.php" --include="composer.*" --exclude="*" ./* "${HOST}:${DOCROOT}/"
-rsync -v "./config/config.${CONFIG}.yml" "${HOST}:${DOCROOT}/config.yml"
-rsync -v --ignore-existing "./credentials.yml.EXAMPLE" "${HOST}:${DOCROOT}/credentials.yml"
+CONFIG_FILE="./config/config.${CONFIG}.yml"
 
-ssh $HOST "cd $DOCROOT && composer install --no-dev --optimize-autoloader && vendor/bin/doctrine orm:generate-proxies"
+eval $(parse_yaml ${CONFIG_FILE} "config_")
+
+HOST=$config_pf3server_url
+USER=$config_pf3server_deploy_user
+DOCROOT=$config_pf3server_docroot
+
+ssh ${USER}@${HOST} "mkdir -p $DOCROOT/cache"
+
+rsync -rv ./routes "${USER}@${HOST}:${DOCROOT}"
+rsync -rv ./src "${USER}@${HOST}:${DOCROOT}"
+rsync -rv ./templates "${USER}@${HOST}:${DOCROOT}"
+rsync -rv --include="bootstrap.php" --include="cli-config.php" --include="index.php" --include="composer.*" --exclude="*" ./* "${USER}@${HOST}:${DOCROOT}/"
+rsync -v ${CONFIG_FILE} "${USER}@${HOST}:${DOCROOT}/config.yml"
+rsync -v --ignore-existing "./credentials.yml.EXAMPLE" "${USER}@${HOST}:${DOCROOT}/credentials.yml"
+
+ssh ${USER}@${HOST} "cd $DOCROOT && composer install --no-dev --optimize-autoloader && vendor/bin/doctrine orm:generate-proxies"
 
 exit 0
