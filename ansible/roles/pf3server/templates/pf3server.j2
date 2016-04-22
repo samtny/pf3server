@@ -4,7 +4,7 @@ server {
 	#ssl_certificate /opt/photos_api/ssl/server.crt;
 	#ssl_certificate_key /opt/photos_api/ssl/server.key;
 
-	root /vagrant;
+	root {{ pf3server_docroot }};
 	index index.php;
 
 	server_name *.pf3server.com localhost;
