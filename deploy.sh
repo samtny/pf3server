@@ -2,7 +2,7 @@
 
 set -e
 
-USAGE="deploy.sh [host] [docroot] [runmode]"
+USAGE="deploy.sh [host] [docroot] [config]"
 
 if [ "$#" -ne 3 ]; then
   echo "$USAGE"
@@ -11,10 +11,17 @@ fi
 
 HOST=$1
 DOCROOT=$2
-RUNMODE=$3
+CONFIG=$3
 
-rsync -rv --include="routes" --include="src" --include="templates" --include="bootstrap.php" --include="index.php" --include="composer.*" --exclude="*" ./* $HOST:$DOCROOT/
+ssh $HOST "mkdir -p $DOCROOT/cache"
 
-ssh $HOST "cd $DOCROOT && composer install --no-dev --optimize-autoloader"
+rsync -rv ./routes "${HOST}:${DOCROOT}"
+rsync -rv ./src "${HOST}:${DOCROOT}"
+rsync -rv ./templates "${HOST}:${DOCROOT}"
+rsync -rv --include="bootstrap.php" --include="cli-config.php" --include="index.php" --include="composer.*" --exclude="*" ./* "${HOST}:${DOCROOT}/"
+rsync -v "./config/config.${CONFIG}.yml" "${HOST}:${DOCROOT}/config.yml"
+rsync -v --ignore-existing "./credentials.yml.EXAMPLE" "${HOST}:${DOCROOT}/credentials.yml"
+
+ssh $HOST "cd $DOCROOT && composer install --no-dev --optimize-autoloader && vendor/bin/doctrine orm:generate-proxies"
 
 exit 0
