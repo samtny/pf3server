@@ -13,6 +13,8 @@ $entityManager = Bootstrap::getEntityManager();
 
 echo "Migrating tokens\n";
 
+$batch_size = 100;
+
 while ($line !== false) {
   $parts = explode(',', $line);
 
@@ -53,12 +55,14 @@ while ($line !== false) {
         $entityManager->persist($user);
 
         $new += 1;
+
+        if ($new % $batch_size == 0) {
+          $entityManager->flush();
+
+          $entityManager->clear();
+        }
       }
     }
-  }
-
-  if ($new % 100 == 0) {
-    $entityManager->flush();
   }
 
   $line = strtok( $separator );

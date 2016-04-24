@@ -18,7 +18,9 @@ $entityManager = Bootstrap::getEntityManager();
 
 echo "Migrating games\n";
 
-foreach ($dom->getElementsByTagName("tr") as $tr) {
+$batch_size = 100;
+
+foreach ($dom->getElementsByTagName("tr") as $index => $tr) {
   $fields = $tr->getElementsByTagName("td");
 
   if ($fields->length === 6) {
@@ -50,6 +52,12 @@ foreach ($dom->getElementsByTagName("tr") as $tr) {
       }
 
       $entityManager->persist($game);
+
+      if ($index % $batch_size === 0) {
+        $entityManager->flush();
+
+        $entityManager->clear();
+      }
     }
   }
 }
@@ -59,7 +67,7 @@ $entityManager->flush();
 $legacy_gamedict = file_get_contents(__DIR__ . "/gamedict.txt");
 $legacy_games = explode('\g', $legacy_gamedict);
 
-foreach ($legacy_games as $legacy_game) {
+foreach ($legacy_games as $index => $legacy_game) {
   $parts = explode('\f', $legacy_game);
 
   $legacy_abbr = $parts[0];
@@ -72,6 +80,12 @@ foreach ($legacy_games as $legacy_game) {
     $game->setAbbreviation($legacy_abbr);
 
     $entityManager->persist($game);
+
+    if ($index % $batch_size === 0) {
+      $entityManager->flush();
+
+      $entityManager->clear();
+    }
   }
 }
 

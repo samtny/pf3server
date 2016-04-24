@@ -6,6 +6,8 @@ $entityManager = Bootstrap::getEntityManager();
 
 echo "Migrating venues\n";
 
+$batch_size = 100;
+
 /**
  * @param $xml
  * @param \Doctrine\ORM\EntityManager $entityManager
@@ -13,6 +15,8 @@ echo "Migrating venues\n";
  * @return int
  */
 function parse_pf_xml($xml, $entityManager, $approve = true) {
+  global $batch_size;
+
   $num = 0;
 
   foreach ($xml->locations->loc as $loc_index => $loc) {
@@ -87,12 +91,12 @@ function parse_pf_xml($xml, $entityManager, $approve = true) {
       $entityManager->persist($venue);
 
       $num++;
-    }
 
-    if ($loc_index % 100 === 0) {
-      $entityManager->flush();
+      if ($num % $batch_size === 0) {
+        $entityManager->flush();
 
-      $entityManager->clear();
+        $entityManager->clear();
+      }
     }
 
     $venue = NULL;
