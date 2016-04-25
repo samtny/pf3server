@@ -2,7 +2,7 @@
 
 set -e
 
-USAGE="test.sh [config] [target]"
+USAGE="test.sh [config] [filter]"
 
 if [ "$#" -lt 1 ]; then
   echo "$USAGE"
@@ -10,7 +10,7 @@ if [ "$#" -lt 1 ]; then
 fi
 
 CONFIG=$1
-TARGET=$2
+FILTER=$2
 
 parse_yaml() {
    local prefix=$2
@@ -38,8 +38,8 @@ DOCROOT=$config_pf3server_docroot
 
 rsync -rv ./migrate "${USER}@${HOST}:${DOCROOT}"
 
-if [ "$TARGET" != "" ]; then
-  ssh ${USER}@${HOST} "php -d allow_url_fopen=On ${DOCROOT}/migrate/migrate_${TARGET}.php"
+if [ "$FILTER" != "" ]; then
+  ssh ${USER}@${HOST} "php -d allow_url_fopen=On ${DOCROOT}/migrate/migrate_${FILTER}.php"
 else
   if [ ! -f "./migrate/ipdb.html" ]; then
     echo "ipdb.html does not exist, aborting"
