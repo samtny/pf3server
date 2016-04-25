@@ -1,7 +1,7 @@
 ---
 
 pf3server_url: local.pf3server.com
-pf3server_runmode: development
+pf3server_runmode: profile
 pf3server_docroot: /var/www/pf3server
 pf3server_ssl: /home/vagrant/credentials
 

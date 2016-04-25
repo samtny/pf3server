@@ -40,6 +40,10 @@ $app->notFound(function () use ($app) {
 
 $serializer = PinfinderSerializer::create($entityManager, Bootstrap::getRunmode() === 'production');
 
+if (Bootstrap::getRunmode() === 'profile') {
+  $app->add(new \PF\Slim\XHProfMiddleware());
+}
+
 $app->add(new \PF\Slim\ResponseMiddleware($serializer));
 
 $adminRouteMiddleware = new \PF\Slim\AdminRouteMiddleware();
