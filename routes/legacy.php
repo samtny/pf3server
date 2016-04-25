@@ -107,11 +107,10 @@ $app->group('/legacy', function () use ($app, $entityManager) {
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
     //header('Access-Control-Allow-Origin: *');
 
+    $app->response->headers->set('Content-Type', 'application/xml');
     header('Content-type: application/xml');
 
     echo $legacy_result->saveXML();
-
-    exit;
   });
 
   $app->post('/', function () use ($app, $entityManager) {
