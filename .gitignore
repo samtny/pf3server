@@ -3,3 +3,4 @@ vendor
 *.sqlite
 credentials.yml
 ipdb.html
+build
