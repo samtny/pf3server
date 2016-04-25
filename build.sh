@@ -58,8 +58,8 @@ fi
 
 mkdir -p ${BUILD_DIR}
 
-cp -ru routes/ src/ templates/ bootstrap.php cli-config.php index.php composer.* .htaccess credentials.EXAMPLE.yml -t ${BUILD_DIR}
-cp -u ${CONFIG_FILE} ${BUILD_DIR}/config.yml
+cp -rv routes/ src/ templates/ bootstrap.php cli-config.php index.php composer.* .htaccess credentials.EXAMPLE.yml ${BUILD_DIR}
+cp -v ${CONFIG_FILE} ${BUILD_DIR}/config.yml
 
 mkdir -p $BUILD_DIR/cache
 
