@@ -70,7 +70,7 @@ function parse_pf_xml($xml, $entityManager, $approve = true) {
 
           $venue->addMachine($machine, true);
         } else {
-          echo "missing game: " . $locmachine['key'];
+          echo "missing game: " . $locmachine['key'] . "\n";
         }
       }
 
