@@ -41,12 +41,12 @@ $app->notFound(function () use ($app) {
 $serializer = PinfinderSerializer::create($entityManager, Bootstrap::getRunmode() === 'production');
 
 if (Bootstrap::getRunmode() === 'profile') {
-  $app->add(new \PF\Slim\XHProfMiddleware());
+  $app->add(new \PF\Middleware\XHProfMiddleware());
 }
 
-$app->add(new \PF\Slim\ResponseMiddleware($serializer));
+$app->add(new \PF\Middleware\ResponseMiddleware($serializer));
 
-$adminRouteMiddleware = new \PF\Slim\AdminRouteMiddleware();
+$adminRouteMiddleware = new \PF\Middleware\AdminRouteMiddleware();
 
 require 'routes/login.php';
 require 'routes/admin.php';
