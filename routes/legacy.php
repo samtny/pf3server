@@ -41,53 +41,53 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       $legacy_request_proxy->set('q', $legacy_request->get('q'));
     }
 
-    $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy);
+    $venueIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy);
 
     $legacy_result = new PF\Legacy\Result();
 
-    foreach ($venuesIterator as $venue) {
+    foreach ($venueIterator as $venue) {
       $legacy_venue = new PF\Legacy\Venue();
 
-      $legacy_venue->id = $venue->getId();
-      $legacy_venue->name = $venue->getName();
-      $legacy_venue->street = $venue->getStreet();
-      $legacy_venue->city = $venue->getCity();
-      $legacy_venue->state = $venue->getState();
-      $legacy_venue->zipcode = $venue->getZipcode();
-      $legacy_venue->phone = $venue->getPhone();
-      $legacy_venue->lat = $venue->getLatitude();
-      $legacy_venue->lon = $venue->getLongitude();
-      $legacy_venue->updated = $venue->getUpdated()->format('Y-m-d');
-      $legacy_venue->created = $venue->getCreated()->format('Y-m-d');
-      $legacy_venue->url = $venue->getUrl();
+      $legacy_venue->id = $venue['id'];
+      $legacy_venue->name = $venue['name'];
+      $legacy_venue->street = $venue['street'];
+      $legacy_venue->city = $venue['city'];
+      $legacy_venue->state = $venue['state'];
+      $legacy_venue->zipcode = $venue['zipcode'];
+      $legacy_venue->phone = $venue['phone'];
+      $legacy_venue->lat = $venue['latitude'];
+      $legacy_venue->lon = $venue['longitude'];
+      $legacy_venue->updated = date_format($venue['updated'], 'Y-m-d');
+      $legacy_venue->created = date_format($venue['created'], 'Y-m-d');
+      $legacy_venue->url = $venue['url'];
 
-      foreach ($venue->getActiveMachines() as $machine) {
+      foreach ($venue['machines'] as $machine) {
         $legacy_game = new PF\Legacy\Game();
 
-        $legacy_game->id = $machine->getId();
+        $legacy_game->id = $machine['id'];
 
-        $abbr = $machine->getGame()->getAbbreviation();
+        $abbr = $machine['game']['abbreviation'];
 
         $legacy_game->abbr = $abbr;
 
-        $legacy_result->meta->gamedict->en[$abbr] = $machine->getGame()->getName();
+        $legacy_result->meta->gamedict->en[$abbr] = $machine['game']['name'];
 
-        $legacy_game->cond = $machine->getCondition();
-        $legacy_game->price = $machine->getPrice();
-        $legacy_game->ipdb = $machine->getIpdb();
-        $legacy_game->new = $machine->getGame()->getNew();
-        $legacy_game->rare = $machine->getGame()->getRare();
+        $legacy_game->cond = $machine['condition'];
+        $legacy_game->price = $machine['price'];
+        $legacy_game->ipdb = $machine['game']['id'];
+        $legacy_game->new = $machine['game']['new'];
+        $legacy_game->rare = $machine['game']['rare'];
 
         $legacy_venue->addGame($legacy_game);
       }
 
-      foreach ($venue->getActiveComments() as $comment) {
+      foreach ($venue['comments'] as $comment) {
         $legacy_comment = new PF\Legacy\Comment();
 
-        $legacy_comment->id = $comment->getId();
+        $legacy_comment->id = $comment['id'];
 
-        $legacy_comment->text = $comment->getText();
-        $legacy_comment->date = $comment->getCreated()->format('c');
+        $legacy_comment->text = $comment['text'];
+        $legacy_comment->date = date_format($comment['created'], 'c');
 
         $legacy_venue->addComment($legacy_comment);
       }

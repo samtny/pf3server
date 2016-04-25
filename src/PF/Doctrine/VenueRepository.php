@@ -167,6 +167,8 @@ class VenueRepository extends EntityRepository {
 
     $query = $qb->getQuery();
 
+    $query->setHydrationMode(Doctrine\ORM\Query::HYDRATE_ARRAY);
+
     return new Paginator($query);
   }
 }
