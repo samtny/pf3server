@@ -45,7 +45,7 @@ class VenueRepository extends EntityRepository {
     return $qb->getQuery()->getArrayResult();
   }
 
-  public function getVenues($request) {
+  public function getVenues($request, $hydration_mode = Doctrine\ORM\Query::HYDRATE_OBJECT) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('v', 'm', 'g', 'c'));
@@ -165,9 +165,8 @@ class VenueRepository extends EntityRepository {
     $qb->setFirstResult($p * $l)
       ->setMaxResults($l);
 
-    $query = $qb->getQuery();
-
-    $query->setHydrationMode(Doctrine\ORM\Query::HYDRATE_ARRAY);
+    $query = $qb->getQuery()
+      ->setHydrationMode($hydration_mode);
 
     return new Paginator($query);
   }

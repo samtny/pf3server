@@ -41,7 +41,7 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       $legacy_request_proxy->set('q', $legacy_request->get('q'));
     }
 
-    $venueIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy);
+    $venueIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy, Doctrine\ORM\Query::HYDRATE_ARRAY);
 
     $legacy_result = new PF\Legacy\Result();
 
