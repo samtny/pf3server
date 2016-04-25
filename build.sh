@@ -2,7 +2,22 @@
 
 set -e
 
-USAGE="build.sh [config] [nodeps] [clean]"
+USAGE="build.sh -dc [config]"
+
+DEPS=false
+CLEAN=false
+
+while getopts "dc" opt; do
+    case "$opt" in
+        d)
+            DEPS=true
+            ;;
+        c)
+            CLEAN=true
+            ;;
+    esac
+done
+shift "$((OPTIND-1))"
 
 if [ "$#" -lt 1 ]; then
   echo "$USAGE"
@@ -10,8 +25,6 @@ if [ "$#" -lt 1 ]; then
 fi
 
 CONFIG=$1
-NODEPS=$2
-CLEAN=$3
 
 parse_yaml() {
    local prefix=$2
@@ -39,20 +52,18 @@ DOCROOT=$config_pf3server_docroot
 
 BUILD_DIR="./build"
 
-if [ "$#" -gt 2 ]; then
+if [ "$CLEAN" = true ]; then
   [ -d ${BUILD_DIR} ] && rm -rf ${BUILD_DIR}
 fi
 
 mkdir -p ${BUILD_DIR}
 
-cp -r routes/ src/ templates/ bootstrap.php cli-config.php index.php composer.* .htaccess credentials.yml.EXAMPLE -t ${BUILD_DIR}
-cp ${CONFIG_FILE} ${BUILD_DIR}/config.yml
+cp -ru routes/ src/ templates/ bootstrap.php cli-config.php index.php composer.* .htaccess credentials.yml.EXAMPLE -t ${BUILD_DIR}
+cp -u ${CONFIG_FILE} ${BUILD_DIR}/config.yml
 
 mkdir -p $BUILD_DIR/cache
 
-[ "$#" -eq 2 ] && exit 0
-
-cd ${BUILD_DIR}
+[ "$DEPS" = false ] && exit 0
 
 if [ ! -f "composer.phar" ]; then
   wget -O composer-setup.php https://getcomposer.org/installer
@@ -62,12 +73,11 @@ if [ ! -f "composer.phar" ]; then
 fi
 
 if [ "$config_pf3server_runmode" == "production" ]; then
-  php -d allow_url_fopen=On composer.phar install --no-dev --optimize-autoloader
-  cd ${DOCROOT} && vendor/bin/doctrine orm:generate-proxies
+  php -d allow_url_fopen=On composer.phar install --working-dir=${BUILD_DIR} --no-dev --optimize-autoloader
+  cd ${BUILD_DIR} && vendor/bin/doctrine orm:generate-proxies
+  cd -
 else
-  php -d allow_url_fopen=On composer.phar install
+  php -d allow_url_fopen=On composer.phar install --working-dir=${BUILD_DIR}
 fi
-
-cd -
 
 exit 0
