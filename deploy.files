@@ -5,8 +5,9 @@ src/
 templates/
 .htaccess
 bootstrap.php
-index.php
+build.sh
 cli-config.php
 composer.json
 composer.lock
-credentials.yml.EXAMPLE
+credentials.EXAMPLE.yml
+index.php
