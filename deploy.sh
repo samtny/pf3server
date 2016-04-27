@@ -51,7 +51,7 @@ RSYNC_EXCLUDE=""
 rsync -ruvz --files-from "deploy.files" . "${USER}@${HOST}:${DOCROOT}"
 
 if [ "$DEPS" = true ]; then
-  echo "yo"
+  ssh ${USER}@${HOST} "cd ${DOCROOT} && ./build.sh"
 fi
 
 exit 0
