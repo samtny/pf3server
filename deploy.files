@@ -1,0 +1,12 @@
+cache/
+config/
+routes/
+src/
+templates/
+.htaccess
+bootstrap.php
+index.php
+cli-config.php
+composer.json
+composer.lock
+credentials.yml.EXAMPLE

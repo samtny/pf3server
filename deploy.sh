@@ -46,10 +46,12 @@ HOST=$config_pf3server_deploy_host
 USER=$config_pf3server_deploy_user
 DOCROOT=$config_pf3server_docroot
 
+RSYNC_EXCLUDE=""
+
+rsync -ruvz --files-from "deploy.files" . "${USER}@${HOST}:${DOCROOT}"
+
 if [ "$DEPS" = true ]; then
-  rsync -rv build/** "${USER}@${HOST}:${DOCROOT}/"
-else
-  rsync -rv --exclude vendor build/** "${USER}@${HOST}:${DOCROOT}/"
+  echo "yo"
 fi
 
 exit 0
