@@ -184,15 +184,15 @@ $app->group('/legacy', function () use ($app, $entityManager) {
       if (!empty($venue)) {
         $venue->touch();
 
-        $venue->setName($legacy_venue->name);
-        $venue->setStreet($legacy_venue->street);
-        $venue->setCity($legacy_venue->city);
-        $venue->setState($legacy_venue->state);
-        $venue->setZipcode($legacy_venue->zipcode);
-        $venue->setLatitude($legacy_venue->lat);
-        $venue->setLongitude($legacy_venue->lon);
-        $venue->setPhone($legacy_venue->phone);
-        $venue->setUrl($legacy_venue->url);
+        !empty($legacy_venue->name) && $venue->setName($legacy_venue->name);
+        !empty($legacy_venue->street) && $venue->setStreet($legacy_venue->street);
+        !empty($legacy_venue->city) && $venue->setCity($legacy_venue->city);
+        !empty($legacy_venue->state) && $venue->setState($legacy_venue->state);
+        !empty($legacy_venue->zipcode) && $venue->setZipcode($legacy_venue->zipcode);
+        !empty($legacy_venue->lat) && $venue->setLatitude($legacy_venue->lat);
+        !empty($legacy_venue->lon) && $venue->setLongitude($legacy_venue->lon);
+        !empty($legacy_venue->phone) && $venue->setPhone($legacy_venue->phone);
+        !empty($legacy_venue->url) && $venue->setUrl($legacy_venue->url);
 
         //$flag = $legacy_venue->flag;
 
@@ -202,8 +202,8 @@ $app->group('/legacy', function () use ($app, $entityManager) {
           if (!empty($legacy_machine->id)) {
             $machine = $entityManager->find('PF\Machine', $legacy_machine->id);
 
-            $machine->setCondition($legacy_machine->cond);
-            $machine->setPrice($legacy_machine->price);
+            !empty($legacy_machine->cond) && $machine->setCondition($legacy_machine->cond);
+            !empty($legacy_machine->price) && $machine->setPrice($legacy_machine->price);
 
             if ($legacy_machine->deleted) {
               $entityManager->remove($machine);
