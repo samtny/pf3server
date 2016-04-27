@@ -2,7 +2,7 @@
 
 use PF\Legacy;
 
-$app->group('/legacy', function () use ($app, $entityManager) {
+$app->group('/pf2/pf', function () use ($app, $entityManager) {
   $app->get('/', function () use ($app, $entityManager) {
     $legacy_request = $app->request();
     $legacy_request_proxy = new Legacy\LegacyRequestProxy();
