@@ -105,7 +105,6 @@ $app->group('/pf2/pf', function () use ($app, $entityManager) {
 
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-    //header('Access-Control-Allow-Origin: *');
 
     $app->response->headers->set('Content-Type', 'application/xml');
     header('Content-type: application/xml');
@@ -194,8 +193,6 @@ $app->group('/pf2/pf', function () use ($app, $entityManager) {
         !empty($legacy_venue->phone) && $venue->setPhone($legacy_venue->phone);
         !empty($legacy_venue->url) && $venue->setUrl($legacy_venue->url);
 
-        //$flag = $legacy_venue->flag;
-
         foreach ($legacy_venue->games as $legacy_machine) {
           $machine = NULL;
 
@@ -256,7 +253,5 @@ $app->group('/pf2/pf', function () use ($app, $entityManager) {
     header('Content-Type: application/xml;type=result;charset="utf-8"');
 
     echo $legacy_result_xml;
-
-    exit;
   });
 });

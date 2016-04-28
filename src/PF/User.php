@@ -115,7 +115,7 @@ class User {
     $this->updated = $updated;
   }
 
-  public function addToken($token) {
+  public function addToken(Token $token) {
     $this->tokens[] = $token;
 
     $token->setUser($this);

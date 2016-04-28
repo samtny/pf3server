@@ -236,7 +236,7 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
       if (!empty($venue)) {
         $entityManager->remove($venue);
 
-        $entityManager->flush();
+        $entityManager->flush($venue);
       }
     }
   }
