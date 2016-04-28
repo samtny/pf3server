@@ -3,6 +3,7 @@
 namespace PF\Notifications;
 
 use FastAPNS;
+use PF\Notification;
 
 class NotificationClient {
   /**
@@ -18,7 +19,7 @@ class NotificationClient {
    * @param \PF\Notification $notification
    * @return array
    */
-  public function sendNotification($notification) {
+  public function sendNotification(Notification $notification) {
     $num_tokens = 0;
     $num_bad_tokens = 0;
 
