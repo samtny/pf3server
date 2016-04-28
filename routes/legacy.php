@@ -253,7 +253,5 @@ $app->group('/pf2/pf', function () use ($app, $entityManager) {
     header('Content-Type: application/xml;type=result;charset="utf-8"');
 
     echo $legacy_result_xml;
-
-    exit;
   });
 });
