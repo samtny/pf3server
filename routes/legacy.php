@@ -37,7 +37,7 @@ $app->group('/pf2/pf', function () use ($app, $entityManager) {
       $legacy_request_proxy->set('g', $legacy_request->get('q'));
     }
 
-    if ($legacy_request->get('t') === 'venue' && !empty($legacy_request->get('q'))) {
+    if (!empty($legacy_request->get('q')) && ($legacy_request->get('t') === 'venue' || is_numeric($legacy_request->get('q')))) {
       $legacy_request_proxy->set('q', $legacy_request->get('q'));
     }
 
