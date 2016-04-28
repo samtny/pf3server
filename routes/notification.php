@@ -87,7 +87,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
     $entityManager->flush();
   });
 
-  $app->post('/feedback', function () use ($app, $entityManager, $serializer) {
+  $app->post('/feedback', function () use ($app, $entityManager) {
     $client = new PF\Notifications\NotificationClient($entityManager);
 
     $flagged = $client->processFeedback();
