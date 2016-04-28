@@ -1,6 +1,6 @@
 <?php
 
-namespace PF\Slim;
+namespace PF\Middleware;
 
 use \JMS\Serializer;
 use \JMS\Serializer\SerializationContext;

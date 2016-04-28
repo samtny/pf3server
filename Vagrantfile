@@ -15,6 +15,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.synced_folder '.', '/vagrant', type: 'nfs'
+  config.bindfs.bind_folder "/vagrant", "/vagrant"
 
   config.vm.provision "ansible" do |ansible|
     ansible.groups = {

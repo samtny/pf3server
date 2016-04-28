@@ -45,7 +45,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $data['num_tokens'] += $result['num_tokens'];
       $data['num_bad_tokens'] += $result['num_bad_tokens'];
 
-      //$notification->archive();
+      $notification->archive();
 
       $entityManager->persist($notification);
     }
@@ -80,14 +80,14 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       }
     }
 
-    //$notification->archive();
+    $notification->archive();
 
     $entityManager->persist($notification);
 
     $entityManager->flush();
   });
 
-  $app->post('/feedback', function () use ($app, $entityManager, $serializer) {
+  $app->post('/feedback', function () use ($app, $entityManager) {
     $client = new PF\Notifications\NotificationClient($entityManager);
 
     $flagged = $client->processFeedback();

@@ -1,6 +1,6 @@
 <?php
 
-namespace PF\Slim;
+namespace PF\Middleware;
 
 use Slim\Slim;
 

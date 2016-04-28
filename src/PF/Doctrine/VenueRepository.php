@@ -45,23 +45,26 @@ class VenueRepository extends EntityRepository {
     return $qb->getQuery()->getArrayResult();
   }
 
-  public function getVenues($request) {
+  public function getVenues($request, $hydration_mode = Doctrine\ORM\Query::HYDRATE_OBJECT) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('v', 'm', 'g', 'c'));
     $qb->from('\PF\Venue', 'v')
       ->leftJoin('v.comments', 'c')
       ->leftJoin('v.machines', 'm')
-      ->leftJoin('m.game', 'g')
-      ->where($qb->expr()->andX(
-        $qb->expr()->isNotNull('v.latitude'),
-        $qb->expr()->isNotNull('v.longitude')
-      ));
+      ->leftJoin('m.game', 'g');
 
     $s = !empty($request->get('s')) ? $request->get('s') : 'APPROVED';
 
     $qb->andWhere($qb->expr()->eq('v.status', ':status'))
       ->setParameter('status', $s);
+
+    if ($s === 'APPROVED') {
+      $qb->andWhere($qb->expr()->andX(
+        $qb->expr()->isNotNull('v.latitude'),
+        $qb->expr()->isNotNull('v.longitude')
+      ));
+    }
 
     if (!empty($request->get('n'))) {
       $n = $request->get('n');
@@ -104,17 +107,23 @@ class VenueRepository extends EntityRepository {
     }
 
     if (!empty($request->get('q'))) {
-      $name = $request->get('q');
+      if (is_numeric($request->get('q'))) {
+        $id = $request->get('q');
 
-      $name_clean = StringUtil::cleanName($name);
-      $name_dm = StringUtil::dmName($name);
+        $qb->andWhere($qb->expr()->eq('v.id', $id));
+      } else {
+        $name = $request->get('q');
 
-      $qb->andWhere($qb->expr()->orX(
-        $qb->expr()->like('v.name_clean', ':name_clean'),
-        $qb->expr()->like('v.name_dm', ':name_dm')
-      ))
-        ->setParameter('name_clean', '%' . $name_clean . '%')
-        ->setParameter('name_dm', '%' . $name_dm . '%');
+        $name_clean = StringUtil::cleanName($name);
+        $name_dm = StringUtil::dmName($name);
+
+        $qb->andWhere($qb->expr()->orX(
+          $qb->expr()->like('v.name_clean', ':name_clean'),
+          $qb->expr()->like('v.name_dm', ':name_dm')
+        ))
+          ->setParameter('name_clean', '%' . $name_clean . '%')
+          ->setParameter('name_dm', '%' . $name_dm . '%');
+      }
     }
 
     if (!empty($request->get('g'))) {
@@ -162,7 +171,8 @@ class VenueRepository extends EntityRepository {
     $qb->setFirstResult($p * $l)
       ->setMaxResults($l);
 
-    $query = $qb->getQuery();
+    $query = $qb->getQuery()
+      ->setHydrationMode($hydration_mode);
 
     return new Paginator($query);
   }

@@ -72,6 +72,8 @@ $app->group('/comment', function () use ($app, $entityManager, $serializer, $adm
       $app->notFound();
     }
 
+    $comment->touch();
+
     $comment->delete();
 
     $entityManager->persist($comment);

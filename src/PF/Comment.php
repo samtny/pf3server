@@ -65,6 +65,10 @@ class Comment {
     $this->status = 'APPROVED';
   }
 
+  public function touch() {
+    $this->updated = new \DateTime("now");
+  }
+
   public function delete() {
     $this->status = 'DELETED';
   }

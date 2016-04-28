@@ -29,6 +29,8 @@ $app->any('/login', function () use ($app, $entityManager) {
 
     $app->setCookie('session', $session->getId(), '365 days');
 
-    $app->redirect('/admin');
+    if (!$app->request->isAjax()) {
+      $app->redirect('/admin');
+    }
   }
 });

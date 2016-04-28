@@ -3,3 +3,6 @@ vendor
 *.sqlite
 credentials.yml
 ipdb.html
+build
+temp
+composer.phar

@@ -57,6 +57,8 @@ $app->group('/machine', function () use ($app, $entityManager, $serializer, $adm
       $app->notFound();
     }
 
+    $machine->touch();
+
     $machine->delete();
 
     $entityManager->persist($machine);

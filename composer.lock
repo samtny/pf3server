@@ -930,16 +930,16 @@
         },
         {
             "name": "samtny/fastapns",
-            "version": "1.0.3",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/samtny/fastapns.git",
-                "reference": "8afb9a749706605ddc82b858943a07d1ff7a040f"
+                "reference": "59308d33186ea1f00943484a9d6081b84c2c320b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/samtny/fastapns/zipball/8afb9a749706605ddc82b858943a07d1ff7a040f",
-                "reference": "8afb9a749706605ddc82b858943a07d1ff7a040f",
+                "url": "https://api.github.com/repos/samtny/fastapns/zipball/59308d33186ea1f00943484a9d6081b84c2c320b",
+                "reference": "59308d33186ea1f00943484a9d6081b84c2c320b",
                 "shasum": ""
             },
             "require": {
@@ -968,7 +968,7 @@
                 "ios",
                 "xcode"
             ],
-            "time": "2016-04-18 21:08:28"
+            "time": "2016-04-18 22:17:23"
         },
         {
             "name": "slim/slim",
@@ -1942,16 +1942,16 @@
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "3.1.2",
+            "version": "3.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "7c34c9bdde4131b824086457a3145e27dba10ca1"
+                "reference": "151c96874bff6fe61a25039df60e776613a61489"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/7c34c9bdde4131b824086457a3145e27dba10ca1",
-                "reference": "7c34c9bdde4131b824086457a3145e27dba10ca1",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/151c96874bff6fe61a25039df60e776613a61489",
+                "reference": "151c96874bff6fe61a25039df60e776613a61489",
                 "shasum": ""
             },
             "require": {
@@ -1994,7 +1994,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2016-03-24 05:58:25"
+            "time": "2016-04-20 14:39:26"
         },
         {
             "name": "psr/http-message",

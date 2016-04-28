@@ -149,6 +149,30 @@ class VenueTest extends \PHPUnit_Framework_TestCase
     $this->assertArrayHasKey('id', $first_venue);
   }
 
+  public function testGetNewYork() {
+    $client = new Client(array(
+      'base_uri' => 'http://localhost:80',
+      'exceptions' => false,
+    ));
+
+    $response = $client->get('/venue/search?n=New%20York');
+
+    $this->assertEquals(200, $response->getStatusCode());
+
+    $response_body = json_decode($response->getBody(), true);
+
+    $this->assertArrayHasKey('status', $response_body);
+    $this->assertArrayHasKey('data', $response_body);
+
+    $data = $response_body['data'];
+
+    $this->assertArrayHasKey('venues', $data);
+
+    $first_venue = $data['venues'][0];
+
+    $this->assertArrayHasKey('id', $first_venue);
+  }
+
   /**
    * @depends testCreateVenue
    */
@@ -175,7 +199,7 @@ class VenueTest extends \PHPUnit_Framework_TestCase
 
     $this->assertArrayHasKey('id', $first_venue);
   }
-  
+
   /**
    * @depends testCreateVenue
    */

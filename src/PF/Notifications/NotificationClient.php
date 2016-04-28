@@ -3,6 +3,7 @@
 namespace PF\Notifications;
 
 use FastAPNS;
+use PF\Notification;
 
 class NotificationClient {
   /**
@@ -18,7 +19,7 @@ class NotificationClient {
    * @param \PF\Notification $notification
    * @return array
    */
-  public function sendNotification($notification) {
+  public function sendNotification(Notification $notification) {
     $num_tokens = 0;
     $num_bad_tokens = 0;
 
@@ -58,7 +59,7 @@ class NotificationClient {
 
           if (!empty($tokens_free)) {
             $client = FastAPNS\ClientBuilder::create()
-              ->setLocalCert(__DIR__ . '/../../../ssl/PinfinderFreePushDist.includesprivatekey.pem')
+              ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/PinfinderFreePushDist.includesprivatekey.pem')
               ->setPassphrase('')
               ->build();
 
@@ -85,7 +86,7 @@ class NotificationClient {
 
           if (!empty($tokens_pro)) {
             $client = FastAPNS\ClientBuilder::create()
-              ->setLocalCert(__DIR__ . '/../../../ssl/PinfinderProPushDist.includesprivatekey.pem')
+              ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/PinfinderProPushDist.includesprivatekey.pem')
               ->setPassphrase('')
               ->build();
 

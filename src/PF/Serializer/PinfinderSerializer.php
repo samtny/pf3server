@@ -16,7 +16,7 @@ class PinfinderSerializer extends Serializer {
     $serializer_builder->setDebug($debug);
 
     if ($cache) {
-      $serializer_builder->setCacheDir('/tmp');
+      $serializer_builder->setCacheDir(__DIR__ . '/../../../cache');
     }
 
     return $serializer_builder->build();

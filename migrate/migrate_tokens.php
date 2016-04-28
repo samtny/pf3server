@@ -9,12 +9,18 @@ $line = strtok($contents, $separator);
 
 $new = 0;
 
+$entityManager = Bootstrap::getEntityManager();
+
+echo "Migrating tokens\n";
+
+$batch_size = 100;
+
 while ($line !== false) {
   $parts = explode(',', $line);
 
   if (count($parts) == 2) {
     $app = $parts[1];
-    $tokenString = $parts[0];
+    $tokenString = preg_replace('/\s|<|>/', '', $parts[0]);
 
     switch ($app) {
       case 'apns':
@@ -49,12 +55,14 @@ while ($line !== false) {
         $entityManager->persist($user);
 
         $new += 1;
+
+        if ($new % $batch_size == 0) {
+          $entityManager->flush();
+
+          $entityManager->clear();
+        }
       }
     }
-  }
-
-  if ($new % 100 == 0) {
-    $entityManager->flush();
   }
 
   $line = strtok( $separator );

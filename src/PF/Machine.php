@@ -8,7 +8,7 @@ class Machine {
   protected $venue;
   protected $condition;
   protected $price;
-  protected $deleted;
+  protected $status;
   protected $created;
   protected $updated;
 
@@ -31,7 +31,7 @@ class Machine {
   public function __construct() {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
-    $this->deleted = false;
+    $this->status = 'ACTIVE';
   }
 
   public function getId() {
@@ -40,6 +40,16 @@ class Machine {
 
   public function setId($id) {
     $this->id = $id;
+  }
+
+  public function getStatus()
+  {
+    return $this->status;
+  }
+
+  public function setStatus($status)
+  {
+    $this->status = $status;
   }
 
   public function getGame() {
@@ -89,5 +99,13 @@ class Machine {
 
   public function setPrice($price) {
     $this->price = $price;
+  }
+
+  public function touch() {
+    $this->updated = new \DateTime("now");
+  }
+
+  public function delete() {
+    $this->status = 'DELETED';
   }
 }

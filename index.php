@@ -6,9 +6,11 @@ use PF\Serializer\PinfinderSerializer;
 use PF\Slim\PinfinderApp;
 use Slim\Views\Twig;
 
+$entityManager = Bootstrap::getEntityManager();
+
 $app = new PinfinderApp(
   array(
-    'mode' => $runmode,
+    'mode' => Bootstrap::getRunmode(),
     'view' => new Twig(),
   )
 );
@@ -36,11 +38,15 @@ $app->notFound(function () use ($app) {
   $app->render('404.html');
 });
 
-$serializer = PinfinderSerializer::create($entityManager, $runmode === 'production');
+$serializer = PinfinderSerializer::create($entityManager, Bootstrap::getRunmode() === 'production');
 
-$app->add(new \PF\Slim\ResponseMiddleware($serializer));
+if (Bootstrap::getRunmode() === 'profile') {
+  $app->add(new \PF\Middleware\XHProfMiddleware());
+}
 
-$adminRouteMiddleware = new \PF\Slim\AdminRouteMiddleware();
+$app->add(new \PF\Middleware\ResponseMiddleware($serializer));
+
+$adminRouteMiddleware = new \PF\Middleware\AdminRouteMiddleware();
 
 require 'routes/login.php';
 require 'routes/admin.php';
@@ -51,5 +57,7 @@ require 'routes/stats.php';
 require 'routes/geocode.php';
 require 'routes/notification.php';
 require 'routes/machine.php';
+require 'routes/legacy.php';
+require 'routes/user.php';
 
 $app->run();

@@ -120,6 +120,24 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
             $app->notFound();
         }
 
+        foreach ($venue->getMachines() as $machine) {
+          $machine->touch();
+
+          $machine->delete();
+
+          $entityManager->persist($machine);
+        }
+
+        foreach ($venue->getComments() as $comment) {
+          $comment->touch();
+
+          $comment->delete();
+
+          $entityManager->persist($comment);
+        }
+
+        $venue->touch();
+
         $venue->delete();
 
         $entityManager->persist($venue);

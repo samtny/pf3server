@@ -1,13 +1,20 @@
 ---
 
-pf3server_url: local.pf3server.com
-pf3server_runmode: development
+pf3server_url: pinballfinder.org
+pf3server_runmode: production
+pf3server_docroot: /usr/home/samtny/public_html/pinballfinder.org/pf3
+pf3server_ssl: /usr/home/samtny/certificates/pf3server
+
+pf3server_deploy_host: samtny.pairserver.com
+pf3server_deploy_user: samtny
 
 php_pm_max_children: 2
 php_pm_start_servers: 1
 php_pm_min_spare_servers: 1
 php_pm_max_spare_servers: 2
 
+php_fpm_user: vagrant
+php_fpm_group: vagrant
 php_memory_limit: 16M
 php_upload_max_filesize: 2M
 php_post_max_size: 8M

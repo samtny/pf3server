@@ -6,29 +6,60 @@ use Symfony\Component\Yaml\Parser;
 
 require_once "vendor/autoload.php";
 
-$parser = new Parser();
+class Bootstrap {
+  private static $entityManager;
 
-$runmode = $parser->parse(file_get_contents(__DIR__ . '/config.yml'))['pf3server_runmode'];
+  private static $config;
+  private static $runmode;
 
-$conn = array(
-  'driver' => 'pdo_mysql',
-  'dbname' => 'pf3server',
-  'user' => 'pf3server',
-  'password' => 'pf3server',
-  'host' => 'localhost',
-);
+  public static function go() {
+    $parser = new Parser();
 
-$cache_impl = $runmode === 'production' ? new \Doctrine\Common\Cache\ApcCache() : null;
+    $config = $parser->parse(file_get_contents(__DIR__ . '/config.yml'));
 
-$config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), $runmode === 'development', null, $cache_impl);
-$config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');
-$config->addCustomNumericFunction('COS', '\DoctrineExtensions\Query\Mysql\Cos');
-$config->addCustomNumericFunction('ACOS', '\DoctrineExtensions\Query\Mysql\Acos');
-$config->addCustomNumericFunction('RADIANS', '\DoctrineExtensions\Query\Mysql\Radians');
-$config->addCustomNumericFunction('YEAR', '\DoctrineExtensions\Query\Mysql\Year');
-$config->addCustomNumericFunction('MONTH', '\DoctrineExtensions\Query\Mysql\Month');
-$config->addCustomNumericFunction('DATEDIFF', '\DoctrineExtensions\Query\Mysql\DateDiff');
-$config->addCustomStringFunction('DATE_FORMAT', '\DoctrineExtensions\Query\Mysql\DateFormat');
-$config->addCustomDatetimeFunction('LAST_DAY', '\DoctrineExtensions\Query\Mysql\LastDay');
+    self::$config = $config;
 
-$entityManager = EntityManager::create($conn, $config);
+    self::$runmode = $config['pf3server_runmode'];
+
+    $credentials = $parser->parse(file_get_contents(__DIR__ . '/credentials.yml'));
+
+    $conn = array(
+      'driver' => 'pdo_mysql',
+      'dbname' => $credentials['pf3server_db_name'],
+      'user' => $credentials['pf3server_db_user'],
+      'password' => $credentials['pf3server_db_password'],
+      'host' => $credentials['pf3server_db_host'],
+    );
+
+    $proxy_dir = __DIR__ . '/cache';
+
+    $cache_impl = (self::$runmode === 'production' && extension_loaded('apc')) ? new \Doctrine\Common\Cache\ApcCache() : null;
+
+    $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), self::$runmode !== 'production', $proxy_dir, $cache_impl);
+    $config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');
+    $config->addCustomNumericFunction('COS', '\DoctrineExtensions\Query\Mysql\Cos');
+    $config->addCustomNumericFunction('ACOS', '\DoctrineExtensions\Query\Mysql\Acos');
+    $config->addCustomNumericFunction('RADIANS', '\DoctrineExtensions\Query\Mysql\Radians');
+    $config->addCustomNumericFunction('YEAR', '\DoctrineExtensions\Query\Mysql\Year');
+    $config->addCustomNumericFunction('MONTH', '\DoctrineExtensions\Query\Mysql\Month');
+    $config->addCustomNumericFunction('DATEDIFF', '\DoctrineExtensions\Query\Mysql\DateDiff');
+    $config->addCustomStringFunction('DATE_FORMAT', '\DoctrineExtensions\Query\Mysql\DateFormat');
+    $config->addCustomDatetimeFunction('LAST_DAY', '\DoctrineExtensions\Query\Mysql\LastDay');
+
+    self::$entityManager = EntityManager::create($conn, $config);
+  }
+
+  public static function getEntityManager() {
+    return static::$entityManager;
+  }
+
+  public static function getConfig() {
+    return static::$config;
+  }
+
+  public static function getRunmode() {
+    return static::$runmode;
+  }
+}
+
+Bootstrap::go();

@@ -176,6 +176,18 @@ class Venue {
     return $this->machines;
   }
 
+  public function getActiveMachines() {
+    $activeMachines = new ArrayCollection();
+
+    foreach ($this->machines as $machine) {
+      if ($machine->getStatus() !== 'DELETED') {
+        $activeMachines->add($machine);
+      }
+    }
+
+    return $activeMachines;
+  }
+
   public function addMachine(Machine $machine, $migration = false) {
     $this->machines[] = $machine;
 
@@ -188,6 +200,18 @@ class Venue {
 
   public function getComments() {
     return $this->comments;
+  }
+
+  public function getActiveComments() {
+    $activeComments = new ArrayCollection();
+
+    foreach ($this->comments as $comment) {
+      if ($comment->getStatus() === 'APPROVED') {
+        $activeComments->add($comment);
+      }
+    }
+
+    return $activeComments;
   }
 
   public function addComment(Comment $comment, $migration = false) {
