@@ -126,10 +126,6 @@ class Result {
         $loc->appendChild($name);
       }
 
-      //$name = $doc->createElement("dist");
-      //$name->appendChild($doc->createTextNode(sprintf("%01.2f", $d)));
-      //$loc->appendChild($name);
-
       if (!$minimal) {
 
         if ($venue->dist) {
@@ -410,7 +406,6 @@ class Result {
 
     if ($this->meta->stats) {
 
-      // stats;
       $stats = $doc->createElement("stats");
 
       // notifications attribute;

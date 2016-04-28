@@ -193,8 +193,6 @@ $app->group('/pf2/pf', function () use ($app, $entityManager) {
         !empty($legacy_venue->phone) && $venue->setPhone($legacy_venue->phone);
         !empty($legacy_venue->url) && $venue->setUrl($legacy_venue->url);
 
-        //$flag = $legacy_venue->flag;
-
         foreach ($legacy_venue->games as $legacy_machine) {
           $machine = NULL;
 
