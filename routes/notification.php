@@ -80,7 +80,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       }
     }
 
-    //$notification->archive();
+    $notification->archive();
 
     $entityManager->persist($notification);
 
