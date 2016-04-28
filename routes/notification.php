@@ -45,7 +45,7 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $data['num_tokens'] += $result['num_tokens'];
       $data['num_bad_tokens'] += $result['num_bad_tokens'];
 
-      //$notification->archive();
+      $notification->archive();
 
       $entityManager->persist($notification);
     }
