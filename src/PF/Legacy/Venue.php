@@ -52,7 +52,7 @@ class Venue {
   function __sleep() {
     $keys = array();
     foreach (get_object_vars($this) as $key => $var) {
-      if ($var != null) {
+      if ($var !== null) {
         $keys[] = $key;
       }
     }
