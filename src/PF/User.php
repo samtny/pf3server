@@ -75,6 +75,18 @@ class User {
     return $this->tokens;
   }
 
+  public function getTokenStrings($app) {
+    $token_strings = array();
+
+    foreach ($this->getTokens() as $token) {
+      if ($token->getApp() === $app) {
+        $token_strings[] = $token->getToken();
+      }
+    }
+
+    return $token_strings;
+  }
+
   /**
    * @param mixed $tokens
    */

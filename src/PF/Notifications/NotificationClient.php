@@ -2,6 +2,7 @@
 
 namespace PF\Notifications;
 
+use Doctrine\ORM\Query;
 use FastAPNS;
 use PF\Notification;
 
@@ -15,109 +16,88 @@ class NotificationClient {
     $this->entityManager = $entityManager;
   }
 
+  public function getValidApps() {
+    return array(
+      'apnsfree',
+      'apnspro'
+    );
+  }
+
   /**
    * @param \PF\Notification $notification
    * @return array
    */
   public function sendNotification(Notification $notification) {
-    $num_tokens = 0;
-    $num_bad_tokens = 0;
-
     if ($notification->getGlobal() === true) {
-      $tokensIterator = $this->entityManager->getRepository('\PF\Token')->getValidTokens();
+      $payload = array(
+        'aps' => array(
+          'alert' => $notification->getMessage(),
+        ),
+      );
 
-      PinfinderAPNS::sendNotification($notification, $tokensIterator);
+      if (!empty($notification->getQueryParams())) {
+        $payload['queryparams'] = $notification->getQueryParams();
+      }
+
+      foreach ($this->getValidApps() as $app) {
+        $tokens = $this->entityManager->getRepository('\PF\Token')->getValidTokens($app, Query::HYDRATE_ARRAY);
+
+        if (!empty($tokens)) {
+          $token_strings = array();
+
+          foreach ($tokens as $token) {
+            $token_strings[] = $token['token'];
+          }
+
+          $this->sendPayload($payload, $app, $token_strings, (new \DateTime('+24 hours'))->getTimestamp());
+        }
+      }
     } else {
       $user = $notification->getUser();
 
       if (!empty($user)) {
-        $tokens = $user->getTokens();
+       $payload = array(
+          'aps' => array(
+            'alert' => $notification->getMessage(),
+          ),
+        );
 
-        $num_tokens += count($tokens);
+        if (!empty($notification->getQueryParams())) {
+          $payload['queryparams'] = $notification->getQueryParams();
+        }
 
-        if (!empty($tokens)) {
-          $payload = array(
-            'aps' => array(
-              'alert' => $notification->getMessage(),
-            ),
-          );
+        foreach ($this->getValidApps() as $app) {
+          $tokens = $user->getTokenStrings($app);
 
-          if (!empty($notification->getQueryParams())) {
-            $payload['queryparams'] = $notification->getQueryParams();
-          }
-
-          $tokens_free = array();
-          $tokens_pro = array();
-
-          foreach ($tokens as $token) {
-            if (strpos($token->getApp(), 'apnsfree') === 0) {
-              $tokens_free[] = $token->getToken();
-            } else {
-              $tokens_pro[] = $token->getToken();
-            }
-          }
-
-          if (!empty($tokens_free)) {
-            $client = FastAPNS\ClientBuilder::create()
-              ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/PinfinderFreePushDist.includesprivatekey.pem')
-              ->setPassphrase('')
-              ->build();
-
-            $client->send($payload, $tokens_free, (new \DateTime('+24 hours'))->getTimestamp());
-
-            if (!empty($client->getBadTokens())) {
-              foreach ($client->getBadTokens() as $tokenString) {
-                $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnsfree'));
-
-                if (empty($token)) {
-                  $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnsfree2'));
-                }
-
-                if (!empty($token)) {
-                  $token->flag();
-
-                  $this->entityManager->persist($token);
-
-                  $num_bad_tokens += 1;
-                }
-              }
-            }
-          }
-
-          if (!empty($tokens_pro)) {
-            $client = FastAPNS\ClientBuilder::create()
-              ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/PinfinderProPushDist.includesprivatekey.pem')
-              ->setPassphrase('')
-              ->build();
-
-            $client->send($payload, $tokens_pro, (new \DateTime('+24 hours'))->getTimestamp());
-
-            if (!empty($client->getBadTokens())) {
-              foreach ($client->getBadTokens() as $tokenString) {
-                $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnspro'));
-
-                if (empty($token)) {
-                  $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnspro2'));
-                }
-
-                if (!empty($token)) {
-                  $token->flag();
-
-                  $this->entityManager->persist($token);
-
-                  $num_bad_tokens += 1;
-                }
-              }
-            }
+          if (!empty($tokens)) {
+            $this->sendPayload($payload, $app, $tokens, (new \DateTime('+24 hours'))->getTimestamp());
           }
         }
       }
     }
+  }
 
-    return array(
-      'num_tokens' => $num_tokens,
-      'num_bad_tokens' => $num_bad_tokens,
-    );
+  public function sendPayload($payload, $app, $tokens, $expiry) {
+    $client = FastAPNS\ClientBuilder::create()
+      ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/Pinfinder' . ($app === 'apnsfree' ? 'Free' : 'Pro') . 'PushDist.includesprivatekey.pem')
+      ->setPassphrase('')
+      ->build();
+
+    $client->send($payload, $tokens, $expiry);
+
+    if (!empty($client->getBadTokens())) {
+      foreach ($client->getBadTokens() as $tokenString) {
+        $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => $app));
+
+        if (!empty($token)) {
+          $token->flag();
+
+          $this->entityManager->persist($token);
+        }
+      }
+
+      $this->entityManager->flush();
+    }
   }
 
   public function processFeedback() {
