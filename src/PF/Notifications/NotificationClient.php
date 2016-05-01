@@ -31,84 +31,23 @@ class NotificationClient {
       $user = $notification->getUser();
 
       if (!empty($user)) {
-        $tokens = $user->getTokens();
+        $apps = array('apnsfree', 'apnspro');
 
-        $num_tokens += count($tokens);
+        $payload = array(
+          'aps' => array(
+            'alert' => $notification->getMessage(),
+          ),
+        );
 
-        if (!empty($tokens)) {
-          $payload = array(
-            'aps' => array(
-              'alert' => $notification->getMessage(),
-            ),
-          );
+        if (!empty($notification->getQueryParams())) {
+          $payload['queryparams'] = $notification->getQueryParams();
+        }
 
-          if (!empty($notification->getQueryParams())) {
-            $payload['queryparams'] = $notification->getQueryParams();
-          }
+        foreach ($apps as $app) {
+          $tokens = $user->getTokenStrings($app);
 
-          $tokens_free = array();
-          $tokens_pro = array();
-
-          foreach ($tokens as $token) {
-            if (strpos($token->getApp(), 'apnsfree') === 0) {
-              $tokens_free[] = $token->getToken();
-            } else {
-              $tokens_pro[] = $token->getToken();
-            }
-          }
-
-          if (!empty($tokens_free)) {
-            $client = FastAPNS\ClientBuilder::create()
-              ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/PinfinderFreePushDist.includesprivatekey.pem')
-              ->setPassphrase('')
-              ->build();
-
-            $client->send($payload, $tokens_free, (new \DateTime('+24 hours'))->getTimestamp());
-
-            if (!empty($client->getBadTokens())) {
-              foreach ($client->getBadTokens() as $tokenString) {
-                $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnsfree'));
-
-                if (empty($token)) {
-                  $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnsfree2'));
-                }
-
-                if (!empty($token)) {
-                  $token->flag();
-
-                  $this->entityManager->persist($token);
-
-                  $num_bad_tokens += 1;
-                }
-              }
-            }
-          }
-
-          if (!empty($tokens_pro)) {
-            $client = FastAPNS\ClientBuilder::create()
-              ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/PinfinderProPushDist.includesprivatekey.pem')
-              ->setPassphrase('')
-              ->build();
-
-            $client->send($payload, $tokens_pro, (new \DateTime('+24 hours'))->getTimestamp());
-
-            if (!empty($client->getBadTokens())) {
-              foreach ($client->getBadTokens() as $tokenString) {
-                $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnspro'));
-
-                if (empty($token)) {
-                  $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => 'apnspro2'));
-                }
-
-                if (!empty($token)) {
-                  $token->flag();
-
-                  $this->entityManager->persist($token);
-
-                  $num_bad_tokens += 1;
-                }
-              }
-            }
+          if (!empty($tokens)) {
+            $this->sendPayload($payload, $app, $tokens, (new \DateTime('+24 hours'))->getTimestamp());
           }
         }
       }
@@ -118,6 +57,27 @@ class NotificationClient {
       'num_tokens' => $num_tokens,
       'num_bad_tokens' => $num_bad_tokens,
     );
+  }
+
+  public function sendPayload($payload, $app, $tokens, $expiry) {
+    $client = FastAPNS\ClientBuilder::create()
+      ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/Pinfinder' . ($app === 'apnsfree' ? 'Free' : 'Pro') . 'PushDist.includesprivatekey.pem')
+      ->setPassphrase('')
+      ->build();
+
+    $client->send($payload, $tokens, $expiry);
+
+    if (!empty($client->getBadTokens())) {
+      foreach ($client->getBadTokens() as $tokenString) {
+        $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => $app));
+
+        if (!empty($token)) {
+          $token->flag();
+
+          $this->entityManager->persist($token);
+        }
+      }
+    }
   }
 
   public function processFeedback() {
