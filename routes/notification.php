@@ -70,15 +70,9 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
     $client = new PF\Notifications\NotificationClient($entityManager);
 
-    $result = $client->sendNotification($notification);
+    $client->sendNotification($notification);
 
-    if ($result['num_tokens'] > 0) {
-      $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
-
-      if (!empty($result['num_bad_tokens'])) {
-        $app->responseMessage .= ' (Tokens Flagged: ' . $result['num_bad_tokens'] . ')';
-      }
-    }
+    $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
 
     $notification->archive();
 
