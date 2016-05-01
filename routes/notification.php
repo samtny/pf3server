@@ -32,31 +32,17 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
     $client = new PF\Notifications\NotificationClient($entityManager);
 
-    $data = array(
-      'num_tokens' => 0,
-      'num_bad_tokens' => 0,
-    );
-
     foreach ($notificationsIterator as $notification) {
       $count += 1;
 
-      $result = $client->sendNotification($notification);
-
-      $data['num_tokens'] += $result['num_tokens'];
-      $data['num_bad_tokens'] += $result['num_bad_tokens'];
+      $client->sendNotification($notification);
 
       $notification->archive();
 
       $entityManager->persist($notification);
     }
 
-    if ($data['num_tokens'] > 0) {
-      $app->responseMessage = 'Sent ' . $count . ' Notifications';
-
-      if (!empty($data['num_bad_tokens'])) {
-        $app->responseMessage .= ' (Flagged ' . $data['num_bad_tokens'] . ' tokens)';
-      }
-    }
+    $app->responseMessage = 'Sent ' . $count . ' Notification(s)';
 
     $entityManager->flush();
   });
