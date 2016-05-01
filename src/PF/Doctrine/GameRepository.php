@@ -2,13 +2,14 @@
 
 namespace PF\Doctrine;
 
+use Doctrine;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 use PF\Utilities\StringUtil;
 
 class GameRepository extends EntityRepository {
-  public function getGames($request) {
+  public function getGames($request, $hydration_mode = Doctrine\ORM\Query::HYDRATE_OBJECT) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('g'));
@@ -54,7 +55,8 @@ class GameRepository extends EntityRepository {
     $qb->setFirstResult($p * $l)
       ->setMaxResults($l);
 
-    $query = $qb->getQuery();
+    $query = $qb->getQuery()
+      ->setHydrationMode($hydration_mode);
 
     return new Paginator($query);
   }
