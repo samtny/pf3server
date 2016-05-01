@@ -15,25 +15,41 @@ class NotificationClient {
     $this->entityManager = $entityManager;
   }
 
+  public function getValidApps() {
+    return array(
+      'apnsfree',
+      'apnspro'
+    );
+  }
+
   /**
    * @param \PF\Notification $notification
    * @return array
    */
   public function sendNotification(Notification $notification) {
-    $num_tokens = 0;
-    $num_bad_tokens = 0;
-
     if ($notification->getGlobal() === true) {
-      $tokensIterator = $this->entityManager->getRepository('\PF\Token')->getValidTokens();
+      $payload = array(
+        'aps' => array(
+          'alert' => $notification->getMessage(),
+        ),
+      );
 
-      PinfinderAPNS::sendNotification($notification, $tokensIterator);
+      if (!empty($notification->getQueryParams())) {
+        $payload['queryparams'] = $notification->getQueryParams();
+      }
+
+      foreach ($this->getValidApps() as $app) {
+        $tokens = $this->entityManager->getRepository('\PF\Token')->getValidTokens($app);
+
+        if (!empty($tokens)) {
+          $this->sendPayload($payload, $app, $tokens, (new \DateTime('+24 hours'))->getTimestamp());
+        }
+      }
     } else {
       $user = $notification->getUser();
 
       if (!empty($user)) {
-        $apps = array('apnsfree', 'apnspro');
-
-        $payload = array(
+       $payload = array(
           'aps' => array(
             'alert' => $notification->getMessage(),
           ),
@@ -43,7 +59,7 @@ class NotificationClient {
           $payload['queryparams'] = $notification->getQueryParams();
         }
 
-        foreach ($apps as $app) {
+        foreach ($this->getValidApps() as $app) {
           $tokens = $user->getTokenStrings($app);
 
           if (!empty($tokens)) {
@@ -52,11 +68,6 @@ class NotificationClient {
         }
       }
     }
-
-    return array(
-      'num_tokens' => $num_tokens,
-      'num_bad_tokens' => $num_bad_tokens,
-    );
   }
 
   public function sendPayload($payload, $app, $tokens, $expiry) {
