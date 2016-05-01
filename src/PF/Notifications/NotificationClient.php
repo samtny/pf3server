@@ -2,6 +2,7 @@
 
 namespace PF\Notifications;
 
+use Doctrine\ORM\Query;
 use FastAPNS;
 use PF\Notification;
 
@@ -39,10 +40,16 @@ class NotificationClient {
       }
 
       foreach ($this->getValidApps() as $app) {
-        $tokens = $this->entityManager->getRepository('\PF\Token')->getValidTokens($app);
+        $tokens = $this->entityManager->getRepository('\PF\Token')->getValidTokens($app, Query::HYDRATE_ARRAY);
 
         if (!empty($tokens)) {
-          $this->sendPayload($payload, $app, $tokens, (new \DateTime('+24 hours'))->getTimestamp());
+          $token_strings = array();
+
+          foreach ($tokens as $token) {
+            $token_strings[] = $token['token'];
+          }
+
+          $this->sendPayload($payload, $app, $token_strings, (new \DateTime('+24 hours'))->getTimestamp());
         }
       }
     } else {
@@ -88,6 +95,8 @@ class NotificationClient {
           $this->entityManager->persist($token);
         }
       }
+
+      $this->entityManager->flush();
     }
   }
 
