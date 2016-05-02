@@ -168,6 +168,9 @@ class VenueRepository extends EntityRepository {
     $p = !empty($request->get('p')) ? $request->get('p') : 0;
     $l = !empty($request->get('l')) ? $request->get('l') : 70;
 
+    $qb->addOrderBy('g.name', 'ASC');
+    $qb->addOrderBy('c.created', 'DESC');
+
     $qb->setFirstResult($p * $l)
       ->setMaxResults($l);
 
