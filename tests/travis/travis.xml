@@ -1,8 +1,25 @@
-<phpunit>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/5.3/phpunit.xsd"
+         bootstrap="../../bootstrap.php"
+         backupGlobals="false"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         verbose="true">
+
 <testsuites>
-    <testsuite name="default">
-        <directory>..</directory>
-        <exclude>../PF/Slim</exclude>
-    </testsuite>
+  <testsuite name="default">
+    <directory>..</directory>
+    <exclude>../PF/Slim</exclude>
+    <exclude>../PF/Legacy</exclude>
+  </testsuite>
 </testsuites>
+
+<filter>
+  <whitelist processUncoveredFilesFromWhitelist="true">
+    <directory suffix=".php">src</directory>
+  </whitelist>
+</filter>
 </phpunit>
