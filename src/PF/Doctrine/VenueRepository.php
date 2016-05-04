@@ -21,6 +21,17 @@ class VenueRepository extends EntityRepository {
     return $venue;
   }
 
+  public function getFreshnessStats() {
+    $qb = $this->getEntityManager()->createQueryBuilder();
+
+    $qb->select('COUNT(v.id) as total, CASE WHEN DATEDIFF(CURRENT_DATE(), v.updated) <= 365 THEN \'Fresh\' ELSE \'Not Fresh\' END as freshness')
+      ->from('\PF\Venue', 'v')
+      ->where('v.status = \'APPROVED\'')
+      ->groupBy('freshness');
+
+    return $qb->getQuery()->getArrayResult();
+  }
+
   public function getCreatedStats() {
     $qb = $this->getEntityManager()->createQueryBuilder();
 

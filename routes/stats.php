@@ -6,6 +6,7 @@ $app->get('/stats', function () use ($app, $entityManager) {
   $createdData = $entityManager->getRepository('\PF\Venue')->getCreatedStats();
 
   $createdStats = array(
+    'type' => 'Line',
     'title' => 'New Venues',
     'data' => array(),
     'labels' => array(),
@@ -21,6 +22,7 @@ $app->get('/stats', function () use ($app, $entityManager) {
   $updatedData = $entityManager->getRepository('PF\Venue')->getUpdatedStats();
 
   $updatedStats = array(
+    'type' => 'Line',
     'title' => 'Updates',
     'data' => array(),
     'labels' => array(),
@@ -32,6 +34,23 @@ $app->get('/stats', function () use ($app, $entityManager) {
   }
 
   $stats[] = $updatedStats;
+
+  $freshnessData = $entityManager->getRepository('\PF\Venue')->getFreshnessStats();
+
+  $freshnessStats = array(
+    'type' => 'Pie',
+    'title' => 'Freshness',
+    'data' => array(),
+  );
+
+  foreach ($freshnessData as $item) {
+    $freshnessStats['data'][] = array(
+      'label' => $item['freshness'],
+      'value' => $item['total'],
+    );
+  }
+
+  $stats[] = $freshnessStats;
 
   $app->responseData = array('stats' => $stats);
 });
