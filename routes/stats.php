@@ -17,7 +17,7 @@ $app->get('/stats', function () use ($app, $entityManager) {
     $createdStats['labels'][] = $item['month'];
   }
 
-  $stats[] = $createdStats;
+  $stats['createdStats'] = $createdStats;
 
   $updatedData = $entityManager->getRepository('PF\Venue')->getUpdatedStats();
 
@@ -33,7 +33,7 @@ $app->get('/stats', function () use ($app, $entityManager) {
     $updatedStats['labels'][] = $item['month'];
   }
 
-  $stats[] = $updatedStats;
+  $stats['updatedStats'] = $updatedStats;
 
   $freshnessData = $entityManager->getRepository('\PF\Venue')->getFreshnessStats();
 
@@ -50,7 +50,7 @@ $app->get('/stats', function () use ($app, $entityManager) {
     );
   }
 
-  $stats[] = $freshnessStats;
+  $stats['freshnessStats'] = $freshnessStats;
 
   $app->responseData = array('stats' => $stats);
 });
