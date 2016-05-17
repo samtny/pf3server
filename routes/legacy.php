@@ -2,7 +2,7 @@
 
 use PF\Legacy;
 
-$app->group('/pf2/pf', function () use ($app, $entityManager) {
+$app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddleware) {
   $app->get('/', function () use ($app, $entityManager) {
     $legacy_request = $app->request();
     $legacy_request_proxy = new Legacy\LegacyRequestProxy();
@@ -253,5 +253,29 @@ $app->group('/pf2/pf', function () use ($app, $entityManager) {
     header('Content-Type: application/xml;type=result;charset="utf-8"');
 
     echo $legacy_result_xml;
+  });
+
+  $app->post('/gamedict/refresh', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
+    $requestProxy = new Legacy\LegacyRequestProxy();
+
+    $requestProxy->set('l', 999999);
+
+    $gamesIterator = $entityManager->getRepository('\PF\Game')->getGames($requestProxy, $hydration_mode = Doctrine\ORM\Query::HYDRATE_ARRAY, 'name');
+
+    $gameDict = "";
+
+    foreach ($gamesIterator as $game) {
+      if (!empty($game['abbreviation'])) {
+        if (!empty($gameDict)) {
+          $gameDict .= '\g';
+        }
+
+        $gameDict .= $game["abbreviation"] . '\f' . $game["name"] . '\f' . $game["id"];
+      }
+    }
+
+    file_put_contents(\Bootstrap::getConfig()['pf3server_gamedict_path'], $gameDict);
+
+    $app->responseMessage = 'Game dictionary refreshed';
   });
 });
