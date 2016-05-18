@@ -270,7 +270,7 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
           $gameDict .= '\g';
         }
 
-        $gameDict .= $game["abbreviation"] . '\f' . $game["name"] . '\f' . $game["id"];
+        $gameDict .= $game["abbreviation"] . '\f' . $game["name"] . '\f' . $game["ipdb"];
       }
     }
 
