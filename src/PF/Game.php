@@ -9,6 +9,7 @@ class Game {
   protected $name;
   protected $name_clean;
   protected $name_dm;
+  protected $ipdb;
   protected $abbreviation;
   protected $year;
   protected $manufacturer;
@@ -49,6 +50,14 @@ class Game {
 
   public function getNameDm() {
     return $this->name_dm;
+  }
+
+  public function getIpdb() {
+    return $this->ipdb;
+  }
+
+  public function setIpdb($ipdb) {
+    $this->ipdb = $ipdb;
   }
 
   public function getYear() {

@@ -12,6 +12,9 @@ PF\Game:
       type: string
     name_dm:
       type: string
+    ipdb:
+      type: integer
+      nullable: true
     abbreviation:
       type: string
       nullable: true

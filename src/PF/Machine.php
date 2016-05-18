@@ -13,7 +13,7 @@ class Machine {
   protected $updated;
 
   public function getIpdb() {
-    return !empty($this->game) ? $this->game->getId() : null;
+    return !empty($this->game) ? $this->game->getIpdb() : null;
   }
 
   public function getName() {

@@ -4,13 +4,16 @@ PF\Game:
   read_only: false
   access_type: property
   accessor_order: custom
-  custom_accessor_order: [id, name, created, updated]
+  custom_accessor_order: [id, name, ipdb, year, manufacturer, new, rare, created, updated]
   properties:
     id:
       type: integer
       groups: [read]
     name:
       type: string
+      groups: [read]
+    ipdb:
+      type: integer
       groups: [read]
     year:
       type: string
