@@ -11,22 +11,22 @@ PF\Game:
       groups: [read]
     name:
       type: string
-      groups: [read]
+      groups: [read, create, update]
     ipdb:
       type: integer
-      groups: [read]
+      groups: [read, create, update]
     year:
       type: string
-      groups: [read]
+      groups: [read, create, update]
     manufacturer:
       type: string
-      groups: [read]
+      groups: [read, create, update]
     new:
       type: boolean
-      groups: [read]
+      groups: [read, create, update]
     rare:
       type: boolean
-      groups: [read]
+      groups: [read, create, update]
     created:
       exclude: true
     updated:

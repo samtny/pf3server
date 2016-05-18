@@ -19,6 +19,7 @@ PF\Game:
       nullable: true
     abbreviation:
       type: string
+      unique: true
       nullable: true
     year:
       type: string
