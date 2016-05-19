@@ -7,3 +7,4 @@ build
 temp
 composer.phar
 gamedict.txt
+!sql/*
