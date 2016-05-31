@@ -93,7 +93,13 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
 
                 $machine = $serializer->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
 
-                $game = $entityManager->getRepository('\PF\Game')->find($json_machine_decoded['ipdb']);
+                $game = NULL;
+
+                if (!empty($json_machine_decoded['ipdb'])) {
+                  $game = $entityManager->getRepository('\PF\Game')->find($json_machine_decoded['ipdb']);
+                } else {
+                  $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $json_machine_decoded['name']));
+                }
 
                 $machine->setGame($game);
 
