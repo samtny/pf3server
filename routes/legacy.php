@@ -232,6 +232,10 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
           }
         }
 
+        if (!empty($legacy_venue->flag)) {
+          $venue->flag();
+        }
+
         $entityManager->persist($venue);
       }
     }

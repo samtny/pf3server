@@ -40,6 +40,22 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
         $app->responseMessage = 'Approved Venue with ID ' . $venue->getId();
     });
 
+    $app->post('/:id/flag', function ($id) use ($app, $entityManager) {
+      $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+
+      if (empty($venue)) {
+        $app->notFound();
+      }
+
+      $venue->flag();
+
+      $entityManager->persist($venue);
+
+      $entityManager->flush();
+
+      $app->responseMessage = 'Flagged Venue with ID ' . $venue->getId();
+    });
+
     $app->get('/:id', function ($id) use ($app, $entityManager) {
         $venue = $entityManager->getRepository('\PF\Venue')->find($id);
 

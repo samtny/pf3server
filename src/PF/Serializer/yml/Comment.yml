@@ -10,7 +10,8 @@ PF\Comment:
       type: integer
       groups: [read]
     venue:
-      exclude: true
+      type: PF\Venue
+      groups: [admin]
     text:
       type: string
       groups: [create, read, update]

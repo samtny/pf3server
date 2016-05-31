@@ -232,6 +232,10 @@ class Venue {
     }
   }
 
+  public function flag() {
+    $this->status = "FLAGGED";
+  }
+
   public function delete($migration = false) {
     $this->status = "DELETED";
 
