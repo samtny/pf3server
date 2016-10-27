@@ -2,15 +2,23 @@
 
 use JMS\Serializer\DeserializationContext;
 
+function comment_route_search($entityManager, $request) {
+  $commentsIterator = $entityManager->getRepository('\PF\Comment')->getComments($request);
+
+  $comments = [];
+
+  foreach ($commentsIterator as $comment) {
+    $comments[] = $comment;
+  }
+
+  return $comments;
+}
+
 $app->group('/comment', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
   $app->get('/search', function () use ($app, $entityManager) {
-    $commentsIterator = $entityManager->getRepository('\PF\Comment')->getComments($app->request());
+    $request = $app->request();
 
-    $comments = [];
-
-    foreach ($commentsIterator as $comment) {
-      $comments[] = $comment;
-    }
+    $comments = comment_route_search($entityManager, $request);
 
     $app->responseData = array('count' => count($comments), 'comments' => $comments);
   });

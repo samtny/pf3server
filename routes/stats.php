@@ -1,6 +1,6 @@
 <?php
 
-$app->get('/stats', function () use ($app, $entityManager) {
+function stats_route($entityManager) {
   $stats = array();
 
   $createdData = $entityManager->getRepository('\PF\Venue')->getCreatedStats(365 * 2);
@@ -51,6 +51,12 @@ $app->get('/stats', function () use ($app, $entityManager) {
   }
 
   $stats['freshnessStats'] = $freshnessStats;
+
+  return $stats;
+}
+
+$app->get('/stats', function () use ($app, $entityManager) {
+  $stats = stats_route($entityManager);
 
   $app->responseData = array('stats' => $stats);
 });

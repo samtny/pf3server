@@ -49,7 +49,6 @@ $app->add(new \PF\Middleware\ResponseMiddleware($serializer));
 $adminRouteMiddleware = new \PF\Middleware\AdminRouteMiddleware();
 
 require 'routes/login.php';
-require 'routes/admin.php';
 require 'routes/venue.php';
 require 'routes/comment.php';
 require 'routes/game.php';
@@ -59,5 +58,6 @@ require 'routes/notification.php';
 require 'routes/machine.php';
 require 'routes/legacy.php';
 require 'routes/user.php';
+require 'routes/app.php';
 
 $app->run();

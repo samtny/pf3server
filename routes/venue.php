@@ -2,15 +2,23 @@
 
 use JMS\Serializer\DeserializationContext;
 
+function venue_route_search($entityManager, $request) {
+  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($request);
+
+  $venues = [];
+
+  foreach ($venuesIterator as $venue) {
+    $venues[] = $venue;
+  }
+
+  return $venues;
+}
+
 $app->group('/venue', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
     $app->get('/search', function () use ($app, $entityManager) {
-        $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($app->request());
+        $request = $app->request();
 
-        $venues = [];
-
-        foreach ($venuesIterator as $venue) {
-            $venues[] = $venue;
-        }
+        $venues = venue_route_search($entityManager, $request);
 
         $app->responseData = array('count' => count($venues), 'venues' => $venues);
     });
