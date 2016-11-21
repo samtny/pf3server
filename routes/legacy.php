@@ -19,16 +19,25 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
     $legacy_request_proxy->set('n', $legacy_request->get('n'));
     $legacy_request_proxy->set('l', $legacy_request->get('l'));
 
-    if ($legacy_request->get('t') === 'special' && $legacy_request->get('q') === 'recent') {
+    if ($legacy_request->get('t') === 'special') {
       switch ($legacy_request->get('q')) {
+        case 'newgame':
+          $legacy_request_proxy->set('x', 'new');
+
+          break;
+        case 'raregame':
+          $legacy_request_proxy->set('x', 'rare');
+
+          break;
         case 'recent':
+
+          break;
+        case 'museum':
         case 'upcomingtournaments':
         case 'mecca':
-        case 'newgame':
-        case 'raregame':
-        case 'museum':
         default:
-          // do nothing
+          $legacy_request_proxy->set('x', $legacy_request->get('q'));
+
           break;
       }
     }
