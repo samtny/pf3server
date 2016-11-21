@@ -1,9 +1,9 @@
 <?php
 
-$app->get('/stats', function () use ($app, $entityManager) {
+function stats_route($entityManager) {
   $stats = array();
 
-  $createdData = $entityManager->getRepository('\PF\Venue')->getCreatedStats();
+  $createdData = $entityManager->getRepository('\PF\Venue')->getCreatedStats(365 * 2);
 
   $createdStats = array(
     'type' => 'Line',
@@ -19,7 +19,7 @@ $app->get('/stats', function () use ($app, $entityManager) {
 
   $stats['createdStats'] = $createdStats;
 
-  $updatedData = $entityManager->getRepository('PF\Venue')->getUpdatedStats();
+  $updatedData = $entityManager->getRepository('PF\Venue')->getUpdatedStats(365 * 2);
 
   $updatedStats = array(
     'type' => 'Line',
@@ -51,6 +51,12 @@ $app->get('/stats', function () use ($app, $entityManager) {
   }
 
   $stats['freshnessStats'] = $freshnessStats;
+
+  return $stats;
+}
+
+$app->get('/stats', function () use ($app, $entityManager) {
+  $stats = stats_route($entityManager);
 
   $app->responseData = array('stats' => $stats);
 });

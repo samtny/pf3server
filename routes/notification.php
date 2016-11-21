@@ -2,15 +2,23 @@
 
 use JMS\Serializer\DeserializationContext;
 
+function notification_route_search($entityManager, $request) {
+  $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getNotifications($request);
+
+  $notifications = [];
+
+  foreach ($notificationsIterator as $notification) {
+    $notifications[] = $notification;
+  }
+
+  return $notifications;
+}
+
 $app->group('/notification', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
   $app->get('/search', function () use ($app, $entityManager) {
-    $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getNotifications($app->request());
+    $request = $app->request();
 
-    $notifications = [];
-
-    foreach ($notificationsIterator as $notification) {
-      $notifications[] = $notification;
-    }
+    $notifications = notification_route_search($entityManager, $request);
 
     $app->responseData = array('count' => count($notifications), 'notifications' => $notifications);
   });
