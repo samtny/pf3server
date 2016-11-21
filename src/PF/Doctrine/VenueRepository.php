@@ -172,6 +172,24 @@ class VenueRepository extends EntityRepository {
             $qb->andWhere($qb->expr()->eq('g.rare', $qb->expr()->literal(true)));
 
             break;
+          case 'museum':
+            $qb->andWhere($qb->expr()->like('v.name', ':museum'));
+            $qb->setParameter('museum', '%museum%');
+
+            break;
+          case 'mecca':
+            $qb3 = $this->getEntityManager()->createQueryBuilder();
+
+            $qb3->select(array('identity(m3.venue)'))
+              ->from('\PF\Machine', 'm3')
+              ->groupBy('m3.venue')
+              ->having('COUNT(m3) >= :machine_threshold');
+
+            $qb->andWhere($qb->expr()->in('v.id', $qb3->getDQL()));
+
+            $qb->setParameter('machine_threshold', 50);
+
+            break;
         }
       }
     }
