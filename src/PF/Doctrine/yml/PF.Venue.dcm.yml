@@ -59,6 +59,9 @@ PF\Venue:
     legacy_key:
       type: integer
       nullable: true
+    external_key:
+        type: integer
+        nullable: true
 
   oneToMany:
     machines:

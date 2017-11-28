@@ -20,6 +20,10 @@ PF\Machine:
       type: datetime
     updated:
       type: datetime
+    external_key:
+      type: integer
+      nullable: true
+
   manyToOne:
     venue:
       targetEntity: PF\Venue
