@@ -2,6 +2,12 @@
 
 require_once '../bootstrap.php';
 
+require 'src/scrape_approve.php';
+
+$region_whitelist = array(
+  'nyc',
+);
+
 //$machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
 //$regions_json = file_get_contents('https://pinballmap.com/api/v1/regions.json');
 
@@ -25,7 +31,7 @@ $pm_regions = $data['regions'];
 foreach ($pm_regions as $pm_region) {
   echo 'Parsing region: ' . $pm_region['name'] . "\n";
 
-  if ($pm_region['name'] === 'nyc') {
+  if (in_array($pm_region['name'], $region_whitelist)) {
     //$locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $region['name'] . '/locations.json');
     //file_put_contents(__DIR__ . '/region_' . $region['name'] . '.json', $locations_json);
 
@@ -79,6 +85,8 @@ foreach ($pm_regions as $pm_region) {
 
         $matches = NULL;
       }
+
+      scrape_approve($venue);
 
       $venue = NULL;
     }
