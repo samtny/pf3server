@@ -25,6 +25,7 @@ class Venue {
   protected $created;
   protected $updated;
   protected $legacy_key;
+  protected $external_key;
 
   protected $machines;
   protected $comments;
@@ -250,6 +251,14 @@ class Venue {
 
   public function setLegacyKey($legacy_key) {
     $this->legacy_key = $legacy_key;
+  }
+
+  public function getExternalKey() {
+    return $this->external_key;
+  }
+
+  public function setExternalKey($external_key) {
+    $this->external_key = $external_key;
   }
 
   public function touch() {

@@ -11,6 +11,7 @@ class Machine {
   protected $status;
   protected $created;
   protected $updated;
+  protected $external_key;
 
   public function getIpdb() {
     return !empty($this->game) ? $this->game->getIpdb() : null;
@@ -99,6 +100,14 @@ class Machine {
 
   public function setPrice($price) {
     $this->price = $price;
+  }
+
+  public function getExternalKey() {
+    return $this->external_key;
+  }
+
+  public function setExternalKey($external_key) {
+    $this->external_key = $external_key;
   }
 
   public function touch() {
