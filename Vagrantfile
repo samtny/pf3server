@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "hashicorp/precise64"
+  config.vm.box = "bento/ubuntu-16.04"
   config.ssh.forward_agent = true
 
   config.vm.hostname = "pf3server"
@@ -15,7 +15,6 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.synced_folder '.', '/vagrant', type: 'nfs'
-  config.bindfs.bind_folder "/vagrant", "/vagrant"
 
   config.vm.provision "ansible" do |ansible|
     ansible.groups = {
@@ -24,7 +23,7 @@ Vagrant.configure(2) do |config|
 
     ansible.playbook = "ansible/site.yml"
 
-    ansible.extra_vars = { ansible_ssh_user: "vagrant" }
-    ansible.sudo = true;
+    ansible.extra_vars = { ansible_ssh_user: "vagrant", ansible_ssh_pipelining: "True" }
+    ansible.sudo = true
   end
 end
