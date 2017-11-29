@@ -21,7 +21,7 @@ PF\Machine:
     updated:
       type: datetime
     external_key:
-      type: integer
+      type: string
       nullable: true
 
   manyToOne:

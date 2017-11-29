@@ -60,7 +60,7 @@ PF\Venue:
       type: integer
       nullable: true
     external_key:
-        type: integer
+        type: string
         nullable: true
 
   oneToMany:

@@ -2,7 +2,17 @@
 
 require_once '../bootstrap.php';
 
-require 'src/scrape_approve.php';
+require_once 'src/scrape_approve.php';
+
+define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap_');
+
+$longopts = array(
+  'dry-run',
+);
+
+$options = getopt("", $longopts);
+
+$dry_run = isset($options['dry-run']);
 
 $region_whitelist = array(
   'nyc',
@@ -45,7 +55,7 @@ foreach ($pm_regions as $pm_region) {
 
       $venue = new \PF\Venue();
 
-      $venue->setExternalKey($pm_location['id']);
+      $venue->setExternalKey(SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX . $pm_location['id']);
       $venue->setName($pm_location['name']);
       $venue->setStreet($pm_location['street']);
       $venue->setCity($pm_location['city']);
@@ -62,7 +72,7 @@ foreach ($pm_regions as $pm_region) {
 
         $machine = new \PF\Machine();
 
-        $machine->setExternalKey($pm_location_machine['id']);
+        $machine->setExternalKey(SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX . $pm_location_machine['id']);
 
         $pm_machine = $pm_machines_lookup[$pm_location_machine['machine_id']];
 
@@ -87,9 +97,10 @@ foreach ($pm_regions as $pm_region) {
 
       $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
-      scrape_import($venue, TRUE);
+      scrape_import($venue, $dry_run);
 
       $venue = NULL;
     }
   }
 }
+
