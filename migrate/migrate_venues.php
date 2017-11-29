@@ -20,6 +20,8 @@ function parse_pf_xml($xml, $entityManager, $approve = true) {
   $num = 0;
 
   foreach ($xml->locations->loc as $loc_index => $loc) {
+    echo "Importing '" . $loc->name . "'\n";
+
     $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('legacy_key' => $loc['key']));
 
     if (empty($venue)) {
@@ -63,8 +65,8 @@ function parse_pf_xml($xml, $entityManager, $approve = true) {
 
           $machine = new \PF\Machine();
 
-          $machine->setCondition($locmachine->cond);
-          $machine->setPrice($locmachine->price);
+          !empty($locmachine->cond) && $machine->setCondition($locmachine->cond);
+          !empty($locmachine->price) && $machine->setPrice($locmachine->price);
 
           $machine->setGame($game);
 
