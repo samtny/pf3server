@@ -43,6 +43,7 @@ foreach ($dom->getElementsByTagName("tr") as $index => $tr) {
         $game = new \PF\Game();
 
         $game->setId($ipdb);
+        $game->setIpdb($ipdb);
 
         $game->setName($fields->item(0)->textContent);
 
