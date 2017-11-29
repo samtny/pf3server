@@ -56,7 +56,6 @@ foreach ($pm_regions as $pm_region) {
       $venue->setLongitude($pm_location['lon']);
       $venue->setUrl($pm_location['website']);
       $venue->setCreated(new DateTime($pm_location['created_at']));
-      $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
       foreach ($pm_location['location_machine_xrefs'] as $pm_location_machine) {
         echo 'Parsing machine: ' . $pm_location_machine['machine_id'] . "\n";
@@ -85,6 +84,8 @@ foreach ($pm_regions as $pm_region) {
 
         $matches = NULL;
       }
+
+      $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
       scrape_approve($venue);
 

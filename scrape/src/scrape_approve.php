@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../bootstrap.php';
 
 define('VENUE_FUZZY_LOOKUP_MAX_DISTANCE', 0.25);
+define('VENUE_MIN_UPDATED', '-2 years');
 
 function venue_route_search($entityManager, $request) {
   $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($request);
@@ -90,25 +91,54 @@ function scrape_is_fresher($scrape_venue, $venue) {
 
 /**
  * @param $scrape_venue \PF\Venue
+ * @return bool
+ */
+function scrape_validate($scrape_venue) {
+  $is_valid = TRUE;
+
+  static $min_updated;
+
+  if (empty($min_updated)) {
+    $min_updated = new DateTime(VENUE_MIN_UPDATED);
+
+    echo "Min updated: " . $min_updated->format('c') . "\n";
+  }
+
+  echo "Scrape updated compare: " . date_diff($scrape_venue->getUpdated(), $min_updated)->format('%a') . "\n";
+
+  ($scrape_venue->getUpdated() >= $min_updated) || $is_valid = FALSE;
+
+  return $is_valid;
+}
+
+/**
+ * @param $scrape_venue \PF\Venue
  */
 function scrape_approve($scrape_venue) {
   $entityManager = Bootstrap::getEntityManager();
 
-  $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('external_key' => $scrape_venue->getExternalKey()));
+  if (scrape_validate($scrape_venue)) {
+    echo "Scrape passes validation" . "\n";
 
-  if (empty($venue)) {
-    $venue = venue_fuzzy_lookup($entityManager, $scrape_venue);
-  }
+    $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('external_key' => $scrape_venue->getExternalKey()));
 
-  if (!empty($venue)) {
-    echo "Found venue: " . $venue->getId() . "\n";
+    if (empty($venue)) {
+      $venue = venue_fuzzy_lookup($entityManager, $scrape_venue);
+    }
 
-    if (scrape_is_fresher($scrape_venue, $venue)) {
-      echo "Scrape is fresher" . "\n";
+    if (!empty($venue)) {
+      echo "Found venue: " . $venue->getId() . "\n";
+
+      if (scrape_is_fresher($scrape_venue, $venue)) {
+        echo "Scrape is fresher" . "\n";
+
+      } else {
+        echo "Scrape is not fresher" . "\n";
+      }
     } else {
-      echo "Scrape is not fresher" . "\n";
+      echo "Creating new venue\n";
     }
   } else {
-    echo "Creating new venue\n";
+    echo "Scrape does not pass validation" . "\n";
   }
 }
