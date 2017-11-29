@@ -87,7 +87,7 @@ foreach ($pm_regions as $pm_region) {
 
       $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
-      scrape_approve($venue);
+      scrape_import($venue, TRUE);
 
       $venue = NULL;
     }

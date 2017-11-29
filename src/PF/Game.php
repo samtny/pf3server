@@ -107,4 +107,8 @@ class Game {
   public function setUpdated($updated) {
     $this->updated = $updated;
   }
+
+  public function __toString() {
+    return $this->name;
+  }
 }
