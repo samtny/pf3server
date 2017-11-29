@@ -94,52 +94,34 @@ function scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game) {
   return $game;
 }
 
-/**
- * @param $scrape_venue \PF\Venue
- */
-function scrape_lookup_games($entityManager, $scrape_venue) {
-  $machines = new \Doctrine\Common\Collections\ArrayCollection();
+function scrape_game_lookup($entityManager, $scrape_game) {
+  $game = NULL;
 
-  foreach ($scrape_venue->getMachines() as &$scrape_machine) {
-    $scrape_game = $scrape_machine->getGame();
-    $game = NULL;
+  if (!empty($scrape_game->getIpdb())) {
+    echo "Looking up game by ipdb: " . $scrape_game->getIpdb() . "\n";
 
-    if (!empty($scrape_game->getIpdb())) {
-      echo "Looking up game by ipdb: " . $scrape_game->getIpdb() . "\n";
-
-      $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $scrape_game->getIpdb()));
-
-      if (!empty($game)) {
-        echo "Found game by ipdb: " . $game->getName() . "\n";
-      }
-      else {
-        echo "WARNING: Game not found by ipdb: " . $scrape_game->getIpdb() . "\n";
-      }
-    }
-
-    if (empty($game)) {
-      echo "Looking up game by fuzzy: " . $scrape_game->getName() . "\n";
-
-      $game = scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game);
-
-      if (!empty($game)) {
-        echo "Found game by fuzzy: " . $game->getName() . "\n";
-      }
-      else {
-        echo "WARNING: Game not found by fuzzy: " . $scrape_game->getName() . "\n";
-      }
-    }
+    $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $scrape_game->getIpdb()));
 
     if (!empty($game)) {
-      echo "Game found\n";
-
-      $scrape_machine->setGame($game);
-      $machines[] = $scrape_machine;
+      echo "Found game by ipdb: " . $game->getName() . "\n";
     }
     else {
-      echo "WARNING: Game not found: " . $scrape_game->getName() . "\n";
+      echo "WARNING: Game not found by ipdb: " . $scrape_game->getIpdb() . "\n";
     }
   }
 
-  $scrape_venue->setMachines($machines, TRUE);
+  if (empty($game)) {
+    echo "Looking up game by fuzzy: " . $scrape_game->getName() . "\n";
+
+    $game = scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game);
+
+    if (!empty($game)) {
+      echo "Found game by fuzzy: " . $game->getName() . "\n";
+    }
+    else {
+      echo "WARNING: Game not found by fuzzy: " . $scrape_game->getName() . "\n";
+    }
+  }
+
+  return $game;
 }

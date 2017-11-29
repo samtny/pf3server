@@ -177,14 +177,6 @@ class Venue {
     return $this->machines;
   }
 
-  public function setMachines($machines, $migration = false) {
-    $this->machines = $machines;
-
-    if (!$migration) {
-      $this->updated = new \DateTime("now");
-    }
-  }
-
   public function getActiveMachines() {
     $activeMachines = new ArrayCollection();
 

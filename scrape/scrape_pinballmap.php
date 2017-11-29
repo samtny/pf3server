@@ -43,8 +43,8 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
     echo 'Parsing region: ' . $pm_region['name'] . "\n";
 
     if (in_array($pm_region['name'], $region_whitelist)) {
-      //$locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $region['name'] . '/locations.json');
-      //file_put_contents(__DIR__ . '/region_' . $region['name'] . '.json', $locations_json);
+      //$pm_locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json');
+      //file_put_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json', $pm_locations_json);
 
       $pm_locations_json = file_get_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json');
 
