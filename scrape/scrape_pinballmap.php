@@ -1,8 +1,6 @@
 <?php
 
-require_once '../bootstrap.php';
-
-require_once 'src/scrape_approve.php';
+require_once __DIR__ . '/src/scrape_import.php';
 
 define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap_');
 define('SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK', 10);
