@@ -12,7 +12,10 @@ class StringUtil {
     $clean = preg_replace("/'s\s/i", "s ", $clean);
 
     // text between parentheses;
-    $clean = preg_replace("/\(.+\)/", "", $clean);
+    $clean = preg_replace("/\((?!(Pro|LE|Premium|Super LE)).+\)/i", "", $clean);
+
+    // remaining parentheses:
+    $clean = preg_replace("/\(|\)/", "", $clean);
 
     // &amp
     $clean = preg_replace("/&amp/", "", $clean);
@@ -66,10 +69,12 @@ class StringUtil {
 
       $dm->DoubleMetaPhone($name_clean_part);
 
-      if (!empty($dm->secondary) && $dm->primary != $dm->secondary) {
-        $dm_parts[] = $dm->primary . ':' . $dm->secondary;
-      } else {
-        $dm_parts[] = $dm->primary;
+      if (!empty($dm->primary)) {
+        if (!empty($dm->secondary) && $dm->primary != $dm->secondary) {
+          $dm_parts[] = $dm->primary . ':' . $dm->secondary;
+        } else {
+          $dm_parts[] = $dm->primary;
+        }
       }
     }
 
