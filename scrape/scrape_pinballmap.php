@@ -5,6 +5,8 @@ require_once __DIR__ . '/src/scrape_import.php';
 define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap_');
 define('SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK', 10);
 define('SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK', 3);
+define('SCRAPE_PINBALLMAP_CONDITION_GREAT', '/great|perfect/i');
+define('SCRAPE_PINBALLMAP_CONDITION_BROKEN', '/broken|not working|out of order|turned off|^broke/i');
 
 $longopts = array(
   'dry-run',
@@ -92,6 +94,10 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
             $machine->setGame($game);
 
+            $machine->setCondition(pinballmap_condition_string_to_condition($pm_location_machine['condition']));
+
+            $machine->setPrice("1.00");
+
             $venue->addMachine($machine);
 
             $matches = NULL;
@@ -112,4 +118,13 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 }
 else {
   exit("ERROR: region count does not pass sanity check!");
+}
+
+function pinballmap_condition_string_to_condition($pm_condition) {
+  $condition = 3;
+
+  preg_match(SCRAPE_PINBALLMAP_CONDITION_GREAT, $pm_condition) === 1 && $condition = 4;
+  preg_match(SCRAPE_PINBALLMAP_CONDITION_BROKEN, $pm_condition) === 1 && $condition = 0;
+
+  return $condition;
 }

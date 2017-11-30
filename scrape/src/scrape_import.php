@@ -55,9 +55,7 @@ function scrape_import_merge_to_venue($scrape_venue, $venue) {
     $venue->setCreated($scrape_venue->getCreated());
   }
 
-  if (empty($venue->getUpdated())) {
-    $venue->setUpdated($scrape_venue->getUpdated());
-  }
+  $venue->setUpdated($scrape_venue->getUpdated());
 
   return $venue;
 }
