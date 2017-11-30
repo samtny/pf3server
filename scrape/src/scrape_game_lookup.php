@@ -117,7 +117,7 @@ function scrape_game_lookup($scrape_game) {
   if (empty($game)) {
     echo "Looking up game by fuzzy: " . $scrape_game->getName() . "\n";
 
-    $game = scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game);
+    $game = scrape_game_fuzzy_lookup($entityManager, $scrape_game);
 
     if (!empty($game)) {
       echo "Found game by fuzzy: " . $game->getName() . "\n";
