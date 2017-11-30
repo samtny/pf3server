@@ -96,8 +96,6 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
             $machine->setCondition(pinballmap_condition_string_to_condition($pm_location_machine['condition']));
 
-            $machine->setPrice("1.00");
-
             $venue->addMachine($machine);
 
             $matches = NULL;
