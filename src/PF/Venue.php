@@ -30,11 +30,15 @@ class Venue {
   protected $machines;
   protected $comments;
 
-  public function __construct() {
+  public function __construct($migration = FALSE) {
     $this->machines = new ArrayCollection();
     $this->comments = new ArrayCollection();
-    $this->created = new \DateTime("now");
-    $this->updated = new \DateTime("now");
+
+    if (!$migration) {
+      $this->created = new \DateTime("now");
+      $this->updated = new \DateTime("now");
+    }
+
     $this->status = 'NEW';
   }
 

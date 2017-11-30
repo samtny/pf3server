@@ -1,18 +1,46 @@
 <?php
 
 require_once __DIR__ . '/../../bootstrap.php';
-require_once __DIR__ . '/scrape_machine_lookup.php';
 require_once __DIR__ . '/scrape_venue_lookup.php';
 require_once __DIR__ . '/scrape_venue_validate.php';
+require_once __DIR__ . '/scrape_import_machine.php';
 
 /**
  * @param $scrape_venue \PF\Venue
  * @param $venue \PF\Venue
  * @return mixed
  */
-function scrape_import_merge_to_venue($scrape_venue, &$venue) {
+function scrape_import_merge_to_venue($scrape_venue, $venue) {
   if (empty($venue->getExternalKey())) {
     $venue->setExternalKey($scrape_venue->getExternalKey());
+  }
+
+  if (empty($venue->getName())) {
+    $venue->setName($scrape_venue->getName());
+  }
+
+  if (empty($venue->getStreet())) {
+    $venue->setStreet($scrape_venue->getStreet());
+  }
+
+  if (empty($venue->getCity())) {
+    $venue->setCity($scrape_venue->getCity());
+  }
+
+  if (empty($venue->getState())) {
+    $venue->setState($scrape_venue->getState());
+  }
+
+  if (empty($venue->getZipcode())) {
+    $venue->setZipcode($scrape_venue->getZipcode());
+  }
+
+  if (empty($venue->getLatitude())) {
+    $venue->setLatitude($scrape_venue->getLatitude());
+  }
+
+  if (empty($venue->getLongitude())) {
+    $venue->setLongitude($scrape_venue->getLongitude());
   }
 
   if (empty($venue->getUrl()) && !empty($scrape_venue->getUrl())) {
@@ -23,13 +51,20 @@ function scrape_import_merge_to_venue($scrape_venue, &$venue) {
     $venue->setPhone($scrape_venue->getPhone());
   }
 
-  $venue->setUpdated($scrape_venue->getUpdated());
+  if (empty($venue->getCreated())) {
+    $venue->setCreated($scrape_venue->getCreated());
+  }
+
+  if (empty($venue->getUpdated())) {
+    $venue->setUpdated($scrape_venue->getUpdated());
+  }
 
   return $venue;
 }
 
 /**
  * @param $scrape_venue \PF\Venue
+ * @param bool $dry_run
  */
 function scrape_import($scrape_venue, $dry_run = FALSE) {
   $entityManager = Bootstrap::getEntityManager();
@@ -47,33 +82,41 @@ function scrape_import($scrape_venue, $dry_run = FALSE) {
     }
 
     if (!empty($venue)) {
-      echo "Found venue: " . $venue->getId() . "\n";
+      echo "Found matching venue: " . $venue->getId() . "\n";
 
       if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
         echo "Scrape is fresher" . "\n";
 
-        scrape_import_merge_to_venue($scrape_venue, $venue);
-
         echo "Updating venue: " . $venue->getId() . "\n";
+
+        $venue = scrape_import_merge_to_venue($scrape_venue, $venue);
 
         if (!$dry_run) {
           $entityManager->persist($venue);
 
           $entityManager->flush();
         }
+
+        scrape_import_machines($scrape_venue, $venue, $dry_run);
       } else {
         echo "Scrape is not fresher" . "\n";
 
         echo "Declining to update venue: " . $venue->getId() . "\n";
       }
     } else {
-      echo "Creating new venue\n";
+      echo "Did not find matching venue\n";
+
+      $venue = new \PF\Venue(TRUE);
+
+      $venue = scrape_import_merge_to_venue($scrape_venue, $venue);
 
       if (!$dry_run) {
-        $entityManager->persist($scrape_venue);
+        $entityManager->persist($venue);
 
         $entityManager->flush();
       }
+
+      scrape_import_machines($scrape_venue, $venue, $dry_run);
     }
   } else {
     echo "Scrape does not pass validation" . "\n";
