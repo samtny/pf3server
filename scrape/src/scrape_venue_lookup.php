@@ -32,29 +32,31 @@ function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
   $venue = NULL;
 
   $request = new \PF\RequestProxy(array(
-    'l' => 1,
+    'l' => 10,
     'n' => $scrape_venue->getLatitude() . ',' . $scrape_venue->getLongitude(),
   ));
 
   $venues = venue_request($entityManager, $request);
 
   if (!empty($venues)) {
-    $distance = _venue_lat_lon_distance($scrape_venue->getLatitude(), $scrape_venue->getLongitude(), $venues[0]->getLatitude(), $venues[0]->getLongitude(), 'M');
+    foreach ($venues as $candidate_venue) {
+      $distance = _venue_lat_lon_distance($scrape_venue->getLatitude(), $scrape_venue->getLongitude(), $candidate_venue->getLatitude(), $candidate_venue->getLongitude(), 'M');
 
-    echo 'Venue distance: ' . $distance . "\n";
+      echo 'Venue distance: ' . $distance . "\n";
 
-    if ($distance <= VENUE_FUZZY_LOOKUP_MAX_DISTANCE) {
-      echo 'Within range' . "\n";
+      if ($distance <= VENUE_FUZZY_LOOKUP_MAX_DISTANCE) {
+        echo 'Within range' . "\n";
 
-      $scrape_dm = $scrape_venue->getNameDm();
-      $candidate_dm = $venues[0]->getNameDm();
+        $scrape_dm = $scrape_venue->getNameDm();
+        $candidate_dm = $candidate_venue->getNameDm();
 
-      if (strpos($scrape_dm, $candidate_dm) !== FALSE || strpos($candidate_dm, $scrape_dm) !== FALSE) {
-        echo $scrape_dm . ' matches ' . $candidate_dm . "\n";
+        if (strpos($scrape_dm, $candidate_dm) !== FALSE || strpos($candidate_dm, $scrape_dm) !== FALSE) {
+          echo $scrape_dm . ' matches ' . $candidate_dm . "\n";
 
-        $venue = $venues[0];
-      } else {
-        echo $scrape_dm . ' does not match ' . $candidate_dm . "\n";
+          $venue = $candidate_venue;
+
+          break;
+        }
       }
     }
   }
