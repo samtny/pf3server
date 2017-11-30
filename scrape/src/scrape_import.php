@@ -97,7 +97,6 @@ function scrape_import($scrape_venue, $dry_run = FALSE) {
         }
 
         scrape_import_machines($scrape_venue, $venue, $dry_run);
-
         scrape_prune_machines($scrape_venue, $venue, $dry_run);
       } else {
         echo "Scrape is not fresher" . "\n";
