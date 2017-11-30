@@ -11,7 +11,7 @@ require_once __DIR__ . '/scrape_prune_machines.php';
  * @param $venue \PF\Venue
  * @return mixed
  */
-function scrape_import_merge_to_venue($scrape_venue, $venue) {
+function scrape_import_merge_properties($scrape_venue, $venue) {
   if (empty($venue->getExternalKey())) {
     $venue->setExternalKey($scrape_venue->getExternalKey());
   }
@@ -63,60 +63,72 @@ function scrape_import_merge_to_venue($scrape_venue, $venue) {
 
 /**
  * @param $scrape_venue \PF\Venue
+ * @param $venue \PF\Venue
+ * @param bool $dry_run
+ */
+function scrape_import_merge_to_venue($scrape_venue, $venue, $dry_run = FALSE) {
+  $entityManager = Bootstrap::getEntityManager();
+
+  if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
+    echo "Scrape is fresher" . "\n";
+
+    echo "Merging venue: " . $venue->getId() . "\n";
+
+    $venue = scrape_import_merge_properties($scrape_venue, $venue);
+
+    if (!$dry_run) {
+      $entityManager->persist($venue);
+
+      $entityManager->flush();
+    }
+
+    scrape_import_machines($scrape_venue, $venue, $dry_run);
+    scrape_prune_machines($scrape_venue, $venue, $dry_run);
+  } else {
+    echo "Scrape is not fresher" . "\n";
+
+    echo "Declining to merge venue: " . $venue->getId() . "\n";
+  }
+}
+
+/**
+ * @param $scrape_venue \PF\Venue
+ * @param bool $dry_run
+ */
+function scrape_import_create_venue($scrape_venue, $dry_run = FALSE) {
+  $entityManager = Bootstrap::getEntityManager();
+
+  $venue = new \PF\Venue(TRUE);
+
+  $venue = scrape_import_merge_properties($scrape_venue, $venue);
+
+  if (!$dry_run) {
+    $entityManager->persist($venue);
+
+    $entityManager->flush();
+  }
+
+  scrape_import_machines($scrape_venue, $venue, $dry_run);
+}
+
+/**
+ * @param $scrape_venue \PF\Venue
  * @param bool $dry_run
  */
 function scrape_import($scrape_venue, $dry_run = FALSE) {
-  $entityManager = Bootstrap::getEntityManager();
-
   if (scrape_venue_validate($scrape_venue)) {
     echo "Scrape passes validation" . "\n";
 
-    echo "Looking up venue by external key: " . $scrape_venue->getExternalKey() . "\n";
-    $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('external_key' => $scrape_venue->getExternalKey()));
-
-    if (empty($venue)) {
-      echo "Looking up venue by fuzzy" . "\n";
-
-      $venue = scrape_venue_fuzzy_lookup($entityManager, $scrape_venue);
-    }
+    $venue = scrape_venue_lookup($scrape_venue);
 
     if (!empty($venue)) {
       echo "Found matching venue: " . $venue->getId() . "\n";
 
-      if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
-        echo "Scrape is fresher" . "\n";
-
-        echo "Updating venue: " . $venue->getId() . "\n";
-
-        $venue = scrape_import_merge_to_venue($scrape_venue, $venue);
-
-        if (!$dry_run) {
-          $entityManager->persist($venue);
-
-          $entityManager->flush();
-        }
-
-        scrape_import_machines($scrape_venue, $venue, $dry_run);
-        scrape_prune_machines($scrape_venue, $venue, $dry_run);
-      } else {
-        echo "Scrape is not fresher" . "\n";
-
-        echo "Declining to update venue: " . $venue->getId() . "\n";
-      }
+      scrape_import_merge_to_venue($scrape_venue, $venue, $dry_run);
     } else {
       echo "Did not find matching venue\n";
 
-      $venue = new \PF\Venue(TRUE);
-
-      $venue = scrape_import_merge_to_venue($scrape_venue, $venue);
-
-      if (!$dry_run) {
-        $entityManager->persist($venue);
-
-        $entityManager->flush();
-      }
-
-      scrape_import_machines($scrape_venue, $venue, $dry_run);
+      scrape_import_create_venue($scrape_venue, $dry_run);
     }
   } else {
     echo "Scrape does not pass validation" . "\n";

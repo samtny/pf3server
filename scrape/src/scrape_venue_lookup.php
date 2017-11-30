@@ -61,3 +61,24 @@ function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
 
   return $venue;
 }
+
+/**
+ * @param $scrape_venue \PF\Venue
+ * @return null
+ */
+function scrape_venue_lookup($scrape_venue) {
+  $venue = NULL;
+
+  $entityManager = Bootstrap::getEntityManager();
+
+  echo "Looking up venue by external key: " . $scrape_venue->getExternalKey() . "\n";
+  $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('external_key' => $scrape_venue->getExternalKey()));
+
+  if (empty($venue)) {
+    echo "Looking up venue by fuzzy" . "\n";
+
+    $venue = scrape_venue_fuzzy_lookup($entityManager, $scrape_venue);
+  }
+
+  return $venue;
+}
