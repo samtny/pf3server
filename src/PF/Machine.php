@@ -117,4 +117,8 @@ class Machine {
   public function delete() {
     $this->status = 'DELETED';
   }
+
+  public function activate() {
+    $this->status = 'ACTIVE';
+  }
 }

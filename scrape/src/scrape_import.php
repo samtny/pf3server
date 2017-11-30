@@ -3,7 +3,8 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/scrape_venue_lookup.php';
 require_once __DIR__ . '/scrape_venue_validate.php';
-require_once __DIR__ . '/scrape_import_machine.php';
+require_once __DIR__ . '/scrape_import_machines.php';
+require_once __DIR__ . '/scrape_prune_machines.php';
 
 /**
  * @param $scrape_venue \PF\Venue
@@ -96,6 +97,8 @@ function scrape_import($scrape_venue, $dry_run = FALSE) {
         }
 
         scrape_import_machines($scrape_venue, $venue, $dry_run);
+
+        scrape_prune_machines($scrape_venue, $venue, $dry_run);
       } else {
         echo "Scrape is not fresher" . "\n";
 

@@ -17,6 +17,8 @@ function scrape_import_machines($scrape_venue, $venue, $dry_run = FALSE) {
     $machine = scrape_machine_lookup($entityManager, $scrape_machine, $venue);
 
     if (!empty($machine)) {
+      $machine->activate();
+
       $venue->addMachine($machine, TRUE);
 
       $updated = TRUE;
