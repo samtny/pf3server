@@ -3,12 +3,19 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/scrape_game_lookup.php';
 
+/**
+ * @param $scrape_machine \PF\Machine
+ * @param $venue \PF\Venue
+ *
+ * @return null|\PF\Machine
+ */
 function scrape_machine_match_venue_game($scrape_machine, $venue) {
   $machine = NULL;
 
   $scrape_machine_game = $scrape_machine->getGame()->getId();
 
   foreach ($venue->getMachines() as $venue_machine) {
+    /** @var $venue_machine_game \PF\Game **/
     $venue_machine_game = $venue_machine->getGame();
 
     if ($venue_machine_game->getId() == $scrape_machine_game) {
@@ -22,39 +29,22 @@ function scrape_machine_match_venue_game($scrape_machine, $venue) {
   return $machine;
 }
 
-function scrape_machine_lookup($entityManager, $scrape_machine, $venue) {
+/**
+ * @param $scrape_machine \PF\Machine
+ * @param $venue \PF\Venue
+ *
+ * @return null|\PF\Machine
+ */
+function scrape_machine_lookup($scrape_machine, $venue) {
   $machine = NULL;
 
-  $scrape_game = $scrape_machine->getGame();
-  $game = scrape_game_lookup($entityManager, $scrape_game);
+  $entityManager = Bootstrap::getEntityManager();
 
-  if (!empty($game)) {
-    echo "Game found\n";
+  echo "Looking up machine by external key: " . $scrape_machine->getExternalKey() . "\n";
+  $machine = $entityManager->getRepository('\PF\Machine')->findOneBy(array('external_key' => $scrape_machine->getExternalKey()));
 
-    echo "Looking up machine by external key: " . $scrape_machine->getExternalKey() . "\n";
-    $machine = $entityManager->getRepository('\PF\Machine')->findOneBy(array('external_key' => $scrape_machine->getExternalKey()));
-
-    if (empty($machine)) {
-      $machine = scrape_machine_match_venue_game($scrape_machine, $venue);
-    }
-
-    if (empty($machine)) {
-      $machine = new \PF\Machine();
-
-      $machine->setExternalKey($scrape_machine->getExternalKey());
-      $machine->setGame($game);
-    }
-
-    if (!empty($scrape_machine->getCondition())) {
-      $machine->setCondition($scrape_machine->getCondition());
-    }
-
-    if (!empty($scrape_machine->getPrice())) {
-      $machine->setPrice($scrape_machine->getPrice());
-    }
-  }
-  else {
-    echo "WARNING: Game not found: " . $scrape_game->getName() . "\n";
+  if (empty($machine)) {
+    $machine = scrape_machine_match_venue_game($scrape_machine, $venue);
   }
 
   return $machine;

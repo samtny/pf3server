@@ -26,7 +26,7 @@ function _venue_lat_lon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
 /**
  * @param $entityManager
  * @param $scrape_venue \PF\Venue
- * @return null
+ * @return \PF\Venue|null
  */
 function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
   $venue = NULL;
@@ -64,7 +64,7 @@ function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
 
 /**
  * @param $scrape_venue \PF\Venue
- * @return null
+ * @return \PF\Venue|null
  */
 function scrape_venue_lookup($scrape_venue) {
   $venue = NULL;

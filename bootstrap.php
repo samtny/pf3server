@@ -52,6 +52,9 @@ class Bootstrap {
     self::$entityManager = EntityManager::create($conn, $config);
   }
 
+  /**
+   * @return EntityManager
+   */
   public static function getEntityManager() {
     return static::$entityManager;
   }

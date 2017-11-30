@@ -94,8 +94,10 @@ function scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game) {
   return $game;
 }
 
-function scrape_game_lookup($entityManager, $scrape_game) {
+function scrape_game_lookup($scrape_game) {
   $game = NULL;
+
+  $entityManager = Bootstrap::getEntityManager();
 
   if (!empty($scrape_game->getIpdb())) {
     echo "Looking up game by ipdb: " . $scrape_game->getIpdb() . "\n";

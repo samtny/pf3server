@@ -13,14 +13,16 @@ define('VENUE_MIN_UPDATED', '-2 years');
 function scrape_venue_validate_fresher($scrape_venue, $venue) {
   $is_fresh = TRUE;
 
-  ($scrape_venue->getUpdated()->getTimestamp() > $venue->getUpdated()->getTimestamp()) || $is_fresh = FALSE;
-  ($scrape_venue->getMachines()->count() > 0) || $is_fresh = FALSE;
+  if (!empty($venue->getUpdated())) {
+    ($scrape_venue->getUpdated()->getTimestamp() > $venue->getUpdated()->getTimestamp()) || $is_fresh = FALSE;
+  }
 
   return $is_fresh;
 }
 
 /**
  * @param $scrape_venue \PF\Venue
+ *
  * @return bool
  */
 function scrape_venue_validate($scrape_venue) {
@@ -37,6 +39,8 @@ function scrape_venue_validate($scrape_venue) {
   echo "Scrape updated compare: " . date_diff($scrape_venue->getUpdated(), $min_updated)->format('%a') . "\n";
 
   ($scrape_venue->getUpdated() >= $min_updated) || $is_valid = FALSE;
+
+  ($scrape_venue->getMachines()->count() > 0) || $is_valid = FALSE;
 
   return $is_valid;
 }

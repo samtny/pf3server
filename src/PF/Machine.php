@@ -53,6 +53,9 @@ class Machine {
     $this->status = $status;
   }
 
+  /**
+   * @return null|\PF\Game
+   */
   public function getGame() {
     return $this->game;
   }

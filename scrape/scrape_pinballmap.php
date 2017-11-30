@@ -7,6 +7,7 @@ define('SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK', 10);
 define('SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK', 3);
 define('SCRAPE_PINBALLMAP_CONDITION_GREAT', '/great|perfect/i');
 define('SCRAPE_PINBALLMAP_CONDITION_BROKEN', '/broken|not working|out of order|turned off|^broke/i');
+define('SCRAPE_PINBALLMAP_TRUST_GAMES', true);
 
 $longopts = array(
   'dry-run',
@@ -103,7 +104,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
           $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
-          scrape_import($venue, $dry_run);
+          scrape_import($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $dry_run);
 
           $venue = NULL;
         }
