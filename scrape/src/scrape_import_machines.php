@@ -6,7 +6,6 @@ require_once __DIR__ . '/scrape_machine_lookup.php';
 /**
  * @param $scrape_venue \PF\Venue
  * @param $venue \PF\Venue
- * @param bool $trust_games
  * @param bool $dry_run
  */
 function scrape_import_machines($scrape_venue, $venue, $dry_run = FALSE) {
@@ -26,7 +25,7 @@ function scrape_import_machines($scrape_venue, $venue, $dry_run = FALSE) {
         $machine = new \PF\Machine();
 
         $machine->setExternalKey($scrape_machine->getExternalKey());
-        $machine->setGame($scrape_machine->getGame());
+        $machine->setGame($game);
       }
     }
 

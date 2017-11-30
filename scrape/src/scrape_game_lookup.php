@@ -18,6 +18,7 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
 
   $request = new \PF\RequestProxy(array(
     'q' => $scrape_game->getName(),
+    'l' => 20,
   ));
 
   $candidate_games = game_request($entityManager, $request);
@@ -32,6 +33,7 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
       $candidate_name = $candidate_game->getName();
 
       if (!empty($candidate_dm) && !empty($scrape_dm)) {
+
         if (strpos($scrape_dm, $candidate_dm) === 0 || strpos($candidate_dm, $scrape_dm) === 0) {
           echo 'Game dm: ' . $scrape_dm . ' matches candidate dm: ' . $candidate_dm . "\n";
 

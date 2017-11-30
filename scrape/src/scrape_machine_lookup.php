@@ -12,14 +12,21 @@ require_once __DIR__ . '/scrape_game_lookup.php';
 function scrape_machine_match_venue_game($scrape_machine, $venue) {
   $machine = NULL;
 
-  $scrape_machine_game = $scrape_machine->getGame()->getId();
+  $scrape_machine_game_id = $scrape_machine->getGame()->getId();
+  $scrape_machine_game_name = $scrape_machine->getGame()->getName();
 
   foreach ($venue->getMachines() as $venue_machine) {
     /** @var $venue_machine_game \PF\Game **/
     $venue_machine_game = $venue_machine->getGame();
 
-    if ($venue_machine_game->getId() == $scrape_machine_game) {
+    if (!empty($scrape_machine_game_id) && ($venue_machine_game->getId() == $scrape_machine_game_id)) {
       echo "Matched machine by game id\n";
+      $machine = $venue_machine;
+
+      break;
+    }
+    else if ($venue_machine_game->getName() == $scrape_machine_game_name) {
+      echo "Matched machine by game name\n";
       $machine = $venue_machine;
 
       break;

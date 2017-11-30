@@ -10,7 +10,7 @@ require_once __DIR__ . '/scrape_game_lookup.php';
 function scrape_import_games($scrape_venue, $dry_run) {
   $entityManager = Bootstrap::getEntityManager();
 
-  foreach ($scrape_venue->getMachines() as &$scrape_machine) {
+  foreach ($scrape_venue->getMachines() as $scrape_machine) {
     /**
      * @var $scrape_machine \PF\Machine
      */
@@ -29,7 +29,5 @@ function scrape_import_games($scrape_venue, $dry_run) {
         $entityManager->flush();
       }
     }
-
-    $scrape_machine->setGame($game);
   }
 }
