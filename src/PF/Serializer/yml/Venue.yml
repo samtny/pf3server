@@ -71,3 +71,6 @@ PF\Venue:
       groups: [read]
     legacy_key:
       exclude: true
+    external_key:
+      type: string
+      groups: [admin]
