@@ -35,8 +35,14 @@ class StringUtil {
     // remove double-spacing
     $clean = preg_replace("/\s+/", " ", $clean);
 
-    // remove leading "the"
+    // remove leading "the "
     $clean = preg_replace("/^the\s/i", "", $clean);
+
+    // remove trailing " bar"
+    $clean = preg_replace("/\s\bbar\b/i", "", $clean);
+
+    // remove trailing " lounge"
+    $clean = preg_replace("/\s\blounge\b/i", "", $clean);
 
     // normalize numerics one thru ten, eleven
     $clean = preg_replace("/1st/i", "First", $clean);
