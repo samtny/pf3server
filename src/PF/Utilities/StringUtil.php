@@ -11,11 +11,23 @@ class StringUtil {
     // special case of 's;
     $clean = preg_replace("/'s\s/i", "s ", $clean);
 
-    // text between parentheses;
+    // text between parentheses, except game qualifiers;
     $clean = preg_replace("/\((?!(Pro|LE|Premium|Super LE)).+\)/i", "", $clean);
 
     // remaining parentheses:
     $clean = preg_replace("/\(|\)/", "", $clean);
+
+    // remove leading "the "
+    $clean = preg_replace("/^the\s/i", "", $clean);
+
+    // remove trailing " bar & grill"
+    $clean = preg_replace("/\sbar\s(\&|and)\sgrill$/i", "", $clean);
+
+    // remove trailing " bar"
+    $clean = preg_replace("/\sbar$/i", "", $clean);
+
+    // remove trailing " lounge"
+    $clean = preg_replace("/\slounge$/i", "", $clean);
 
     // &amp
     $clean = preg_replace("/&amp/", "", $clean);
@@ -34,15 +46,6 @@ class StringUtil {
 
     // remove double-spacing
     $clean = preg_replace("/\s+/", " ", $clean);
-
-    // remove leading "the "
-    $clean = preg_replace("/^the\s/i", "", $clean);
-
-    // remove trailing " bar"
-    $clean = preg_replace("/\s\bbar\b/i", "", $clean);
-
-    // remove trailing " lounge"
-    $clean = preg_replace("/\s\blounge\b/i", "", $clean);
 
     // normalize numerics one thru ten, eleven
     $clean = preg_replace("/1st/i", "First", $clean);
