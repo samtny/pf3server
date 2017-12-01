@@ -3,6 +3,7 @@ config/
 routes/
 src/
 templates/
+util/
 .htaccess
 bootstrap.php
 build.sh
