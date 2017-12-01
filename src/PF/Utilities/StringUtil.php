@@ -21,7 +21,10 @@ class StringUtil {
     $clean = preg_replace("/^the\s/i", "", $clean);
 
     // remove trailing " bar & grill"
-    $clean = preg_replace("/\sbar\s(\&|and)\sgrill$/i", "", $clean);
+    $clean = preg_replace("/\sbar\s((\&|and)\s)?grill$/i", "", $clean);
+
+    // remove trailing " bar & restaurant"
+    $clean = preg_replace("/\sbar\s((\&|and)\s)?restaurant$/i", "", $clean);
 
     // remove trailing " bar"
     $clean = preg_replace("/\sbar$/i", "", $clean);
