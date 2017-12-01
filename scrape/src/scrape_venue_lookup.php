@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/scrape_request.php';
 
 define('VENUE_FUZZY_LOOKUP_MAX_DISTANCE', 0.25);
+define('VENUE_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD', 80);
 
 function _venue_lat_lon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
 
@@ -50,7 +51,9 @@ function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
         $scrape_dm = $scrape_venue->getNameDm();
         $candidate_dm = $candidate_venue->getNameDm();
 
-        if (strpos($scrape_dm, $candidate_dm) !== FALSE || strpos($candidate_dm, $scrape_dm) !== FALSE) {
+        similar_text($scrape_dm, $candidate_dm, $percent);
+
+        if ($percent > VENUE_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD) {
           echo $scrape_dm . ' matches ' . $candidate_dm . "\n";
 
           $venue = $candidate_venue;

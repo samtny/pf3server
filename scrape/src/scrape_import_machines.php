@@ -30,7 +30,7 @@ function scrape_import_machines($scrape_venue, $venue, $dry_run = FALSE) {
     }
 
     if (!empty($machine)) {
-      if (!empty($scrape_machine->getCondition())) {
+      if ($scrape_machine->getCondition() !== NULL) {
         $machine->setCondition($scrape_machine->getCondition());
       }
 

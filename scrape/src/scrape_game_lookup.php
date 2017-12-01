@@ -2,6 +2,8 @@
 
 require_once __DIR__ . '/../../bootstrap.php';
 
+define('GAME_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD', 80);
+
 function _game_shortest_name_sort($a, $b) {
   return strlen($a) < strlen($b) ? -1 : 1;
 }
@@ -34,7 +36,9 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
 
       if (!empty($candidate_dm) && !empty($scrape_dm)) {
 
-        if (strpos($scrape_dm, $candidate_dm) === 0 || strpos($candidate_dm, $scrape_dm) === 0) {
+        similar_text($scrape_dm, $candidate_dm, $percent);
+
+        if ($percent > GAME_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD) {
           echo 'Game dm: ' . $scrape_dm . ' matches candidate dm: ' . $candidate_dm . "\n";
 
           $game = $candidate_game;
@@ -44,7 +48,9 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
       }
 
       if (!empty($candidate_name) && !empty($scrape_name)) {
-        if (strpos($scrape_name, $candidate_name) === 0 || strpos($candidate_name, $scrape_name) === 0) {
+        similar_text($scrape_name, $candidate_name, $percent);
+
+        if ($percent > GAME_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD) {
           echo 'Game name: ' . $scrape_game->getName() . ' matches candidate name: ' . $candidate_game->getName() . "\n";
 
           $game = $candidate_game;
