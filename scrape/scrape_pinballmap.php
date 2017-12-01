@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/src/scrape_import.php';
+require_once __DIR__ . '/src/scrape_import_venue.php';
 
 define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap');
 define('SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK', 10);
@@ -11,15 +11,21 @@ define('SCRAPE_PINBALLMAP_TRUST_GAMES', true);
 
 $longopts = array(
   'dry-run',
+  'force-region:',
+  'auto-approve',
 );
 
 $options = getopt("", $longopts);
 
 $dry_run = isset($options['dry-run']);
+$force_region = !empty($options['force-region']) ? $options['force-region'] : NULL;
+$auto_approve = isset($options['auto-approve']);
 
-$region_whitelist = array(
-  'nyc',
+$region_whitelist = !empty($force_region) ? array($force_region) : array(
+  //'nyc',
   //'minnesota',
+  //'portland',
+  //'toronto',
 );
 
 $pm_machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
@@ -47,6 +53,9 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
     if (in_array($pm_region['name'], $region_whitelist)) {
       $pm_locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json');
+      if ($pm_locations_json === FALSE) {
+        echo 'WARNING: error getting region \'' . $pm_region['name'] . '\' locations: ' . error_get_last()['message'] . "\n";
+      }
       //file_put_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json', $pm_locations_json);
       //$pm_locations_json = file_get_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json');
 
@@ -103,19 +112,19 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
           $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
-          scrape_import($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $dry_run);
+          scrape_import_venue($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $auto_approve, $dry_run);
 
           $venue = NULL;
         }
       }
       else {
-        echo "WARNING: location count for region '" . $pm_region['name'] . "' does not pass sanity check!";
+        echo "WARNING: location count for region '" . $pm_region['name'] . "' does not pass sanity check!\n";
       }
     }
   }
 }
 else {
-  exit("ERROR: region count does not pass sanity check!");
+  exit("ERROR: region count does not pass sanity check!\n");
 }
 
 function pinballmap_condition_string_to_condition($pm_condition) {

@@ -65,26 +65,11 @@ function scrape_import_merge_properties($scrape_venue, $venue) {
 
 /**
  * @param $scrape_venue \PF\Venue
- * @param $venue \PF\Venue
- *
- * @return \PF\Venue
- */
-function scrape_import_merge_to_venue($scrape_venue, $venue) {
-  if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
-    $venue = scrape_import_merge_properties($scrape_venue, $venue);
-  } else {
-    echo "Declining to merge less fresh venue: " . $venue->getId() . "\n";
-  }
-
-  return $venue;
-}
-
-/**
- * @param $scrape_venue \PF\Venue
  * @param bool $trust_games
+ * @param bool $auto_approve
  * @param bool $dry_run
  */
-function scrape_import($scrape_venue, $trust_games, $dry_run = FALSE) {
+function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $dry_run = FALSE) {
   $entityManager = Bootstrap::getEntityManager();
 
   if (scrape_venue_validate($scrape_venue)) {
@@ -100,21 +85,29 @@ function scrape_import($scrape_venue, $trust_games, $dry_run = FALSE) {
       $venue = new \PF\Venue(TRUE);
     }
 
-    $venue = scrape_import_merge_to_venue($scrape_venue, $venue);
+    if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
+      $venue = scrape_import_merge_properties($scrape_venue, $venue);
 
-    if (!$dry_run) {
-      $entityManager->persist($venue);
+      if ($auto_approve) {
+        $venue->approve(TRUE);
+      }
 
-      $entityManager->flush();
+      if (!$dry_run) {
+        $entityManager->persist($venue);
+
+        $entityManager->flush();
+      }
+
+      if ($trust_games) {
+        scrape_import_games($scrape_venue, $dry_run);
+      }
+
+      scrape_import_machines($scrape_venue, $venue, $dry_run);
+
+      scrape_prune_machines($scrape_venue, $venue, $dry_run);
+    } else {
+      echo "Declining to merge less fresh venue\n";
     }
-
-    if ($trust_games) {
-      scrape_import_games($scrape_venue, $dry_run);
-    }
-
-    scrape_import_machines($scrape_venue, $venue, $dry_run);
-
-    scrape_prune_machines($scrape_venue, $venue, $dry_run);
   } else {
     echo "Scrape does not pass validation" . "\n";
   }
