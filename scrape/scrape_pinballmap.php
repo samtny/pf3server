@@ -19,16 +19,12 @@ $dry_run = isset($options['dry-run']);
 
 $region_whitelist = array(
   'nyc',
+  'minnesota',
 );
 
-//$machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
-//$regions_json = file_get_contents('https://pinballmap.com/api/v1/regions.json');
-
+$pm_machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
 //file_put_contents(__DIR__ . '/machines.json', $machines_json);
-//file_put_contents(__DIR__ . '/regions.json', $regions_json);
-
-$pm_machines_json = file_get_contents(__DIR__ . '/machines.json');
-$pm_regions_json = file_get_contents(__DIR__ . '/regions.json');
+//$pm_machines_json = file_get_contents(__DIR__ . '/machines.json');
 
 $data = json_decode($pm_machines_json, TRUE);
 $pm_machines = $data['machines'];
@@ -38,6 +34,10 @@ foreach ($pm_machines as $machine) {
   $pm_machines_lookup[$machine['id']] = $machine;
 }
 
+$pm_regions_json = file_get_contents('https://pinballmap.com/api/v1/regions.json');
+//file_put_contents(__DIR__ . '/regions.json', $regions_json);
+//$pm_regions_json = file_get_contents(__DIR__ . '/regions.json');
+
 $data = json_decode($pm_regions_json, TRUE);
 $pm_regions = $data['regions'];
 
@@ -46,10 +46,9 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
     echo 'Parsing region: ' . $pm_region['name'] . "\n";
 
     if (in_array($pm_region['name'], $region_whitelist)) {
-      //$pm_locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json');
+      $pm_locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json');
       //file_put_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json', $pm_locations_json);
-
-      $pm_locations_json = file_get_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json');
+      //$pm_locations_json = file_get_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json');
 
       $data = json_decode($pm_locations_json, TRUE);
       $pm_locations = $data['locations'];
@@ -110,7 +109,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
         }
       }
       else {
-        exit("ERROR: location count for region '" . $pm_region['name'] . "' does not pass sanity check!");
+        echo "WARNING: location count for region '" . $pm_region['name'] . "' does not pass sanity check!";
       }
     }
   }
