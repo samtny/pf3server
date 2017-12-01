@@ -10,9 +10,9 @@ class GameUtil {
    * @return string
    */
   public static function generateAbbreviation($game) {
-    $abbreviation = null;
+    $abbreviation = StringUtil::abbrName($game->getName());
 
-    $bare_abbreviation = StringUtil::abbrName($game->getName());
+    $bare_abbreviation = $abbreviation;
 
     $tries = 0;
 
