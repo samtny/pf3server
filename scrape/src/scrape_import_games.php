@@ -20,8 +20,13 @@ function scrape_import_games($scrape_venue, $dry_run) {
 
     if (empty($game)) {
       $game = new \PF\Game();
-      $game->setIpdb($scrape_game->getIpdb());
+
       $game->setName($scrape_game->getName());
+      $game->setIpdb($scrape_game->getIpdb());
+
+      $abbreviation = \PF\Utilities\GameUtil::generateAbbreviation($game);
+
+      $game->setAbbreviation($abbreviation);
 
       if (!$dry_run) {
         $entityManager->persist($game);

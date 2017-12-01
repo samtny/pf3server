@@ -39,7 +39,11 @@ $app->group('/game', function () use ($app, $entityManager, $serializer) {
 
     if ($is_new_game) {
       $game->setName($game->getName());
-      $game->setAbbreviation($game->getIpdb());
+      $game->setIpdb($game->getIpdb());
+
+      $abbreviation = \PF\Utilities\GameUtil::generateAbbreviation($game);
+
+      $game->setAbbreviation($abbreviation);
     }
 
     try {
