@@ -1,6 +1,7 @@
 cache/
 config/
 routes/
+scrape/
 src/
 templates/
 util/
