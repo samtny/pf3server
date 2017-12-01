@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/src/scrape_import.php';
 
-define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap_');
+define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap');
 define('SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK', 10);
 define('SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK', 3);
 define('SCRAPE_PINBALLMAP_CONDITION_GREAT', '/great|perfect/i');
@@ -19,7 +19,7 @@ $dry_run = isset($options['dry-run']);
 
 $region_whitelist = array(
   'nyc',
-  'minnesota',
+  //'minnesota',
 );
 
 $pm_machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
@@ -59,7 +59,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
           $venue = new \PF\Venue();
 
-          $venue->setExternalKey(SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX . $pm_location['id']);
+          $venue->setExternalKey(SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX . '_' . $pm_region['name'] . '_' . $pm_location['id']);
           $venue->setName($pm_location['name']);
           $venue->setStreet($pm_location['street']);
           $venue->setCity($pm_location['city']);
@@ -76,7 +76,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
             $machine = new \PF\Machine();
 
-            $machine->setExternalKey(SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX . $pm_location_machine['id']);
+            $machine->setExternalKey(SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX .'_' . $pm_region['name'] .'_' . $pm_location_machine['id']);
 
             $pm_machine = $pm_machines_lookup[$pm_location_machine['machine_id']];
 
