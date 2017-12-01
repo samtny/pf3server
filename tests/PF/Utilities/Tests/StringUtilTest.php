@@ -11,7 +11,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
 
     $clean_name = StringUtil::cleanName($name);
 
-    $this->assertEquals('jack bar', $clean_name);
+    $this->assertEquals('jack', $clean_name);
   }
 
   public function testDmName() {
@@ -19,6 +19,6 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
 
     $dm_name = StringUtil::dmName($name);
 
-    $this->assertEquals('JK:AK PR', $dm_name);
+    $this->assertEquals('JK:AK', $dm_name);
   }
 }
