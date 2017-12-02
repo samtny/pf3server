@@ -3,6 +3,8 @@
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use Symfony\Component\Yaml\Parser;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 require_once "vendor/autoload.php";
 
@@ -10,14 +12,21 @@ class Bootstrap {
   private static $entityManager;
 
   private static $config;
+  private static $logger;
   private static $runmode;
 
   public static function go() {
     $parser = new Parser();
 
     $config = $parser->parse(file_get_contents(__DIR__ . '/config.yml'));
-
     self::$config = $config;
+
+    $logger = new Logger('pf3');
+
+    $logger->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder.log', Logger::DEBUG));
+    $logger->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder_error.log', Logger::ERROR));
+
+    self::$logger = $logger;
 
     self::$runmode = $config['pf3server_runmode'];
 
@@ -50,6 +59,13 @@ class Bootstrap {
     $config->addCustomDatetimeFunction('LAST_DAY', '\DoctrineExtensions\Query\Mysql\LastDay');
 
     self::$entityManager = EntityManager::create($conn, $config);
+  }
+
+  /**
+   * @return Logger
+   */
+  public static function getLogger() {
+    return static::$logger;
   }
 
   /**

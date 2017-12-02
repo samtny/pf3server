@@ -10,7 +10,8 @@
     "beberlei/DoctrineExtensions": "^1.0",
     "jms/serializer": "^1.1",
     "symfony/yaml": "^3.0",
-    "samtny/fastapns": "^1.0"
+    "samtny/fastapns": "^1.0",
+    "monolog/monolog": "^1.23"
   },
   "autoload": {
     "psr-4": {

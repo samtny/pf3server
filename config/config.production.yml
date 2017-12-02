@@ -5,6 +5,7 @@ pf3server_runmode: production
 pf3server_docroot: /usr/home/samtny/public_html/pinballfinder.org/pf3
 pf3server_ssl: /usr/home/samtny/certificates/pf3server
 pf3server_gamedict_path: /usr/home/samtny/public_html/pinballfinder.org/gamedict.txt
+pf3server_log_directory: /usr/home/samtny/pinfinder_logs/pf3
 
 pf3server_deploy_host: samtny.pairserver.com
 pf3server_deploy_user: samtny
