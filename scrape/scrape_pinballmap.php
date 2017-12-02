@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/src/scrape_import_venue.php';
 
 define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap');
@@ -8,6 +9,8 @@ define('SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK', 3);
 define('SCRAPE_PINBALLMAP_CONDITION_GREAT', '/great|perfect/i');
 define('SCRAPE_PINBALLMAP_CONDITION_BROKEN', '/broken|not working|out of order|turned off|^broke/i');
 define('SCRAPE_PINBALLMAP_TRUST_GAMES', true);
+
+$logger = Bootstrap::getLogger();
 
 $longopts = array(
   'dry-run',
