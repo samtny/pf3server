@@ -32,6 +32,8 @@ function _venue_lat_lon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
 function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
   $venue = NULL;
 
+  $logger = Bootstrap::getLogger();
+
   $request = new \PF\RequestProxy(array(
     'l' => 10,
     'n' => $scrape_venue->getLatitude() . ',' . $scrape_venue->getLongitude(),
@@ -43,10 +45,10 @@ function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
     foreach ($venues as $candidate_venue) {
       $distance = _venue_lat_lon_distance($scrape_venue->getLatitude(), $scrape_venue->getLongitude(), $candidate_venue->getLatitude(), $candidate_venue->getLongitude(), 'M');
 
-      echo 'Venue distance: ' . $distance . "\n";
+      $logger->debug('Venue distance: ' . $distance . "\n");
 
       if ($distance <= VENUE_FUZZY_LOOKUP_MAX_DISTANCE) {
-        echo 'Within range' . "\n";
+        $logger->debug('Within range' . "\n");
 
         $scrape_dm = $scrape_venue->getNameDm();
         $candidate_dm = $candidate_venue->getNameDm();
@@ -54,7 +56,7 @@ function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
         similar_text($scrape_dm, $candidate_dm, $percent);
 
         if ($percent > VENUE_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD) {
-          echo $scrape_dm . ' matches ' . $candidate_dm . "\n";
+          $logger->debug($scrape_dm . ' matches ' . $candidate_dm . "\n");
 
           $venue = $candidate_venue;
 
@@ -75,12 +77,13 @@ function scrape_venue_lookup($scrape_venue) {
   $venue = NULL;
 
   $entityManager = Bootstrap::getEntityManager();
+  $logger = Bootstrap::getLogger();
 
-  echo "Looking up venue by external key: " . $scrape_venue->getExternalKey() . "\n";
+  $logger->debug("Looking up venue by external key: " . $scrape_venue->getExternalKey() . "\n");
   $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('external_key' => $scrape_venue->getExternalKey()));
 
   if (empty($venue)) {
-    echo "Looking up venue by fuzzy" . "\n";
+    $logger->debug("Looking up venue by fuzzy" . "\n");
 
     $venue = scrape_venue_fuzzy_lookup($entityManager, $scrape_venue);
   }

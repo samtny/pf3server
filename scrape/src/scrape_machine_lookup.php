@@ -12,6 +12,8 @@ require_once __DIR__ . '/scrape_game_lookup.php';
 function scrape_machine_match_venue_game($scrape_machine, $venue) {
   $machine = NULL;
 
+  $logger = Bootstrap::getLogger();
+
   $scrape_machine_game_id = $scrape_machine->getGame()->getId();
   $scrape_machine_game_name = $scrape_machine->getGame()->getName();
 
@@ -20,13 +22,13 @@ function scrape_machine_match_venue_game($scrape_machine, $venue) {
     $venue_machine_game = $venue_machine->getGame();
 
     if (!empty($scrape_machine_game_id) && ($venue_machine_game->getId() == $scrape_machine_game_id)) {
-      echo "Matched machine by game id\n";
+      $logger->debug("Matched machine by game id\n");
       $machine = $venue_machine;
 
       break;
     }
     else if ($venue_machine_game->getName() == $scrape_machine_game_name) {
-      echo "Matched machine by game name\n";
+      $logger->debug("Matched machine by game name\n");
       $machine = $venue_machine;
 
       break;
@@ -46,8 +48,9 @@ function scrape_machine_lookup($scrape_machine, $venue) {
   $machine = NULL;
 
   $entityManager = Bootstrap::getEntityManager();
+  $logger = Bootstrap::getLogger();
 
-  echo "Looking up machine by external key: " . $scrape_machine->getExternalKey() . "\n";
+  $logger->debug("Looking up machine by external key: " . $scrape_machine->getExternalKey() . "\n");
   $machine = $entityManager->getRepository('\PF\Machine')->findOneBy(array('external_key' => $scrape_machine->getExternalKey()));
 
   if (empty($machine)) {

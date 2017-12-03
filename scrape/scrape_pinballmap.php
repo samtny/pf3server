@@ -3,6 +3,9 @@
 require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/src/scrape_import_venue.php';
 
+use \Monolog\Logger;
+use \Monolog\Handler\ErrorLogHandler;
+
 define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap');
 define('SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK', 10);
 define('SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK', 3);
@@ -10,54 +13,67 @@ define('SCRAPE_PINBALLMAP_CONDITION_GREAT', '/great|perfect/i');
 define('SCRAPE_PINBALLMAP_CONDITION_BROKEN', '/broken|not working|out of order|turned off|^broke/i');
 define('SCRAPE_PINBALLMAP_TRUST_GAMES', true);
 
-$logger = Bootstrap::getLogger();
+$opts = 'v';
 
 $longopts = array(
   'dry-run',
-  'force-region:',
+  'limit-region:',
   'auto-approve',
 );
 
-$options = getopt("", $longopts);
-
+$options = getopt($opts, $longopts);
+$verbose = isset($options['v']);
 $dry_run = isset($options['dry-run']);
-$force_region = !empty($options['force-region']) ? $options['force-region'] : NULL;
+$limit_region = !empty($options['limit-region']) ? $options['limit-region'] : NULL;
 $auto_approve = isset($options['auto-approve']);
 
-$region_whitelist = !empty($force_region) ? array($force_region) : array(
+$logger = Bootstrap::getLogger();
+$logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::WARNING));
+
+$region_whitelist = !empty($limit_region) ? array($limit_region) : array(
   //'nyc',
   //'minnesota',
   //'portland',
   //'toronto',
 );
 
-$pm_machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
-//file_put_contents(__DIR__ . '/machines.json', $machines_json);
-//$pm_machines_json = file_get_contents(__DIR__ . '/machines.json');
+$pm_regions = array();
 
-$data = json_decode($pm_machines_json, TRUE);
-$pm_machines = $data['machines'];
+if (empty($limit_region)) {
+  $pm_regions_json = file_get_contents('https://pinballmap.com/api/v1/regions.json');
+  //file_put_contents(__DIR__ . '/regions.json', $regions_json);
+  //$pm_regions_json = file_get_contents(__DIR__ . '/regions.json');
 
-$pm_machines_lookup = array();
-foreach ($pm_machines as $machine) {
-  $pm_machines_lookup[$machine['id']] = $machine;
+  $data = json_decode($pm_regions_json, TRUE);
+  $pm_regions = $data['regions'];
+} else {
+  $pm_regions = array(
+    array (
+      'name' => $limit_region,
+    ),
+  );
 }
 
-$pm_regions_json = file_get_contents('https://pinballmap.com/api/v1/regions.json');
-//file_put_contents(__DIR__ . '/regions.json', $regions_json);
-//$pm_regions_json = file_get_contents(__DIR__ . '/regions.json');
+if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty($limit_region)) {
+  $pm_machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
+  //file_put_contents(__DIR__ . '/machines.json', $machines_json);
+  //$pm_machines_json = file_get_contents(__DIR__ . '/machines.json');
 
-$data = json_decode($pm_regions_json, TRUE);
-$pm_regions = $data['regions'];
+  $data = json_decode($pm_machines_json, TRUE);
+  $pm_machines = $data['machines'];
 
-if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
+  $pm_machines_lookup = array();
+  foreach ($pm_machines as $machine) {
+    $pm_machines_lookup[$machine['id']] = $machine;
+  }
+
   foreach ($pm_regions as $pm_region) {
-    echo 'Parsing region: ' . $pm_region['name'] . "\n";
+    $logger->debug('Parsing region: ' . $pm_region['name'] . "\n");
 
     if (in_array($pm_region['name'], $region_whitelist)) {
       $pm_locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json');
       if ($pm_locations_json === FALSE) {
-        echo 'WARNING: error getting region \'' . $pm_region['name'] . '\' locations: ' . error_get_last()['message'] . "\n";
+        $logger->warning('Error getting region \'' . $pm_region['name'] . '\' locations: ' . error_get_last()['message'] . "\n");
       }
       //file_put_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json', $pm_locations_json);
       //$pm_locations_json = file_get_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json');
@@ -67,7 +83,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
 
       if (count($pm_locations) >= SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK) {
         foreach ($pm_locations as $pm_location) {
-          echo 'Parsing location: ' . $pm_location['name'] . "\n";
+          $logger->debug('Parsing location: ' . $pm_location['name'] . "\n");
 
           $venue = new \PF\Venue();
 
@@ -84,7 +100,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
           $venue->setCreated(new DateTime($pm_location['created_at']));
 
           foreach ($pm_location['location_machine_xrefs'] as $pm_location_machine) {
-            echo 'Parsing machine: ' . $pm_location_machine['machine_id'] . "\n";
+            $logger->debug('Parsing machine: ' . $pm_location_machine['machine_id'] . "\n");
 
             $machine = new \PF\Machine();
 
@@ -99,7 +115,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
             preg_match('/ipdb.org.*id=(\d*)/', $pm_machine['ipdb_link'], $matches);
 
             if (count($matches) === 2) {
-              echo 'Found ipdb: ' . $matches[1]. "\n";
+              $logger->debug('Found ipdb: ' . $matches[1]. "\n");
 
               $game->setIpdb($matches[1]);
             }
@@ -121,7 +137,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK) {
         }
       }
       else {
-        echo "WARNING: location count for region '" . $pm_region['name'] . "' does not pass sanity check!\n";
+        $logger->warning("Location count for region '" . $pm_region['name'] . "' does not pass sanity check!\n");
       }
     }
   }

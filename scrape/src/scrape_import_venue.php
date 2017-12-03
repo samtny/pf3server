@@ -71,16 +71,17 @@ function scrape_import_merge_properties($scrape_venue, $venue) {
  */
 function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $dry_run = FALSE) {
   $entityManager = Bootstrap::getEntityManager();
+  $logger = Bootstrap::getLogger();
 
   if (scrape_venue_validate($scrape_venue)) {
-    echo "Scrape passes validation" . "\n";
+    $logger->debug("Scrape passes validation" . "\n");
 
     $venue = scrape_venue_lookup($scrape_venue);
 
     if (!empty($venue)) {
-      echo "Found matching venue: " . $venue->getId() . "\n";
+      $logger->debug("Found matching venue: " . $venue->getId() . "\n");
     } else {
-      echo "Creating new venue\n";
+      $logger->debug("Creating new venue\n");
 
       $venue = new \PF\Venue(TRUE);
     }
@@ -106,9 +107,9 @@ function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $dry_ru
 
       scrape_prune_machines($scrape_venue, $venue, $dry_run);
     } else {
-      echo "Declining to merge less fresh venue\n";
+      $logger->debug("Declining to merge less fresh venue\n");
     }
   } else {
-    echo "Scrape does not pass validation" . "\n";
+    $logger->warning("Scrape does not pass validation" . "\n", array('scrape_venue' => $scrape_venue));
   }
 }

@@ -16,6 +16,8 @@ function _game_shortest_name_sort($a, $b) {
 function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
   $game = NULL;
 
+  $logger = Bootstrap::getLogger();
+
   $scrape_name = $scrape_game->getName();
 
   $request = new \PF\RequestProxy(array(
@@ -39,7 +41,7 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
         similar_text($scrape_dm, $candidate_dm, $percent);
 
         if ($percent > GAME_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD) {
-          echo 'Game dm: ' . $scrape_dm . ' matches candidate dm: ' . $candidate_dm . "\n";
+          $logger->debug('Game dm: ' . $scrape_dm . ' matches candidate dm: ' . $candidate_dm . "\n");
 
           $game = $candidate_game;
 
@@ -51,7 +53,7 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
         similar_text($scrape_name, $candidate_name, $percent);
 
         if ($percent > GAME_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD) {
-          echo 'Game name: ' . $scrape_game->getName() . ' matches candidate name: ' . $candidate_game->getName() . "\n";
+          $logger->debug('Game name: ' . $scrape_game->getName() . ' matches candidate name: ' . $candidate_game->getName() . "\n");
 
           $game = $candidate_game;
 
@@ -61,10 +63,10 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
     }
 
     if (empty($game)) {
-      echo "WARNING: game matches no candidates: " . $scrape_game->getName() . "\n";
+      $logger->warning("Game matches no candidates: " . $scrape_game->getName() . "\n");
     }
   } else {
-    echo "WARNING: no candidates for game: " . $scrape_game->getName() . "\n";
+    $logger->warning("No candidates for game: " . $scrape_game->getName() . "\n");
   }
 
   return $game;
@@ -78,6 +80,8 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
 function scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game) {
   $game = NULL;
 
+  $logger = Bootstrap::getLogger();
+
   static $game_fuzzy_lookup_cache = array();
 
   $scrape_name = $scrape_game->getName();
@@ -86,14 +90,14 @@ function scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game) {
   $scrape_cache_key_md5 = md5($scrape_cache_key);
 
   if (key_exists($scrape_cache_key_md5, $game_fuzzy_lookup_cache)) {
-    echo "Game cache lookup hit\n";
+    $logger->debug("Game cache lookup hit\n");
     $id = $game_fuzzy_lookup_cache[$scrape_cache_key_md5];
 
     if (!empty($id)) {
       $game = $entityManager->getRepository('\PF\Game')->find($id);
     }
   } else {
-    echo "Game cache lookup miss\n";
+    $logger->debug("Game cache lookup miss\n");
     $game = scrape_game_fuzzy_lookup($entityManager, $scrape_game);
 
     $game_fuzzy_lookup_cache[$scrape_cache_key_md5] = !empty($game) ? $game->getId() : NULL;
@@ -106,30 +110,31 @@ function scrape_game_lookup($scrape_game) {
   $game = NULL;
 
   $entityManager = Bootstrap::getEntityManager();
+  $logger = Bootstrap::getLogger();
 
   if (!empty($scrape_game->getIpdb())) {
-    echo "Looking up game by ipdb: " . $scrape_game->getIpdb() . "\n";
+    $logger->debug("Looking up game by ipdb: " . $scrape_game->getIpdb() . "\n");
 
     $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $scrape_game->getIpdb()));
 
     if (!empty($game)) {
-      echo "Found game by ipdb: " . $game->getName() . "\n";
+      $logger->debug("Found game by ipdb: " . $game->getName() . "\n");
     }
     else {
-      echo "WARNING: Game not found by ipdb: " . $scrape_game->getIpdb() . "\n";
+      $logger->warning("Game not found by ipdb: " . $scrape_game->getIpdb() . "\n");
     }
   }
 
   if (empty($game)) {
-    echo "Looking up game by fuzzy: " . $scrape_game->getName() . "\n";
+    $logger->debug("Looking up game by fuzzy: " . $scrape_game->getName() . "\n");
 
     $game = scrape_game_fuzzy_lookup($entityManager, $scrape_game);
 
     if (!empty($game)) {
-      echo "Found game by fuzzy: " . $game->getName() . "\n";
+      $logger->debug("Found game by fuzzy: " . $game->getName() . "\n");
     }
     else {
-      echo "WARNING: Game not found by fuzzy: " . $scrape_game->getName() . "\n";
+      $logger->warning("Game not found by fuzzy: " . $scrape_game->getName() . "\n");
     }
   }
 

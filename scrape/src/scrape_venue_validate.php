@@ -28,15 +28,17 @@ function scrape_venue_validate_fresher($scrape_venue, $venue) {
 function scrape_venue_validate($scrape_venue) {
   $is_valid = TRUE;
 
+  $logger = Bootstrap::getLogger();
+
   static $min_updated;
 
   if (empty($min_updated)) {
     $min_updated = new DateTime(VENUE_MIN_UPDATED);
 
-    echo "Min updated: " . $min_updated->format('c') . "\n";
+    $logger->debug("Min updated: " . $min_updated->format('c') . "\n");
   }
 
-  echo "Scrape updated compare: " . date_diff($scrape_venue->getUpdated(), $min_updated)->format('%a') . "\n";
+  $logger->debug("Scrape updated compare: " . date_diff($scrape_venue->getUpdated(), $min_updated)->format('%a') . "\n");
 
   ($scrape_venue->getUpdated() >= $min_updated) || $is_valid = FALSE;
 

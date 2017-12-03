@@ -42,6 +42,15 @@ class Venue {
     $this->status = 'NEW';
   }
 
+  public function __toString() {
+    $string = $this->name ? $this->name : 'NONAME';
+    $string .= $this->id ? ' - ' . $this->id : '';
+
+    $string .= $this->external_key ? ' - (' . $this->external_key . ')' : '';
+
+    return $string;
+  }
+
   public function getId()
   {
     return $this->id;
