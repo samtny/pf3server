@@ -11,7 +11,7 @@ $app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager
     )));
 
     $unapproved_venues = venue_route_search($entityManager, new RequestProxy(array(
-      'l' => 10,
+      'l' => 1000,
       's' => 'NEW',
     )));
 
