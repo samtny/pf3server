@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use PF\Geocode;
 
 class GeocodeRepository extends EntityRepository {
-  private $base_url = "http://maps.googleapis.com/maps/api/geocode/xml?sensor=false";
+  private $base_url = "https://maps.googleapis.com/maps/api/geocode/xml?sensor=false&key=AIzaSyCdr9a-3eLJDMD-jHlGL_nxCXPC2wte2w4";
 
   private $tooSmall = array(
     "street_address",
