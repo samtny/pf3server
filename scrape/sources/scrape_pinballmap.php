@@ -66,6 +66,8 @@ if (empty($limit_region)) {
   );
 }
 
+$imported = 0;
+
 if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty($limit_region)) {
   $logger->info('Retrieving machines json');
 
@@ -145,7 +147,11 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
 
             $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
-            scrape_import_venue($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $auto_approve, $soft_approve, $tidy, $dry_run);
+            $scrape_import_venue_result = scrape_import_venue($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $auto_approve, $soft_approve, $tidy, $dry_run);
+
+            if ($scrape_import_venue_result) {
+              $imported++;
+            }
 
             $venue = NULL;
           }
@@ -173,6 +179,8 @@ function pinballmap_condition_string_to_condition($pm_condition) {
 
   return $condition;
 }
+
+$logger->info('New / updated venue count: ' . $imported);
 
 $time_end = microtime(true);
 
