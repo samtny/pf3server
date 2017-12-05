@@ -3,8 +3,10 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/scrape_request.php';
 
+use \PF\Utilities\StringUtil;
+
 define('VENUE_FUZZY_LOOKUP_MAX_DISTANCE', 0.25);
-define('VENUE_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD', 80);
+define('VENUE_FUZZY_LOOKUP_NAME_MATCH_THRESHOLD', 80);
 
 function _venue_lat_lon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
 
@@ -50,13 +52,8 @@ function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
       if ($distance <= VENUE_FUZZY_LOOKUP_MAX_DISTANCE) {
         $logger->debug('Within range' . "\n");
 
-        $scrape_dm = $scrape_venue->getNameDm();
-        $candidate_dm = $candidate_venue->getNameDm();
-
-        similar_text($scrape_dm, $candidate_dm, $percent);
-
-        if ($percent > VENUE_FUZZY_LOOKUP_STRING_MATCH_THRESHOLD) {
-          $logger->debug($scrape_dm . ' matches ' . $candidate_dm . "\n");
+        if (StringUtil::namesAreSimilar($scrape_venue->getName(), $candidate_venue->getName(), VENUE_FUZZY_LOOKUP_NAME_MATCH_THRESHOLD)) {
+          $logger->debug($scrape_venue->getName() . ' matches ' . $candidate_venue->getName() . "\n");
 
           $venue = $candidate_venue;
 
