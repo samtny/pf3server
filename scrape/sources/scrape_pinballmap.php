@@ -34,7 +34,7 @@ $tidy = isset($options['tidy']);
 $logger = Bootstrap::getLogger();
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
 
-$region_whitelist = !empty($limit_region) ? array($limit_region) : array(
+$region_blacklist = array(
   //'nyc',
   //'minnesota',
   //'portland',
@@ -77,7 +77,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
   }
 
   foreach ($pm_regions as $pm_region) {
-    if (in_array($pm_region['name'], $region_whitelist)) {
+    if (!in_array($pm_region['name'], $region_blacklist)) {
       $logger->info('Parsing region: ' . $pm_region['name']);
 
       $pm_locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json');
@@ -150,6 +150,8 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
       else {
         $logger->warning('Error getting region \'' . $pm_region['name'] . '\' locations: ' . error_get_last()['message']);
       }
+    } else {
+      $logger->info('Skipping blacklisted region \'' . $pm_region['name'] . '\'');
     }
   }
 } else {
