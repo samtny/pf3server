@@ -2,8 +2,6 @@
 
 namespace PF\Utilities;
 
-use PF\Utilities\DoubleMetaPhone;
-
 class StringUtil {
   public static function cleanName($name) {
     $clean = $name;
@@ -105,5 +103,20 @@ class StringUtil {
     }
 
     return $abbr;
+  }
+
+  public static function namesAreSimilar($nameA, $nameB, $threshold = 80) {
+    $similar = FALSE;
+
+    $dmA = self::dmName($nameA);
+    $dmB = self::dmName($nameB);
+
+    similar_text($dmA, $dmB, $percent);
+
+    if ($percent > $threshold) {
+      $similar = TRUE;
+    }
+
+    return $similar;
   }
 }
