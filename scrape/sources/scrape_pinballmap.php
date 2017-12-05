@@ -5,6 +5,7 @@ require_once __DIR__ . '/../src/scrape_import_venue.php';
 
 use \Monolog\Logger;
 use \Monolog\Handler\ErrorLogHandler;
+use \PF\Utilities\HttpUtil;
 
 define('SCRAPE_PINBALLMAP_EXTERNAL_KEY_PREFIX', 'pinballmap');
 define('SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK', 10);
@@ -12,6 +13,8 @@ define('SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK', 3);
 define('SCRAPE_PINBALLMAP_CONDITION_GREAT', '/great|perfect/i');
 define('SCRAPE_PINBALLMAP_CONDITION_BROKEN', '/broken|not working|out of order|turned off|^broke/i');
 define('SCRAPE_PINBALLMAP_TRUST_GAMES', true);
+define('SCRAPE_PINBALLMAP_RETRIES_REQUEST', 2);
+define('SCRAPE_PINBALLMAP_SLEEP_REQUEST', 2);
 
 $opts = 'v';
 
@@ -46,7 +49,7 @@ $pm_regions = array();
 if (empty($limit_region)) {
   $logger->info('Retrieving region json');
 
-  $pm_regions_json = file_get_contents('https://pinballmap.com/api/v1/regions.json');
+  $pm_regions_json = HttpUtil::fileGetContentsRetry('https://pinballmap.com/api/v1/regions.json', SCRAPE_PINBALLMAP_RETRIES_REQUEST, SCRAPE_PINBALLMAP_SLEEP_REQUEST);
   //file_put_contents(__DIR__ . '/regions.json', $regions_json);
   //$pm_regions_json = file_get_contents(__DIR__ . '/regions.json');
 
@@ -64,7 +67,7 @@ if (empty($limit_region)) {
 if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty($limit_region)) {
   $logger->info('Retrieving machines json');
 
-  $pm_machines_json = file_get_contents('https://pinballmap.com/api/v1/machines.json');
+  $pm_machines_json = HttpUtil::fileGetContentsRetry('https://pinballmap.com/api/v1/machines.json', SCRAPE_PINBALLMAP_RETRIES_REQUEST, SCRAPE_PINBALLMAP_SLEEP_REQUEST);
   //file_put_contents(__DIR__ . '/machines.json', $machines_json);
   //$pm_machines_json = file_get_contents(__DIR__ . '/machines.json');
 
@@ -80,7 +83,9 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
     if (!in_array($pm_region['name'], $region_blacklist)) {
       $logger->info('Parsing region: ' . $pm_region['name']);
 
-      $pm_locations_json = file_get_contents('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json');
+      sleep(SCRAPE_PINBALLMAP_SLEEP_REQUEST);
+
+      $pm_locations_json = HttpUtil::fileGetContentsRetry('https://pinballmap.com/api/v1/region/' . $pm_region['name'] . '/locations.json', SCRAPE_PINBALLMAP_RETRIES_REQUEST, SCRAPE_PINBALLMAP_SLEEP_REQUEST);
       //file_put_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json', $pm_locations_json);
       //$pm_locations_json = file_get_contents(__DIR__ . '/region_' . $pm_region['name'] . '.json');
 
