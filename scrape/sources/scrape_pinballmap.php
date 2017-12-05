@@ -20,6 +20,7 @@ $longopts = array(
   'limit-region:',
   'auto-approve',
   'soft-approve',
+  'tidy',
 );
 
 $options = getopt($opts, $longopts);
@@ -28,6 +29,7 @@ $dry_run = isset($options['dry-run']);
 $limit_region = !empty($options['limit-region']) ? $options['limit-region'] : NULL;
 $auto_approve = isset($options['auto-approve']);
 $soft_approve = isset($options['soft-approve']);
+$tidy = isset($options['tidy']);
 
 $logger = Bootstrap::getLogger();
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
@@ -136,7 +138,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
 
             $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
-            scrape_import_venue($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $auto_approve, $soft_approve, $dry_run);
+            scrape_import_venue($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $auto_approve, $soft_approve, $tidy, $dry_run);
 
             $venue = NULL;
           }

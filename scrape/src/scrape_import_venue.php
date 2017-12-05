@@ -6,6 +6,7 @@ require_once __DIR__ . '/scrape_venue_validate.php';
 require_once __DIR__ . '/scrape_import_games.php';
 require_once __DIR__ . '/scrape_import_machines.php';
 require_once __DIR__ . '/scrape_prune_machines.php';
+require_once __DIR__ . '/scrape_tidy_venue.php';
 
 /**
  * @param $scrape_venue \PF\Venue
@@ -67,9 +68,11 @@ function scrape_import_merge_properties($scrape_venue, $venue) {
  * @param $scrape_venue \PF\Venue
  * @param bool $trust_games
  * @param bool $auto_approve
+ * @param bool $soft_approve
+ * @param bool $tidy
  * @param bool $dry_run
  */
-function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $soft_approve, $dry_run = FALSE) {
+function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve = FALSE, $soft_approve = FALSE, $tidy = FALSE, $dry_run = FALSE) {
   $entityManager = Bootstrap::getEntityManager();
   $logger = Bootstrap::getLogger();
 
@@ -88,6 +91,10 @@ function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $soft_a
 
     if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
       $venue = scrape_import_merge_properties($scrape_venue, $venue);
+
+      if ($tidy) {
+        $venue = scrape_tidy_venue($venue);
+      }
 
       if ($auto_approve) {
         $venue->approve(TRUE);
