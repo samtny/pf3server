@@ -24,6 +24,7 @@ $longopts = array(
   'auto-approve',
   'soft-approve',
   'tidy',
+  'resume-region:',
 );
 
 $options = getopt($opts, $longopts);
@@ -33,6 +34,7 @@ $limit_region = !empty($options['limit-region']) ? $options['limit-region'] : NU
 $auto_approve = isset($options['auto-approve']);
 $soft_approve = isset($options['soft-approve']);
 $tidy = isset($options['tidy']);
+$resume_region = !empty($options['resume-region']) ? $options['resume-region'] : NULL;
 
 $logger = Bootstrap::getLogger();
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
@@ -68,6 +70,8 @@ if (empty($limit_region)) {
 
 $imported = 0;
 
+$skip_regions = empty($resume_region) ? FALSE : TRUE;
+
 if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty($limit_region)) {
   $logger->info('Retrieving machines json');
 
@@ -84,7 +88,11 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
   }
 
   foreach ($pm_regions as $pm_region) {
-    if (!in_array($pm_region['name'], $region_blacklist)) {
+    if (!empty($resume_region) && $pm_region['name'] == $resume_region) {
+       $skip_regions = FALSE;
+    }
+
+    if (!in_array($pm_region['name'], $region_blacklist) && $skip_regions == FALSE) {
       $logger->info('Parsing region: ' . $pm_region['name']);
 
       sleep(SCRAPE_PINBALLMAP_SLEEP_REQUEST);
