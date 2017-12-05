@@ -69,7 +69,7 @@ function scrape_import_merge_properties($scrape_venue, $venue) {
  * @param bool $auto_approve
  * @param bool $dry_run
  */
-function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $dry_run = FALSE) {
+function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $soft_approve, $dry_run = FALSE) {
   $entityManager = Bootstrap::getEntityManager();
   $logger = Bootstrap::getLogger();
 
@@ -91,6 +91,10 @@ function scrape_import_venue($scrape_venue, $trust_games, $auto_approve, $dry_ru
 
       if ($auto_approve) {
         $venue->approve(TRUE);
+      } else if ($soft_approve) {
+        if (scrape_venue_validate_complete($venue)) {
+          $venue->approve(TRUE);
+        }
       }
 
       if (!$dry_run) {

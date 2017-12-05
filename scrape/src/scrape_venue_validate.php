@@ -46,3 +46,22 @@ function scrape_venue_validate($scrape_venue) {
 
   return $is_valid;
 }
+
+/**
+ * @param $venue \PF\Venue
+ *
+ * @return bool
+ */
+function scrape_venue_validate_complete($venue) {
+  $complete = TRUE;
+
+  if (empty($venue->getName()) || empty($venue->getStreet())) {
+    $complete = FALSE;
+  }
+
+  if (empty($venue->getPhone()) && empty($venue->getUrl())) {
+    $complete = FALSE;
+  }
+
+  return $complete;
+}
