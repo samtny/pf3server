@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/scrape_machine_lookup.php';
 
+define('SCRAPE_IMPORT_MACHINE_DEFAULT_PRICE', '1.00');
+
 /**
  * @param $scrape_venue \PF\Venue
  * @param $venue \PF\Venue
@@ -36,6 +38,8 @@ function scrape_import_machines($scrape_venue, $venue, $dry_run = FALSE) {
 
       if (!empty($scrape_machine->getPrice())) {
         $machine->setPrice($scrape_machine->getPrice());
+      } else {
+        $machine->setPrice(SCRAPE_IMPORT_MACHINE_DEFAULT_PRICE);
       }
 
       $machine->activate();
