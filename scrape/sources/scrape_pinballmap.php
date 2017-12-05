@@ -37,6 +37,8 @@ $tidy = isset($options['tidy']);
 $logger = Bootstrap::getLogger();
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
 
+$time_start = microtime(true);
+
 $region_blacklist = array(
   //'nyc',
   //'minnesota',
@@ -171,3 +173,9 @@ function pinballmap_condition_string_to_condition($pm_condition) {
 
   return $condition;
 }
+
+$time_end = microtime(true);
+
+$execution_time = ($time_end - $time_start);
+
+$logger->info('Execution time: '. $execution_time .' seconds.');
