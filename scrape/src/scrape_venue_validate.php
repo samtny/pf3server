@@ -1,8 +1,12 @@
 <?php
 
 require_once __DIR__ . '/../../bootstrap.php';
+require_once __DIR__ . '/scrape_util.php';
+
+use \PF\Utilities\StringUtil;
 
 define('VENUE_MIN_UPDATED', '-2 years');
+define('VENUE_VALIDATE_NO_CONFLICT_MIN_DISTANCE', 0.10);
 
 /**
  * @param $scrape_venue \PF\Venue
@@ -64,4 +68,52 @@ function scrape_venue_validate_complete($venue) {
   }
 
   return $complete;
+}
+
+/**
+ * @param $venue \PF\Venue
+ * @return bool
+ */
+function scrape_venue_validate_no_conflict($venue) {
+  $no_conflict = TRUE;
+
+  $entityManager = Bootstrap::getEntityManager();
+  $logger = Bootstrap::getLogger();
+
+  if (!empty($venue->getLatitude()) && !empty($venue->getLongitude())) {
+    $request = new \PF\RequestProxy(array(
+      'l' => 1,
+      'n' => $venue->getLatitude() . ',' . $venue->getLongitude(),
+    ));
+
+    $venues = venue_request($entityManager, $request);
+
+    if (!empty($venues)) {
+      foreach ($venues as $candidate_venue) {
+        $distance = _venue_lat_lon_distance($venue->getLatitude(), $venue->getLongitude(), $candidate_venue->getLatitude(), $candidate_venue->getLongitude(), 'M');
+
+        $logger->debug('Venue distance: ' . $distance . "\n");
+
+        if ($distance <= VENUE_VALIDATE_NO_CONFLICT_MIN_DISTANCE) {
+
+          if (empty($venue->getId()) || $venue->getId() != $candidate_venue->getId()) {
+            $logger->debug('Too close' . "\n");
+
+            $no_conflict = FALSE;
+
+            break;
+          } else if (!empty($venue->getExternalKey()) && empty($candidate_venue->getExternalKey())) {
+            $logger->debug('Too close' . "\n");
+
+            $no_conflict = FALSE;
+
+            break;
+          }
+
+        }
+      }
+    }
+  }
+
+  return $no_conflict;
 }

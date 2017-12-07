@@ -2,29 +2,12 @@
 
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/scrape_request.php';
+require_once __DIR__ . '/scrape_util.php';
 
 use \PF\Utilities\StringUtil;
 
 define('VENUE_FUZZY_LOOKUP_MAX_DISTANCE', 0.25);
 define('VENUE_FUZZY_LOOKUP_NAME_MATCH_THRESHOLD', 80);
-
-function _venue_lat_lon_distance($lat1, $lon1, $lat2, $lon2, $unit = 'M') {
-
-  $theta = $lon1 - $lon2;
-  $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-  $dist = acos($dist);
-  $dist = rad2deg($dist);
-  $miles = $dist * 60 * 1.1515;
-  $unit = strtoupper($unit);
-
-  if ($unit == "K") {
-    return ($miles * 1.609344);
-  } else if ($unit == "N") {
-    return ($miles * 0.8684);
-  } else {
-    return $miles;
-  }
-}
 
 /**
  * @param $entityManager

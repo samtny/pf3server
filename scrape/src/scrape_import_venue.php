@@ -106,21 +106,25 @@ function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve 
         }
       }
 
-      if (!$dry_run) {
-        $entityManager->persist($venue);
+      if (scrape_venue_validate_no_conflict($venue)) {
+        if (!$dry_run) {
+          $entityManager->persist($venue);
 
-        $entityManager->flush();
+          $entityManager->flush();
+        }
+
+        if ($trust_games) {
+          scrape_import_games($scrape_venue, $dry_run);
+        }
+
+        scrape_import_machines($scrape_venue, $venue, $dry_run);
+
+        scrape_prune_machines($scrape_venue, $venue, $dry_run);
+
+        $imported = TRUE;
+      } else {
+        $logger->warning("Declining to import conflicting venue\n");
       }
-
-      if ($trust_games) {
-        scrape_import_games($scrape_venue, $dry_run);
-      }
-
-      scrape_import_machines($scrape_venue, $venue, $dry_run);
-
-      scrape_prune_machines($scrape_venue, $venue, $dry_run);
-
-      $imported = TRUE;
     } else {
       $logger->debug("Declining to merge less fresh venue\n");
     }
