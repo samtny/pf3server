@@ -20,17 +20,38 @@ function scrape_tidy_venue_merge_place($venue, $placeDetail) {
   if (!empty($placeDetail['address_components'])) {
     $streetNumber = NULL;
     $route = NULL;
+    $zipcode = NULL;
+    $city = NULL;
+    $state = NULL;
 
     foreach ($placeDetail['address_components'] as $address_component) {
       if (in_array('street_number', $address_component['types'])) {
         $streetNumber = $address_component['short_name'];
       } else if (in_array('route', $address_component['types'])) {
         $route = $address_component['short_name'];
+      } else if (in_array('postal_code', $address_component['types'])) {
+        $zipcode = $address_component['short_name'];
+      } else if (in_array('locality', $address_component['types'])) {
+        $city = $address_component['short_name'];
+      } else if (in_array('administrative_area_level_1', $address_component['types'])) {
+        $state = $address_component['short_name'];
       }
     }
 
     if (!empty($streetNumber) && !empty($route)) {
       $venue->setStreet($streetNumber . ' ' . $route);
+    }
+
+    if (!empty($city)) {
+      $venue->setCity($city);
+    }
+
+    if (!empty($state)) {
+      $venue->setState($state);
+    }
+
+    if (!empty($zipcode)) {
+      $venue->setZipcode($zipcode);
     }
   }
 
