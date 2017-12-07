@@ -17,8 +17,12 @@ function scrape_prune_machine_exists($machine, $scrape_machines) {
      */
     if ($scrape_machine->getIpdb() == $machine->getIpdb()) {
       $exists = TRUE;
-    } else if ($scrape_machine->getName() == $machine->getName()) {
-      $exists = TRUE;
+    } else if (!empty($scrape_machine->getGame()) && !empty($machine->getGame())) {
+      if ($scrape_machine->getName() == $machine->getName()) {
+        $exists = TRUE;
+      } else if ($scrape_machine->getGame()->getNameDm() == $machine->getGame()->getNameDm()) {
+        $exists = TRUE;
+      }
     }
 
     if ($exists) {
