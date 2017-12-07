@@ -3,11 +3,21 @@
 require_once __DIR__ . '/../../bootstrap.php';
 require_once __DIR__ . '/scrape_machine_lookup.php';
 
+/**
+ * @param $machine \PF\Machine
+ * @param $scrape_machines \Doctrine\Common\Collections\ArrayCollection
+ * @return bool
+ */
 function scrape_prune_machine_exists($machine, $scrape_machines) {
   $exists = FALSE;
 
   foreach ($scrape_machines as $scrape_machine) {
+    /**
+     * @var $scrape_machine \PF\Machine
+     */
     if ($scrape_machine->getIpdb() == $machine->getIpdb()) {
+      $exists = TRUE;
+    } else if ($scrape_machine->getName() == $machine->getName()) {
       $exists = TRUE;
     }
 
