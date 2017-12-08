@@ -75,7 +75,7 @@ while ($iterated < $limit) {
 
       if (!empty($ps_locations)) {
         foreach ($ps_locations as $ps_location) {
-          $logger->info('Parsing location: ' . $ps_location['location_name']);
+          $logger->debug('Parsing location: ' . $ps_location['location_name']);
 
           $venue = new \PF\Venue();
 

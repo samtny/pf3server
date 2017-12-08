@@ -107,7 +107,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
 
         if (count($pm_locations) >= SCRAPE_PINBALLMAP_REGION_LOCATION_COUNT_SANITY_CHECK) {
           foreach ($pm_locations as $pm_location) {
-            $logger->info('Parsing location: ' . $pm_location['name']);
+            $logger->debug('Parsing location: ' . $pm_location['name']);
 
             $venue = new \PF\Venue();
 

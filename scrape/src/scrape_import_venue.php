@@ -8,6 +8,8 @@ require_once __DIR__ . '/scrape_import_machines.php';
 require_once __DIR__ . '/scrape_prune_machines.php';
 require_once __DIR__ . '/scrape_tidy_venue.php';
 
+use \PF\Venue;
+
 /**
  * @param $scrape_venue \PF\Venue
  * @param $venue \PF\Venue
@@ -66,70 +68,135 @@ function scrape_import_merge_properties($scrape_venue, $venue) {
 
 /**
  * @param $scrape_venue \PF\Venue
+ * @param $venue \PF\Venue
  * @param bool $trust_games
- * @param bool $auto_approve
- * @param bool $soft_approve
  * @param bool $tidy
  * @param bool $dry_run
+ * @return bool
  */
-function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve = FALSE, $soft_approve = FALSE, $tidy = FALSE, $dry_run = FALSE) {
+function scrape_import_update_venue($scrape_venue, $venue, $trust_games = FALSE, $tidy = FALSE, $dry_run = FALSE) {
   $imported = FALSE;
 
   $entityManager = Bootstrap::getEntityManager();
   $logger = Bootstrap::getLogger();
 
-  if (scrape_venue_validate($scrape_venue)) {
-    $logger->debug("Scrape passes validation" . "\n");
+  if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
+    $logger->info("Updating existing venue", array('name' => $venue->getName()));
+
+    if ($tidy) {
+      $scrape_venue = scrape_tidy_venue($scrape_venue);
+    }
+
+    $venue = scrape_import_merge_properties($scrape_venue, $venue);
+
+    if (!$dry_run) {
+      $entityManager->persist($venue);
+
+      $entityManager->flush();
+    }
+
+    if ($trust_games) {
+      scrape_import_games($scrape_venue, $dry_run);
+    }
+
+    scrape_import_machines($scrape_venue, $venue, $dry_run);
+
+    scrape_prune_machines($scrape_venue, $venue, $dry_run);
+
+    $imported = TRUE;
+  } else {
+    $logger->info("Declining to merge less fresh venue", array('name' => $scrape_venue->getName()));
+  }
+
+  return $imported;
+}
+
+/**
+ * @param $scrape_venue \PF\Venue
+ * @param bool $trust_games
+ * @param bool $auto_approve
+ * @param bool $soft_approve
+ * @param bool $tidy
+ * @param bool $dry_run
+ * @return bool
+ */
+function scrape_import_new_venue($scrape_venue, $trust_games = FALSE, $auto_approve = FALSE, $soft_approve = FALSE, $tidy = FALSE, $dry_run = FALSE) {
+  $imported = FALSE;
+
+  $entityManager = Bootstrap::getEntityManager();
+  $logger = Bootstrap::getLogger();
+
+  if ($tidy) {
+    $scrape_venue = scrape_tidy_venue($scrape_venue);
+  }
+
+  $venue = scrape_import_merge_properties($scrape_venue, new Venue(TRUE));
+
+  if ($auto_approve) {
+    $venue->approve(TRUE);
+  }
+  else if ($soft_approve && scrape_venue_validate_complete($venue)) {
+    $venue->approve(TRUE);
+  }
+
+  if (scrape_venue_validate_no_conflict($venue)) {
+    $logger->info("Importing new venue", array('name' => $venue->getName()));
+
+    if (!$dry_run) {
+      $entityManager->persist($venue);
+
+      $entityManager->flush();
+    }
+
+    if ($trust_games) {
+      scrape_import_games($scrape_venue, $dry_run);
+    }
+
+    scrape_import_machines($scrape_venue, $venue, $dry_run);
+
+    $imported = TRUE;
+  }
+  else {
+    $logger->warning("Declining to import conflicting venue\n");
+  }
+
+  return $imported;
+}
+
+/**
+ * @param $scrape_venue \PF\Venue
+ * @param bool $trust_games
+ * @param bool $auto_approve
+ * @param bool $soft_approve
+ * @param bool $tidy
+ * @param bool $dry_run
+ * @return bool
+ */
+function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve = FALSE, $soft_approve = FALSE, $tidy = FALSE, $dry_run = FALSE) {
+  $imported = FALSE;
+
+  $logger = Bootstrap::getLogger();
+
+  if (scrape_venue_validate_is_fresh($scrape_venue)) {
+    $logger->debug("Venue is fresh");
 
     $venue = scrape_venue_lookup($scrape_venue);
 
     if (!empty($venue)) {
-      $logger->debug("Found matching venue: " . $venue->getId() . "\n");
+      $logger->debug("Found matching venue: " . $venue->getId());
+
+      $imported = scrape_import_update_venue($scrape_venue, $venue, $trust_games, $tidy, $dry_run);
     } else {
-      $logger->debug("Creating new venue\n");
+      if (scrape_venue_validate_has_games($scrape_venue)) {
+        $logger->debug("Did not find matching venue");
 
-      $venue = new \PF\Venue(TRUE);
-    }
-
-    if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
-      $venue = scrape_import_merge_properties($scrape_venue, $venue);
-
-      if ($tidy) {
-        $venue = scrape_tidy_venue($venue);
-      }
-
-      if ($auto_approve) {
-        $venue->approve(TRUE);
-      } else if ($soft_approve) {
-        if (scrape_venue_validate_complete($venue)) {
-          $venue->approve(TRUE);
-        }
-      }
-
-      if (scrape_venue_validate_no_conflict($venue)) {
-        if (!$dry_run) {
-          $entityManager->persist($venue);
-
-          $entityManager->flush();
-        }
-
-        if ($trust_games) {
-          scrape_import_games($scrape_venue, $dry_run);
-        }
-
-        scrape_import_machines($scrape_venue, $venue, $dry_run);
-
-        scrape_prune_machines($scrape_venue, $venue, $dry_run);
-
-        $imported = TRUE;
+        $imported = scrape_import_new_venue($scrape_venue, $trust_games, $auto_approve, $soft_approve, $tidy, $dry_run);
       } else {
-        $logger->warning("Declining to import conflicting venue\n");
+        $logger->info("Declining to create new venue with zero games", array('scrape_venue', $scrape_venue));
       }
-    } else {
-      $logger->debug("Declining to merge less fresh venue\n");
     }
   } else {
-    $logger->warning("Scrape does not pass validation" . "\n", array('scrape_venue' => $scrape_venue));
+    $logger->info("Declining to process stale venue", array('scrape_venue' => $scrape_venue));
   }
 
   return $imported;

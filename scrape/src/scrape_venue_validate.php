@@ -15,13 +15,13 @@ define('VENUE_VALIDATE_NO_CONFLICT_MIN_DISTANCE', 0.10);
  * @return boolean
  */
 function scrape_venue_validate_fresher($scrape_venue, $venue) {
-  $is_fresh = TRUE;
+  $is_fresher = TRUE;
 
   if (!empty($venue->getUpdated())) {
-    ($scrape_venue->getUpdated()->getTimestamp() > $venue->getUpdated()->getTimestamp()) || $is_fresh = FALSE;
+    ($scrape_venue->getUpdated()->getTimestamp() > $venue->getUpdated()->getTimestamp()) || $is_fresher = FALSE;
   }
 
-  return $is_fresh;
+  return $is_fresher;
 }
 
 /**
@@ -29,8 +29,8 @@ function scrape_venue_validate_fresher($scrape_venue, $venue) {
  *
  * @return bool
  */
-function scrape_venue_validate($scrape_venue) {
-  $is_valid = TRUE;
+function scrape_venue_validate_is_fresh($scrape_venue) {
+  $is_fresh = TRUE;
 
   $logger = Bootstrap::getLogger();
 
@@ -44,11 +44,17 @@ function scrape_venue_validate($scrape_venue) {
 
   $logger->debug("Scrape updated compare: " . date_diff($scrape_venue->getUpdated(), $min_updated)->format('%a') . "\n");
 
-  ($scrape_venue->getUpdated() >= $min_updated) || $is_valid = FALSE;
+  ($scrape_venue->getUpdated() >= $min_updated) || $is_fresh = FALSE;
 
-  ($scrape_venue->getMachines()->count() > 0) || $is_valid = FALSE;
+  return $is_fresh;
+}
 
-  return $is_valid;
+/**
+ * @param $scrape_venue \PF\Venue
+ * @return bool
+ */
+function scrape_venue_validate_has_games($scrape_venue) {
+  return $scrape_venue->getMachines()->count() > 0;;
 }
 
 /**
