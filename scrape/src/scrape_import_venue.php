@@ -157,7 +157,7 @@ function scrape_import_new_venue($scrape_venue, $trust_games = FALSE, $auto_appr
     $imported = TRUE;
   }
   else {
-    $logger->warning("Declining to import conflicting venue\n");
+    $logger->warning("Declining to import conflicting venue", array('name' => $venue->getName()));
   }
 
   return $imported;
