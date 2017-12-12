@@ -8,6 +8,8 @@ use Slim\Views\Twig;
 
 $entityManager = Bootstrap::getEntityManager();
 
+$config = Bootstrap::getConfig();
+
 $app = new PinfinderApp(
   array(
     'mode' => Bootstrap::getRunmode(),
