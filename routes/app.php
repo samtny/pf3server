@@ -2,7 +2,7 @@
 
 use PF\RequestProxy;
 
-$app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager) {
+$app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager, $config) {
   $app->get('/home', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
     $stats = stats_route($entityManager);
 
@@ -34,6 +34,54 @@ $app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager
       'stats' => $stats,
       'notifications' => $notifications,
       'flagged_venues' => $flagged_venues,
+    );
+  });
+
+  $app->get('/logs', array($adminRouteMiddleware, 'call'), function () use ($app, $config) {
+    $logs = array();
+
+    $log_dir = $config['pf3server_log_directory'];
+
+    foreach (glob($log_dir . "/*.log") as $log_file) {
+      $logs[] = array(
+        'filename' => $log_file,
+        'size' => filesize($log_file),
+        'hash' => md5($log_file),
+        'date' => date("F d Y H:i:s.", filemtime($log_file)),
+      );
+    }
+
+    $app->responseData = array(
+      'logs' => $logs,
+    );
+  });
+
+  $app->get('/logs/:hash', array($adminRouteMiddleware, 'call'), function ($hash) use ($app, $config) {
+    $log = NULL;
+
+    $log_dir = $config['pf3server_log_directory'];
+
+    foreach (glob($log_dir . "/*.log") as $log_file) {
+      if (md5($log_file) === $hash) {
+        $size = filesize($log_file);
+
+        $handle = fopen($log_file, 'r');
+
+        $maxlength = 1000000;
+        $offset = 0;
+
+        $data = stream_get_contents($handle, $maxlength, $offset);
+
+        $log = array(
+          'hash' => $hash,
+          'contents' => $data,
+          'size' => $size,
+        );
+      }
+    }
+
+    $app->responseData = array(
+      'log' => $log,
     );
   });
 });
