@@ -23,7 +23,7 @@ class Bootstrap {
 
     $logger = new Logger('pf3');
 
-    $logger->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder.log', Logger::DEBUG));
+    $logger->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder.log', Logger::INFO));
     $logger->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder_error.log', Logger::ERROR));
 
     self::$logger = $logger;
