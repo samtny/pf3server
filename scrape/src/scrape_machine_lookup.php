@@ -27,7 +27,7 @@ function scrape_machine_match_venue_game($scrape_machine, $venue) {
 
       break;
     }
-    else if ($venue_machine_game->getName() == $scrape_machine_game_name) {
+    else if (!empty($venue_machine_game) && $venue_machine_game->getName() == $scrape_machine_game_name) {
       $logger->debug("Matched machine by game name\n");
       $machine = $venue_machine;
 
