@@ -25,6 +25,10 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
     $app->responseData = array('game' => $game);
   });
 
+  $app->post('/:id/merge/:mergeId', array($adminRouteMiddleware, 'call'), function ($id, $mergeId) use ($app) {
+    $app->responseMessage = ('WIP merge game');
+  });
+
   $app->post('', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
     $json_game_encoded = $app->request->getBody();
 
