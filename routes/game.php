@@ -25,8 +25,22 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
     $app->responseData = array('game' => $game);
   });
 
-  $app->post('/:id/merge/:mergeId', array($adminRouteMiddleware, 'call'), function ($id, $mergeId) use ($app) {
-    $app->responseMessage = ('WIP merge game');
+  $app->post('/:id/merge/:mergeId', array($adminRouteMiddleware, 'call'), function ($id, $mergeId) use ($app, $entityManager) {
+    $app->responseMessage = ('WIP merge game: ' . $id . ' with: ' . $mergeId);
+
+    $game = $entityManager->find('\PF\Game', $id);
+    $mergeGame = $entityManager->find('\PF\Game', $mergeId);
+
+    if (empty($game) || empty($mergeGame)) {
+      $app->status(500);
+
+      $app->responseMessage = ('Invalid parameters received for merge');
+
+      return;
+    }
+
+    $app->status(201);
+    $app->responseMessage = ('WIP Game ' . $id . ' merged to ' . $mergeId);
   });
 
   $app->post('', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
