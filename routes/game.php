@@ -2,7 +2,7 @@
 
 use JMS\Serializer\DeserializationContext;
 
-$app->group('/game', function () use ($app, $entityManager, $serializer) {
+$app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManager, $serializer) {
   $app->get('/search', function () use ($app, $entityManager) {
     $gamesIterator = $entityManager->getRepository('\PF\Game')->getGames($app->request());
 
@@ -25,7 +25,7 @@ $app->group('/game', function () use ($app, $entityManager, $serializer) {
     $app->responseData = array('game' => $game);
   });
 
-  $app->post('', function () use ($app, $entityManager, $serializer) {
+  $app->post('', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
     $json_game_encoded = $app->request->getBody();
 
     $json_game_decoded = json_decode($json_game_encoded, true);
