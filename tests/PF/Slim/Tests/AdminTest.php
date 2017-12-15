@@ -13,7 +13,7 @@ class AdminTest extends \PHPUnit_Framework_TestCase
       'allow_redirects' => false
     ));
 
-    $response = $client->get('/admin');
+    $response = $client->get('/app/home');
 
     $this->assertEquals(401, $response->getStatusCode());
   }

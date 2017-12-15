@@ -153,13 +153,13 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
     }
   }
 
-  public function testLegacyGetPopeye() {
+  public function testLegacyGetFishtales() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
     ));
 
-    $response = $client->get('/pf2/pf?q=Popeye&t=game');
+    $response = $client->get('/pf2/pf?q=fish tales&t=game');
 
     $this->assertEquals(200, $response->getStatusCode());
 
@@ -175,21 +175,21 @@ class LegacyTest extends \PHPUnit_Framework_TestCase {
     foreach ($locs as $loc) {
       $this->assertNotEmpty($loc->getElementsByTagName("name")->item(0)->nodeValue);
 
-      $popeye = array();
+      $fishtales = array();
 
       $games = $loc->getElementsByTagName("game");
 
       foreach ($games as $g) {
         if (!empty($g->getElementsByTagName("abbr")->item(0)->nodeValue)) {
-          if ($g->getElementsByTagName("abbr")->item(0)->nodeValue === 'P') {
-            $popeye[] = 'P';
+          if ($g->getElementsByTagName("abbr")->item(0)->nodeValue === 'FT') {
+            $fishtales[] = 'FT';
 
             break;
           }
         }
       }
 
-      $this->assertEquals(array('P'), $popeye);
+      $this->assertEquals(array('FT'), $fishtales);
 
       break;
     }

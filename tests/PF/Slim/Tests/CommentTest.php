@@ -87,6 +87,9 @@ class CommentTest extends \PHPUnit_Framework_TestCase
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',
       'exceptions' => false,
+      'query' => array(
+        's' => 'NEW',
+      ),
     ));
 
     $response = $client->get('/comment/search');

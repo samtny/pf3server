@@ -182,7 +182,7 @@ class VenueTest extends \PHPUnit_Framework_TestCase
         'exceptions' => false,
     ));
 
-    $response = $client->get('/venue/search?n=california');
+    $response = $client->get('/venue/search?n=new york');
 
     $this->assertEquals(200, $response->getStatusCode());
 
