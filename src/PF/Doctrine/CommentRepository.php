@@ -22,9 +22,8 @@ class CommentRepository extends EntityRepository {
   public function getComments($request) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
-    $qb->select(array('c', 'v'));
-    $qb->from('\PF\Comment', 'c')
-      ->join('c.venue', 'v');
+    $qb->select(array('c'));
+    $qb->from('\PF\Comment', 'c');
 
     $s = !empty($request->get('s')) ? $request->get('s') : 'APPROVED';
 
