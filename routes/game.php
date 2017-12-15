@@ -28,10 +28,14 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
   $app->post('/:id/merge/:mergeId', array($adminRouteMiddleware, 'call'), function ($id, $mergeId) use ($app, $entityManager) {
     $app->responseMessage = ('WIP merge game: ' . $id . ' with: ' . $mergeId);
 
+    /**
+     * @var $game \PF\Game
+     * @var $targetGame \PF\Game
+     */
     $game = $entityManager->find('\PF\Game', $id);
-    $mergeGame = $entityManager->find('\PF\Game', $mergeId);
+    $targetGame = $entityManager->find('\PF\Game', $mergeId);
 
-    if (empty($game) || empty($mergeGame)) {
+    if (empty($game) || empty($targetGame)) {
       $app->status(500);
 
       $app->responseMessage = ('Invalid parameters received for merge');
@@ -39,8 +43,29 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
       return;
     }
 
+    $machinesIterator = $entityManager->getRepository('\PF\Machine')->findBy(array('game' => $game));
+
+    $updates = 0;
+
+    foreach ($machinesIterator as $machine) {
+      /** @var $machine \PF\Machine **/
+      $machine->setGame($targetGame);
+
+      $entityManager->persist($machine);
+
+      $updates += 1;
+    }
+
+    $lookup = new \PF\GameLookup();
+    $lookup->setLookupString($game->getName());
+    $lookup->setGame($targetGame);
+
+    $entityManager->persist($lookup);
+
+    $entityManager->flush();
+
     $app->status(201);
-    $app->responseMessage = ('WIP Game ' . $id . ' merged to ' . $mergeId);
+    $app->responseMessage = ('WIP Game ' . $id . ' merged to ' . $mergeId . '.  Machines updated: ' . $updates);
   });
 
   $app->post('', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {

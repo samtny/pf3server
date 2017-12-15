@@ -1,0 +1,21 @@
+PF\GameLookup:
+  type: entity
+  repositoryClass: PF\Doctrine\GameLookupRepository
+  table: game_lookup
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    lookupString:
+      type: string
+
+    created:
+      type: datetime
+    updated:
+      type: datetime
+
+  manyToOne:
+    game:
+      targetEntity: PF\Game
