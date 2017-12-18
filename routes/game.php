@@ -29,13 +29,13 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
     $app->responseMessage = ('WIP merge game: ' . $id . ' with: ' . $mergeId);
 
     /**
-     * @var $game \PF\Game
+     * @var $sourceGame \PF\Game
      * @var $targetGame \PF\Game
      */
-    $game = $entityManager->find('\PF\Game', $id);
+    $sourceGame = $entityManager->find('\PF\Game', $id);
     $targetGame = $entityManager->find('\PF\Game', $mergeId);
 
-    if (empty($game) || empty($targetGame)) {
+    if (empty($sourceGame) || empty($targetGame)) {
       $app->status(500);
 
       $app->responseMessage = ('Invalid parameters received for merge');
@@ -43,7 +43,7 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
       return;
     }
 
-    $machinesIterator = $entityManager->getRepository('\PF\Machine')->findBy(array('game' => $game));
+    $machinesIterator = $entityManager->getRepository('\PF\Machine')->findBy(array('game' => $sourceGame));
 
     $updates = 0;
 
@@ -56,15 +56,24 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
       $updates += 1;
     }
 
-    $lookup = new \PF\GameLookup();
-    $lookup->setLookupString($game->getName());
-    $lookup->setGame($targetGame);
+    if (!empty($sourceGame->getName()) && !empty($targetGame->getName()) && $sourceGame->getName() != $targetGame->getName()) {
+      $lookup = $entityManager->getRepository('\PF\GameLookup')->findOneBy(array('lookup_string' => $sourceGame->getName()));
 
-    $entityManager->persist($lookup);
+      if (empty($lookup)) {
+        $lookup = new \PF\GameLookup();
+        $lookup->setLookupString($sourceGame->getName());
+        $lookup->setGame($targetGame);
+
+        $entityManager->persist($lookup);
+      }
+    }
+
+    $entityManager->remove($sourceGame);
 
     $entityManager->flush();
 
     $app->status(201);
+
     $app->responseMessage = ('WIP Game ' . $id . ' merged to ' . $mergeId . '.  Machines updated: ' . $updates);
   });
 
