@@ -32,6 +32,12 @@ class GameRepository extends EntityRepository {
         ->setParameter('name_dm', '%' . $name_dm . '%');
     }
 
+    if (!empty($request->get('i'))) {
+      $ipdb = $request->get('i');
+
+      $qb->andWhere($qb->expr()->eq('g.ipdb', $qb->expr()->literal($ipdb)));
+    }
+
     if (!empty($request->get('x'))) {
       $x_parts = explode(',', $request->get('x'));
 
