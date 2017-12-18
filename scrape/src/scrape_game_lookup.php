@@ -9,6 +9,29 @@ function _game_shortest_name_sort($a, $b) {
 }
 
 /**
+ * @param $scrape_game \PF\Game
+ * @return null|\PF\Game
+ */
+function scrape_game_name_lookup_table($scrape_game) {
+  $game = NULL;
+
+  $entityManager = Bootstrap::getEntityManager();
+
+  if (!empty($scrape_game->getName())) {
+    /**
+     * @var $game_lookup \PF\GameLookup
+     */
+    $game_lookup = $entityManager->getRepository('\PF\GameLookup')->findOneBy(array('lookup_string' => $scrape_game->getName()));
+
+    if (!empty($game_lookup)) {
+      $game = $game_lookup->getGame();
+    }
+  }
+
+  return $game;
+}
+
+/**
  * @param $entityManager \Doctrine\ORM\EntityManager
  * @param $scrape_game \PF\Game
  * @return null
@@ -135,6 +158,19 @@ function scrape_game_lookup($scrape_game) {
     }
     else {
       $logger->warning("Game not found by fuzzy: " . $scrape_game->getName() . "\n");
+    }
+  }
+
+  if (empty($game)) {
+    $logger->debug("Looking up game by lookup table: " . $scrape_game->getName() . "\n");
+
+    $game = scrape_game_name_lookup_table($scrape_game);
+
+    if (!empty($game)) {
+      $logger->debug("Found game by lookup table: " . $game->getName() . "\n");
+    }
+    else {
+      $logger->warning("Game not found by lookup table: " . $scrape_game->getName() . "\n");
     }
   }
 
