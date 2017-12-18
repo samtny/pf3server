@@ -14,6 +14,10 @@ PF\Machine:
       serialized_name: name
       type: string
       groups: [read]
+    getGameId:
+      serialized_name: game_id
+      type: string
+      groups: [read]
     getNew:
       serialized_name: new
       type: boolean

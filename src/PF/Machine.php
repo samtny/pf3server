@@ -64,6 +64,10 @@ class Machine {
     $this->game = $game;
   }
 
+  public function getGameId() {
+    return !empty($this->game) ? $this->game->getId() : NULL;
+  }
+
   public function getVenue()
   {
     return $this->venue;
