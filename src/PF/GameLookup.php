@@ -4,7 +4,7 @@ namespace PF;
 
 class GameLookup {
   protected $id;
-  protected $lookupString;
+  protected $lookup_string;
   protected $game;
   protected $created;
   protected $updated;
@@ -23,11 +23,11 @@ class GameLookup {
   }
 
   public function getLookupString() {
-    return $this->lookupString;
+    return $this->lookup_string;
   }
 
   public function setLookupString($lookupString) {
-    $this->lookupString = $lookupString;
+    $this->lookup_string = $lookupString;
   }
 
   public function getGame() {

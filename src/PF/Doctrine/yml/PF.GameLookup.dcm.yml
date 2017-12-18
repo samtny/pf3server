@@ -1,6 +1,5 @@
 PF\GameLookup:
   type: entity
-  repositoryClass: PF\Doctrine\GameLookupRepository
   table: game_lookup
   id:
     id:
@@ -8,7 +7,7 @@ PF\GameLookup:
       generator:
         strategy: AUTO
   fields:
-    lookupString:
+    lookup_string:
       type: string
 
     created:
