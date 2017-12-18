@@ -10,7 +10,7 @@ class StringUtil {
     $clean = preg_replace("/'s\s/i", "s ", $clean);
 
     // text between parentheses, except game qualifiers;
-    $clean = preg_replace("/\((?!(Pro|LE|Premium|Super LE)).+\)/i", "", $clean);
+    $clean = preg_replace("/\((?!(Pro|LE|Premium|Super LE|Premium\/LE)).+\)/i", "", $clean);
 
     // remaining parentheses:
     $clean = preg_replace("/\(|\)/", "", $clean);
