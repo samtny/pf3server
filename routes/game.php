@@ -26,8 +26,6 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
   });
 
   $app->post('/:id/merge/:mergeId', array($adminRouteMiddleware, 'call'), function ($id, $mergeId) use ($app, $entityManager) {
-    $app->responseMessage = ('WIP merge game: ' . $id . ' with: ' . $mergeId);
-
     /**
      * @var $sourceGame \PF\Game
      * @var $targetGame \PF\Game
@@ -74,7 +72,7 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
 
     $app->status(201);
 
-    $app->responseMessage = ('WIP Game ' . $id . ' merged to ' . $mergeId . '.  Machines updated: ' . $updates);
+    $app->responseMessage = ('Game ' . $id . ' merged to ' . $mergeId . '.  Machines updated: ' . $updates);
   });
 
   $app->post('', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {

@@ -16,7 +16,7 @@ PF\Machine:
       groups: [read]
     getGameId:
       serialized_name: game_id
-      type: string
+      type: integer
       groups: [read]
     getNew:
       serialized_name: new
