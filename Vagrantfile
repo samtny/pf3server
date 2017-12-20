@@ -24,6 +24,7 @@ Vagrant.configure(2) do |config|
     ansible.playbook = "ansible/site.yml"
 
     ansible.extra_vars = { ansible_ssh_user: "vagrant", ansible_ssh_pipelining: "True" }
-    ansible.sudo = true
+    ansible.become = true
+    ansible.compatibility_mode = "2.0"
   end
 end

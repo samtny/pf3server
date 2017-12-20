@@ -1,26 +1,32 @@
 ---
+- name: Install python-software-properties
+  apt: name=python-software-properties state=present
+
+- name: Add ppa:ondrej/php
+  apt_repository: repo='ppa:ondrej/php' update_cache=yes
+
 - name: Install php
   apt: name={{ item }} state=present
   notify: Restart php
   with_items:
-    - php7.0-fpm
-    - php7.0-cli
-    - php7.0-curl
-    - php7.0-mysql
-    - php7.0-sqlite3
-    - php7.0-gd
+    - php7.1-fpm
+    - php7.1-cli
+    - php7.1-curl
+    - php7.1-mysql
+    - php7.1-sqlite3
+    - php7.1-gd
     - php-pear
-    - php7.0-dev
+    - php7.1-dev
     - build-essential
     - checkinstall
 
 - name: Ensure php.ini
-  template: src=php.ini.j2 dest=/etc/php/7.0/fpm/php.ini owner=root group=root mode=0644
+  template: src=php.ini.j2 dest=/etc/php/7.1/fpm/php.ini owner=root group=root mode=0644
   notify: Restart php
 
 - name: Ensure www.conf
-  template: src=www.conf.j2 dest=/etc/php/7.0/fpm/pool.d/www.conf owner=root group=root mode=0644
+  template: src=www.conf.j2 dest=/etc/php/7.1/fpm/pool.d/www.conf owner=root group=root mode=0644
   notify: Restart php
 
-- name: Ensure php7.0-fpm state
-  service: name=php7.0-fpm state=started
+- name: Ensure php7.1-fpm state
+  service: name=php7.1-fpm state=started
