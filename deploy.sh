@@ -2,14 +2,17 @@
 
 set -e
 
-USAGE="deploy.sh -d [config]"
+USAGE="deploy.sh -d -i [config]"
 
 DEPS=false
 
-while getopts "d" opt; do
+while getopts "di" opt; do
     case "$opt" in
         d)
             DEPS=true
+            ;;
+        i)
+            INIT=true
             ;;
     esac
 done
@@ -52,6 +55,12 @@ rsync -ruvz --files-from "deploy.files" . "${USER}@${HOST}:${DOCROOT}"
 
 if [ "$DEPS" = true ]; then
   ssh ${USER}@${HOST} "cd ${DOCROOT} && ./build.sh ${CONFIG}"
+fi
+
+if [ "$INIT" = true ]; then
+  ssh ${USER}@${HOST} "cd ${DOCROOT} && cp config/config.${CONFIG}.yml config.yml && cp credentials.EXAMPLE.yml credentials.yml"
+
+  echo -e "NOTE: credentials.yml file updated.  You will need to modify this file and add valid credentials.  Then execute 'vendor/bin/doctrine orm:schema-tool:create' to create the database."
 fi
 
 exit 0
