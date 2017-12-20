@@ -32,7 +32,7 @@ function scrape_venue_validate_fresher($scrape_venue, $venue) {
 function scrape_venue_validate_is_fresh($scrape_venue) {
   $is_fresh = TRUE;
 
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   static $min_updated;
 
@@ -84,7 +84,7 @@ function scrape_venue_validate_no_conflict($venue) {
   $no_conflict = TRUE;
 
   $entityManager = Bootstrap::getEntityManager();
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   if (!empty($venue->getLatitude()) && !empty($venue->getLongitude())) {
     $request = new \PF\RequestProxy(array(

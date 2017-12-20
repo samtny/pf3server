@@ -42,7 +42,7 @@ $tidy = isset($options['tidy']);
 $limit = !empty($options['limit']) ? $options['limit'] : SCRAPE_PINSIDE_LOCATION_DEFAULT_LIMIT;
 $resume_page = !empty($options['resume-page']) ? $options['resume-page'] : NULL;
 
-$logger = Bootstrap::getLogger();
+$logger = Bootstrap::getLogger('pf3_scrape');
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
 
 $time_start = microtime(true);

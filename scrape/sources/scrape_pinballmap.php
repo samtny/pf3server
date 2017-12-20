@@ -36,7 +36,7 @@ $soft_approve = isset($options['soft-approve']);
 $tidy = isset($options['tidy']);
 $resume_region = !empty($options['resume-region']) ? $options['resume-region'] : NULL;
 
-$logger = Bootstrap::getLogger();
+$logger = Bootstrap::getLogger('pf3_scrape');
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
 
 $time_start = microtime(true);

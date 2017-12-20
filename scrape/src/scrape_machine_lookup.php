@@ -12,7 +12,7 @@ require_once __DIR__ . '/scrape_game_lookup.php';
 function scrape_machine_match_venue_game($scrape_machine, $venue) {
   $machine = NULL;
 
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   $scrape_machine_game_id = $scrape_machine->getGame()->getId();
   $scrape_machine_game_name = $scrape_machine->getGame()->getName();
@@ -48,7 +48,7 @@ function scrape_machine_lookup($scrape_machine, $venue) {
   $machine = NULL;
 
   $entityManager = Bootstrap::getEntityManager();
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   $logger->debug("Looking up machine by external key: " . $scrape_machine->getExternalKey() . "\n");
   $machine = $entityManager->getRepository('\PF\Machine')->findOneBy(array('external_key' => $scrape_machine->getExternalKey()));

@@ -17,7 +17,7 @@ define('VENUE_FUZZY_LOOKUP_NAME_MATCH_THRESHOLD', 80);
 function scrape_venue_fuzzy_lookup($entityManager, $scrape_venue) {
   $venue = NULL;
 
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   $request = new \PF\RequestProxy(array(
     'l' => 10,
@@ -57,7 +57,7 @@ function scrape_venue_lookup($scrape_venue) {
   $venue = NULL;
 
   $entityManager = Bootstrap::getEntityManager();
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   $logger->debug("Looking up venue by external key: " . $scrape_venue->getExternalKey() . "\n");
   $venue = $entityManager->getRepository('\PF\Venue')->findOneBy(array('external_key' => $scrape_venue->getExternalKey()));

@@ -78,7 +78,7 @@ function scrape_import_update_venue($scrape_venue, $venue, $trust_games = FALSE,
   $imported = FALSE;
 
   $entityManager = Bootstrap::getEntityManager();
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   if (scrape_venue_validate_fresher($scrape_venue, $venue)) {
     $logger->info("Updating existing venue", array('name' => $venue->getName()));
@@ -124,7 +124,7 @@ function scrape_import_new_venue($scrape_venue, $trust_games = FALSE, $auto_appr
   $imported = FALSE;
 
   $entityManager = Bootstrap::getEntityManager();
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   if ($tidy) {
     $scrape_venue = scrape_tidy_venue($scrape_venue);
@@ -175,7 +175,7 @@ function scrape_import_new_venue($scrape_venue, $trust_games = FALSE, $auto_appr
 function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve = FALSE, $soft_approve = FALSE, $tidy = FALSE, $dry_run = FALSE) {
   $imported = FALSE;
 
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   if (scrape_venue_validate_is_fresh($scrape_venue)) {
     $logger->debug("Venue is fresh");

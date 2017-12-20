@@ -39,7 +39,7 @@ function scrape_game_name_lookup_table($scrape_game) {
 function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
   $game = NULL;
 
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   $scrape_name = $scrape_game->getName();
 
@@ -103,7 +103,7 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
 function scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game) {
   $game = NULL;
 
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   static $game_fuzzy_lookup_cache = array();
 
@@ -133,7 +133,7 @@ function scrape_game_lookup($scrape_game) {
   $game = NULL;
 
   $entityManager = Bootstrap::getEntityManager();
-  $logger = Bootstrap::getLogger();
+  $logger = Bootstrap::getLogger('pf3_scrape');
 
   if (!empty($scrape_game->getIpdb())) {
     $logger->debug("Looking up game by ipdb: " . $scrape_game->getIpdb() . "\n");
