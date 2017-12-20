@@ -12,7 +12,7 @@ class Bootstrap {
   private static $entityManager;
 
   private static $config;
-  private static $logger;
+  private static $logger = [];
   private static $runmode;
 
   public static function go() {
@@ -21,10 +21,13 @@ class Bootstrap {
     $config = $parser->parse(file_get_contents(__DIR__ . '/config.yml'));
     self::$config = $config;
 
-    $logger = new Logger('pf3');
+    $logger['pf3'] = new Logger('pf3');
+    $logger['pf3']->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder.log', Logger::INFO));
+    $logger['pf3']->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder_error.log', Logger::ERROR));
 
-    $logger->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder.log', Logger::INFO));
-    $logger->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/pinfinder_error.log', Logger::ERROR));
+    $logger['pf3_scrape'] = new Logger('pf3_scrape');
+    //$logger['pf3_scrape']->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/scrape.log', Logger::INFO));
+    $logger['pf3_scrape']->pushHandler(new StreamHandler($config['pf3server_log_directory'] . '/scrape_error.log', Logger::ERROR));
 
     self::$logger = $logger;
 
@@ -62,10 +65,12 @@ class Bootstrap {
   }
 
   /**
+   * @var $identifier string
+   *
    * @return Logger
    */
-  public static function getLogger() {
-    return static::$logger;
+  public static function getLogger($identifier = 'pf3') {
+    return static::$logger[$identifier];
   }
 
   /**
