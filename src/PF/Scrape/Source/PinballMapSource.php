@@ -2,11 +2,11 @@
 
 namespace PF\Scrape\Source;
 
-use PF\Annotations\ScrapeSourceAnnotation;
+use PF\Annotations\ScrapeSource;
 use PF\Scrape\ScrapeSourceInterface;
 
 /**
- * @ScrapeSourceAnnotation(
+ * @ScrapeSource(
  *   id = "pinballmap"
  * )
  */
