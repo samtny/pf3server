@@ -1,13 +1,12 @@
 <?php
 
-require_once "vendor/autoload.php";
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use Symfony\Component\Yaml\Parser;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Doctrine\Common\Annotations\AnnotationRegistry;
+
+require_once "vendor/autoload.php";
 
 class Bootstrap {
   private static $entityManager;
@@ -63,8 +62,6 @@ class Bootstrap {
     $config->addCustomDatetimeFunction('LAST_DAY', '\DoctrineExtensions\Query\Mysql\LastDay');
 
     self::$entityManager = EntityManager::create($conn, $config);
-
-    AnnotationRegistry::registerAutoloadNamespace("PF\Annotations", __DIR__ . '/src');
   }
 
   /**
