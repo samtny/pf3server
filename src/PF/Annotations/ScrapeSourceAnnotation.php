@@ -6,6 +6,6 @@ namespace PF\Annotations;
  * @Annotation
  * @Target("CLASS")
  */
-class ScrapeSource {
+class ScrapeSourceAnnotation {
   public $id;
 }
