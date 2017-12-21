@@ -69,6 +69,7 @@ if (empty($limit_region)) {
 }
 
 $imported = 0;
+$skipped = 0;
 
 $skip_regions = empty($resume_region) ? FALSE : TRUE;
 
@@ -159,6 +160,8 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
 
             if ($scrape_import_venue_result) {
               $imported++;
+            } else {
+              $skipped++;
             }
 
             $venue = NULL;
@@ -189,6 +192,7 @@ function pinballmap_condition_string_to_condition($pm_condition) {
 }
 
 $logger->info('New / updated venue count: ' . $imported);
+$logger->info('Skipped venue count: ' . $skipped);
 
 $time_end = microtime(true);
 
