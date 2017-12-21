@@ -86,10 +86,10 @@ function scrape_game_fuzzy_lookup($entityManager, $scrape_game) {
     }
 
     if (empty($game)) {
-      $logger->warning("Game matches no candidates: " . $scrape_game->getName() . "\n");
+      $logger->info("Game matches no candidates: " . $scrape_game->getName() . "\n");
     }
   } else {
-    $logger->warning("No candidates for game: " . $scrape_game->getName() . "\n");
+    $logger->info("No candidates for game: " . $scrape_game->getName() . "\n");
   }
 
   return $game;
@@ -129,6 +129,10 @@ function scrape_game_fuzzy_lookup_cached($entityManager, $scrape_game) {
   return $game;
 }
 
+/**
+ * @param $scrape_game \PF\Game
+ * @return null|object|\PF\Game
+ */
 function scrape_game_lookup($scrape_game) {
   $game = NULL;
 
@@ -136,42 +140,46 @@ function scrape_game_lookup($scrape_game) {
   $logger = Bootstrap::getLogger('pf3_scrape');
 
   if (!empty($scrape_game->getIpdb())) {
-    $logger->debug("Looking up game by ipdb: " . $scrape_game->getIpdb() . "\n");
+    $logger->debug('Looking up game by ipdb: ' . $scrape_game->getIpdb());
 
     $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('ipdb' => $scrape_game->getIpdb()));
 
     if (!empty($game)) {
-      $logger->debug("Found game by ipdb: " . $game->getName() . "\n");
+      $logger->debug('Found game by ipdb: ' . $game->getName());
     }
     else {
-      $logger->warning("Game not found by ipdb: " . $scrape_game->getIpdb() . "\n");
+      $logger->debug('Game not found by ipdb: ' . $scrape_game->getIpdb());
     }
   }
 
   if (empty($game)) {
-    $logger->debug("Looking up game by fuzzy: " . $scrape_game->getName() . "\n");
+    $logger->debug('Looking up game by fuzzy: ' . $scrape_game->getName());
 
     $game = scrape_game_fuzzy_lookup($entityManager, $scrape_game);
 
     if (!empty($game)) {
-      $logger->debug("Found game by fuzzy: " . $game->getName() . "\n");
+      $logger->debug('Found game by fuzzy: ' . $game->getName());
     }
     else {
-      $logger->warning("Game not found by fuzzy: " . $scrape_game->getName() . "\n");
+      $logger->debug('Game not found by fuzzy: ' . $scrape_game->getName());
     }
   }
 
   if (empty($game)) {
-    $logger->debug("Looking up game by lookup table: " . $scrape_game->getName() . "\n");
+    $logger->debug('Looking up game by lookup table: ' . $scrape_game->getName());
 
     $game = scrape_game_name_lookup_table($scrape_game);
 
     if (!empty($game)) {
-      $logger->debug("Found game by lookup table: " . $game->getName() . "\n");
+      $logger->debug('Found game by lookup table: ' . $game->getName());
     }
     else {
-      $logger->warning("Game not found by lookup table: " . $scrape_game->getName() . "\n");
+      $logger->debug('Game not found by lookup table: ' . $scrape_game->getName());
     }
+  }
+
+  if (empty($game)) {
+    $logger->warning('Game not found: ' . $scrape_game->getName());
   }
 
   return $game;

@@ -105,7 +105,7 @@ function scrape_import_update_venue($scrape_venue, $venue, $trust_games = FALSE,
 
     $imported = TRUE;
   } else {
-    $logger->info("Declining to merge less fresh venue", array('name' => $scrape_venue->getName()));
+    $logger->debug("Declining to merge less fresh venue", array('name' => $scrape_venue->getName()));
   }
 
   return $imported;
