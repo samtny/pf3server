@@ -52,6 +52,22 @@ function stats_route($entityManager) {
 
   $stats['freshnessStats'] = $freshnessStats;
 
+  $requestStatsData = $entityManager->getRepository('PF\StatRecord')->getRequestStats(365 * 2);
+
+  $requestStats = array(
+    'type' => 'Line',
+    'title' => 'Search',
+    'data' => array(),
+    'labels' => array(),
+  );
+
+  foreach ($requestStatsData as $item) {
+    $requestStats['data'][] = $item['total'];
+    $requestStats['labels'][] = $item['month'];
+  }
+
+  $stats['requestStats'] = $requestStats;
+
   return $stats;
 }
 
