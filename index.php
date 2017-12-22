@@ -10,6 +10,8 @@ $entityManager = Bootstrap::getEntityManager();
 
 $config = Bootstrap::getConfig();
 
+$logger = Bootstrap::getLogger();
+
 $app = new PinfinderApp(
   array(
     'mode' => Bootstrap::getRunmode(),

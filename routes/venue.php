@@ -14,9 +14,11 @@ function venue_route_search($entityManager, $request) {
   return $venues;
 }
 
-$app->group('/venue', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
-    $app->get('/search', function () use ($app, $entityManager) {
+$app->group('/venue', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware, $logger) {
+    $app->get('/search', function () use ($app, $entityManager, $logger) {
         $request = $app->request();
+
+        $logger->info('Venue search request', array('params' => $request->params()));
 
         $venues = venue_route_search($entityManager, $request);
 

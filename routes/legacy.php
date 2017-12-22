@@ -2,9 +2,12 @@
 
 use PF\Legacy;
 
-$app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddleware) {
-  $app->get('/', function () use ($app, $entityManager) {
+$app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddleware, $logger) {
+  $app->get('/', function () use ($app, $entityManager, $logger) {
     $legacy_request = $app->request();
+
+    $logger->info('Legacy venue search request', array('params' => $legacy_request->params()));
+
     $legacy_request_proxy = new Legacy\LegacyRequestProxy();
     /*
     $q = $_GET["q"]; // query
