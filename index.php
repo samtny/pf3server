@@ -52,6 +52,8 @@ $app->add(new \PF\Middleware\ResponseMiddleware($serializer));
 
 $adminRouteMiddleware = new \PF\Middleware\AdminRouteMiddleware();
 
+$requestStatsMiddleware = new \PF\Middleware\RequestStatsMiddleware();
+
 require 'routes/login.php';
 require 'routes/venue.php';
 require 'routes/comment.php';
