@@ -2,7 +2,7 @@
 
 use PF\RequestProxy;
 
-define('PF3_APP_LOG_FILE_GLOB', '/*.{log,0,gz}');
+define('PF3_APP_LOG_FILE_GLOB', '/*.{log,0}');
 
 $app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager, $config) {
   $app->get('/home', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
