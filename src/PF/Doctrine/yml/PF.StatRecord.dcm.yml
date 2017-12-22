@@ -1,5 +1,6 @@
 PF\StatRecord:
   type: entity
+  repositoryClass: PF\Doctrine\StatRepository
   table: stat
   id:
     id:
