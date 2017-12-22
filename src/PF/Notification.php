@@ -4,6 +4,10 @@ namespace PF;
 
 class Notification {
   protected $id;
+
+  /**
+   * @var $user \PF\User
+   */
   protected $user;
   protected $global;
   protected $message;
@@ -16,6 +20,15 @@ class Notification {
     $this->created = new \DateTime("now");
     $this->updated = new \DateTime("now");
     $this->status = 'NEW';
+  }
+
+  public function __toString() {
+    $string = $this->user ? $this->user->getId() : 'NOUSER';
+    $string .= $this->id ? ' - ' . $this->id : '';
+
+    $string .= $this->queryParams ? ' - (' . $this->queryParams . ')' : '';
+
+    return $string;
   }
 
   /**

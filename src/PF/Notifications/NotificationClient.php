@@ -12,8 +12,14 @@ class NotificationClient {
    */
   private $entityManager;
 
+  /**
+   * @var \Monolog\Logger
+   */
+  private $logger;
+
   public function __construct($entityManager) {
     $this->entityManager = $entityManager;
+    $this->logger = \Bootstrap::getLogger();
   }
 
   public function getValidApps() {
@@ -28,6 +34,8 @@ class NotificationClient {
    * @return array
    */
   public function sendNotification(Notification $notification) {
+    $this->logger->info('BEGIN send notification', array('notification' => $notification));
+
     if ($notification->getGlobal() === true) {
       $payload = array(
         'aps' => array(
@@ -75,9 +83,13 @@ class NotificationClient {
         }
       }
     }
+
+    $this->logger->info('END send notification');
   }
 
   public function sendPayload($payload, $app, $tokens, $expiry) {
+    $this->logger->debug('BEGIN send payload', array('payload' => $payload));
+
     $client = FastAPNS\ClientBuilder::create()
       ->setLocalCert(\Bootstrap::getConfig()['pf3server_ssl'] . '/Pinfinder' . ($app === 'apnsfree' ? 'Free' : 'Pro') . 'PushDist.includesprivatekey.pem')
       ->setPassphrase('')
@@ -86,6 +98,8 @@ class NotificationClient {
     $client->send($payload, $tokens, $expiry);
 
     if (!empty($client->getBadTokens())) {
+      $this->logger->warning('Bad tokens detected', array('tokens' => $client->getBadTokens()));
+
       foreach ($client->getBadTokens() as $tokenString) {
         $token = $this->entityManager->getRepository('\PF\Token')->findOneBy(array('token' => $tokenString, 'app' => $app));
 
@@ -98,9 +112,13 @@ class NotificationClient {
 
       $this->entityManager->flush();
     }
+
+    $this->logger->debug('END send payload');
   }
 
   public function processFeedback() {
+    $this->logger->debug('BEGIN process feedback');
+
     $flagged = array();
 
     $client = FastAPNS\ClientBuilder::create()
@@ -146,6 +164,8 @@ class NotificationClient {
     }
 
     $this->entityManager->flush();
+
+    $this->logger->debug('END process feedback', array('flagged' => $flagged));
 
     return $flagged;
   }
