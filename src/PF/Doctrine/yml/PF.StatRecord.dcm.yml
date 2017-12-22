@@ -1,0 +1,22 @@
+PF\StatRecord:
+  type: entity
+  table: stat
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    created:
+      type: datetime
+    updated:
+      type: datetime
+    path:
+      type: string
+      nullable: true
+    method:
+      type: string
+      nullable: true
+    params:
+      type: string
+      nullable: true
