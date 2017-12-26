@@ -3,7 +3,7 @@
 function stats_route($entityManager) {
   $stats = array();
 
-  $createdData = $entityManager->getRepository('\PF\Venue')->getCreatedStats(365 * 2);
+  $createdData = $entityManager->getRepository('\PF\Venue')->getCreatedStats(365);
 
   $createdStats = array(
     'type' => 'Line',
@@ -19,7 +19,7 @@ function stats_route($entityManager) {
 
   $stats['createdStats'] = $createdStats;
 
-  $updatedData = $entityManager->getRepository('PF\Venue')->getUpdatedStats(365 * 2);
+  $updatedData = $entityManager->getRepository('PF\Venue')->getUpdatedStats(365);
 
   $updatedStats = array(
     'type' => 'Line',
@@ -52,7 +52,7 @@ function stats_route($entityManager) {
 
   $stats['freshnessStats'] = $freshnessStats;
 
-  $requestStatsData = $entityManager->getRepository('PF\StatRecord')->getRequestStats(365 * 2);
+  $requestStatsData = $entityManager->getRepository('PF\StatRecord')->getRequestStats(365);
 
   $requestStats = array(
     'type' => 'Line',
