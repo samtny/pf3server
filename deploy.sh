@@ -53,6 +53,8 @@ RSYNC_EXCLUDE=""
 
 rsync -ruvz --files-from "deploy.files" . "${USER}@${HOST}:${DOCROOT}"
 
+ssh ${USER}@${HOST} "cd ${DOCROOT} && rm -rf cache && mkdir cache && /usr/local/bin/php vendor/doctrine/orm/bin/doctrine.php orm:generate-proxies"
+
 if [ "$DEPS" = true ]; then
   ssh ${USER}@${HOST} "cd ${DOCROOT} && ./build.sh ${CONFIG}"
 fi
