@@ -44,10 +44,9 @@ if [ ! -f "composer.phar" ]; then
   ${php} -r "unlink('composer-setup.php');"
 fi
 
-if [ "$config_pf3server_runmode" == "production" ]; then
+if [ "$config_pf3server_runmode" = "production" ]; then
   echo -e "Installing PRODUCTION dependencies"
   ${php} -d allow_url_fopen=On composer.phar install --no-dev --optimize-autoloader
-  vendor/bin/doctrine orm:generate-proxies
 else
   echo -e "Installing DEVELOPMENT dependencies"
   ${php} -d allow_url_fopen=On composer.phar install
