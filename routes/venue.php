@@ -50,6 +50,26 @@ $app->group('/venue', function () use ($app, $entityManager, $serializer, $admin
         $app->responseMessage = 'Approved Venue with ID ' . $venue->getId();
     });
 
+    $app->post('/:id/confirm', function ($id) use ($app, $entityManager, $logger) {
+      $logger->info('Venue confirm request', array('id' => $id));
+
+      /**
+       * @var $venue \PF\Venue
+       */
+      $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+
+      if (empty($venue)) {
+        $app->notFound();
+      }
+
+      $venue->touch();
+      $entityManager->persist($venue);
+
+      $entityManager->flush();
+
+      $app->responseMessage = 'Confirmed Venue with ID ' . $venue->getId();
+    });
+
     $app->post('/:id/flag', function ($id) use ($app, $entityManager) {
       $venue = $entityManager->getRepository('\PF\Venue')->find($id);
 
