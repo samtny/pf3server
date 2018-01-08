@@ -1,0 +1,25 @@
+PF\LogEntry:
+  exclusion_policy: NONE
+  xml_root_name: pinfinderapp
+  xml_root_namespace: http://pinballfinder.org
+  exclude: false
+  read_only: false
+  access_type: property
+  accessor_order: custom
+  custom_accessor_order: [id, level, message, created, updated]
+  properties:
+    id:
+      type: integer
+      groups: [read]
+    level:
+      type: string
+      groups: [create, read, update]
+    message:
+      type: string
+      groups: [create, read, update]
+    created:
+      type: DateTime
+      groups: [read]
+    updated:
+      type: DateTime
+      groups: [read]

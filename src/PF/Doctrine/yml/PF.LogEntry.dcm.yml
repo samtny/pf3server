@@ -1,0 +1,17 @@
+PF\LogEntry:
+  type: entity
+  table: log
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    level:
+      type: string
+    message:
+      type: string
+    created:
+      type: datetime
+    updated:
+      type: datetime
