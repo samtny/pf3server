@@ -4,7 +4,7 @@ use PF\RequestProxy;
 
 define('PF3_APP_LOG_FILE_GLOB', '/*.{log,0}');
 
-$app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager, $config) {
+$app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager, $config, $logger) {
   $app->get('/home', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
     $stats = stats_route($entityManager);
 
@@ -37,6 +37,20 @@ $app->group('/app', function () use ($adminRouteMiddleware, $app, $entityManager
       'notifications' => $notifications,
       'flagged_venues' => $flagged_venues,
     );
+  });
+
+  $app->post('/log', function () use ($app, $logger) {
+    $json_log_encoded = $app->request->getBody();
+
+    $json_log_decoded = json_decode($json_log_encoded, true);
+
+    $level = !empty($json_log_decoded['level']) ? $json_log_decoded['level'] : 'info';
+
+    $logger->{$level}($json_log_decoded['message'], array('raw' => $json_log_encoded));
+
+    $app->status(201);
+
+    $app->responseMessage = 'Created Log Entry';
   });
 
   $app->get('/logs', array($adminRouteMiddleware, 'call'), function () use ($app, $config) {
