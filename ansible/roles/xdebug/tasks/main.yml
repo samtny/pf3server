@@ -1,6 +1,11 @@
 ---
 - name: Install xdebug
-  pear: name=pecl/xdebug state=present
+  apt: name={{ item }} state=present
+  notify:
+    - Restart php
+    - Reload nginx
+  with_items:
+    - php7.1-xdebug
 
 - name: Create /etc/php/7.1/mods-available/xdebug.ini
   template: src=xdebug.ini.j2 dest=/etc/php/7.1/mods-available/xdebug.ini owner=root group=root mode=0644
