@@ -9,3 +9,5 @@ composer.phar
 gamedict.txt
 !sql/*
 config.yml
+*.my.cnf
+!example.my.cnf

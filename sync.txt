@@ -1,0 +1,3 @@
+mysqldump --defaults-file=./in.my.cnf database samtny_pf3 --result-file=./dump.sql
+
+...

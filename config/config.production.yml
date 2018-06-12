@@ -10,6 +10,8 @@ pf3server_log_directory: /usr/home/samtny/pinfinder_logs/pf3
 pf3server_deploy_host: samtny.pairserver.com
 pf3server_deploy_user: samtny
 
+pf3server_db_name: samtny_pf3
+
 php_pm_max_children: 2
 php_pm_start_servers: 1
 php_pm_min_spare_servers: 1
@@ -27,3 +29,4 @@ php_opcache_memory_consumption: 64
 php_opcache_interned_strings_buffer: 16
 php_opcache_max_accelerated_files: 16228
 php_opcache_validate_timestamps: 1
+

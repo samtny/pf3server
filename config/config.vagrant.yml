@@ -10,6 +10,8 @@ pf3server_log_directory: /home/vagrant
 pf3server_deploy_host: local.pf3server.com
 pf3server_deploy_user: vagrant
 
+pf3server_db_name: mydb
+
 php_pm_max_children: 2
 php_pm_start_servers: 1
 php_pm_min_spare_servers: 1
