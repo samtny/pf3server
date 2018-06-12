@@ -20,6 +20,7 @@
     - build-essential
     - checkinstall
     - php7.1-mbstring
+    - php7.1-dom
 
 - name: Ensure php.ini
   template: src=php.ini.j2 dest=/etc/php/7.1/fpm/php.ini owner=root group=root mode=0644
