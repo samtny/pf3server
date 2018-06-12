@@ -12,8 +12,8 @@
   notify: Restart php
 
 - name: Symlink /etc/php/7.1/fpm/conf.d/xdebug.ini
-  file: src=/etc/php/7.1/mods-available/xdebug.ini dest=/etc/php/7.1/fpm/conf.d/30-xdebug.ini state=link owner=root group=root mode=0644
+  file: src=/etc/php/7.1/mods-available/xdebug.ini dest=/etc/php/7.1/fpm/conf.d/20-xdebug.ini state=link owner=root group=root mode=0644
   notify: Restart php
 
 - name: Symlink /etc/php/7.1/cli/conf.d/xdebug.ini
-  file: src=/etc/php/7.1/mods-available/xdebug.ini dest=/etc/php/7.1/cli/conf.d/30-xdebug.ini state=link owner=root group=root mode=0644
+  file: src=/etc/php/7.1/mods-available/xdebug.ini dest=/etc/php/7.1/cli/conf.d/20-xdebug.ini state=link owner=root group=root mode=0644
