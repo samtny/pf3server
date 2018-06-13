@@ -50,6 +50,10 @@ class Bootstrap {
 
     $cache_impl = (self::$runmode === 'production' && extension_loaded('apc')) ? new \Doctrine\Common\Cache\ApcuCache() : null;
 
+    if (empty($cache_impl)) {
+      $cache_impl = new \Doctrine\Common\Cache\FilesystemCache(__DIR__ . '/cache');
+    }
+
     $config = Setup::createYAMLMetadataConfiguration(array(__DIR__ . '/src/PF/Doctrine/yml'), self::$runmode !== 'production', $proxy_dir, $cache_impl);
     $config->addCustomNumericFunction('SIN', '\DoctrineExtensions\Query\Mysql\Sin');
     $config->addCustomNumericFunction('COS', '\DoctrineExtensions\Query\Mysql\Cos');
