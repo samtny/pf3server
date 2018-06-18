@@ -53,19 +53,19 @@ RSYNC_EXCLUDE=""
 
 rsync -ruvz --files-from "deploy.files" . "${USER}@${HOST}:${DOCROOT}"
 
-if [ "$config_pf3server_runmode" = "production" ]; then
-  echo -e "Regenerating doctrine proxies"
-  ssh ${USER}@${HOST} "cd ${DOCROOT} && rm -rf cache && mkdir cache && /usr/local/bin/php7 vendor/doctrine/orm/bin/doctrine.php orm:generate-proxies"
+if [ "$INIT" = true ]; then
+  ssh ${USER}@${HOST} "cd ${DOCROOT} && cp config/config.${CONFIG}.yml config.yml && cp credentials.EXAMPLE.yml credentials.yml"
+
+  echo -e "NOTE: credentials.yml file updated.  You will need to modify this file and add valid credentials.  Then execute 'vendor/bin/doctrine orm:schema-tool:create' to create the database."
 fi
 
 if [ "$DEPS" = true ]; then
   ssh ${USER}@${HOST} "cd ${DOCROOT} && ./build.sh ${CONFIG}"
 fi
 
-if [ "$INIT" = true ]; then
-  ssh ${USER}@${HOST} "cd ${DOCROOT} && cp config/config.${CONFIG}.yml config.yml && cp credentials.EXAMPLE.yml credentials.yml"
-
-  echo -e "NOTE: credentials.yml file updated.  You will need to modify this file and add valid credentials.  Then execute 'vendor/bin/doctrine orm:schema-tool:create' to create the database."
+if [ "$config_pf3server_runmode" = "production" ]; then
+  echo -e "Regenerating doctrine proxies"
+  ssh ${USER}@${HOST} "cd ${DOCROOT} && sudo rm -rf cache/* && /usr/bin/php7.2 vendor/doctrine/orm/bin/doctrine.php orm:generate-proxies"
 fi
 
 exit 0
