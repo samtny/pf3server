@@ -7,8 +7,8 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CommentRepository extends EntityRepository {
-  public function find($id) {
-    $comment = parent::find($id);
+  public function find($id, $lockMode = null, $lockVersion = null) {
+    $comment = parent::find($id, $lockMode, $lockVersion);
 
     if (!empty($comment)) {
       if ($comment->getStatus() === 'DELETED') {

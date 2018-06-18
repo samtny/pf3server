@@ -9,8 +9,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use PF\Utilities\StringUtil;
 
 class VenueRepository extends EntityRepository {
-  public function find($id) {
-    $venue = parent::find($id);
+  public function find($id, $lockMode = null, $lockVersion = null) {
+    $venue = parent::find($id, $lockMode, $lockVersion);
 
     if (!empty($venue)) {
       if ($venue->getStatus() === 'DELETED') {
