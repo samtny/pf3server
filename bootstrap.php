@@ -48,7 +48,13 @@ class Bootstrap {
 
     $proxy_dir = __DIR__ . '/cache';
 
-    $cache_impl = (self::$runmode === 'production' && extension_loaded('apc')) ? new \Doctrine\Common\Cache\ApcuCache() : null;
+    if (self::$runmode === 'production' && extension_loaded('memcached')) {
+      $memcached = new Memcached();
+      $memcached->addServer('localhost', 11211);
+
+      $cache_impl = new \Doctrine\Common\Cache\MemcachedCache();
+      $cache_impl->setMemcached($memcached);
+    }
 
     if (empty($cache_impl)) {
       $cache_impl = new \Doctrine\Common\Cache\FilesystemCache(__DIR__ . '/cache');

@@ -44,7 +44,7 @@ class ResponseMiddleware extends Middleware
 
       $response = $this->serializer->serialize($response, 'json', $venue_serialization_context);
 
-      header('Content-Type: application/json');
+      header('Content-Type: application/json;charset=UTF-8');
       header('PF-Memory-Get-Peak-Usage: ' . memory_get_peak_usage());
 
       echo $response;
