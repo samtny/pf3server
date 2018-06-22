@@ -3,7 +3,7 @@
 pf3server_url: pinballfinder.org
 pf3server_runmode: production
 pf3server_docroot: /var/www/pf3
-pf3server_ssl: /home/ubuntu/certificates/pf3server
+pf3server_ssl: /home/ubuntu/ssl/pf3/apns
 pf3server_gamedict_path: /var/www/pinballfinder.org/gamedict.txt
 pf3server_log_directory: /home/ubuntu/logs
 
