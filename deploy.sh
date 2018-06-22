@@ -65,7 +65,7 @@ fi
 
 if [ "$config_pf3server_runmode" = "production" ]; then
   echo -e "Regenerating doctrine proxies"
-  ssh ${USER}@${HOST} "cd ${DOCROOT} && sudo rm -rf cache/* && /usr/bin/php7.2 vendor/doctrine/orm/bin/doctrine.php orm:generate-proxies"
+  ssh ${USER}@${HOST} "cd ${DOCROOT} && sudo rm -rf cache/* && export PHP=\$(which php7.2) && \${PHP} vendor/doctrine/orm/bin/doctrine.php orm:generate-proxies"
 fi
 
 exit 0
