@@ -1,6 +1,7 @@
 <?php
 
 function venue_route_search($entityManager, $params) {
+
   $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($params);
 
   $venues = [];
@@ -10,21 +11,26 @@ function venue_route_search($entityManager, $params) {
   }
 
   return $venues;
+
 }
 
-$app->get('/venue/search', function ($request, $response, $args) use ($entityManager, $logger) {
+$app->group('/venue', function () use ($entityManager, $logger) {
 
-  $params = $request->getQueryParams();
+  $this->get('/search', function ($request, $response) use ($entityManager, $logger) {
 
-  $logger->info('Venue request params', array('params' => $params));
+    $params = $request->getQueryParams();
 
-  $venues = venue_route_search($entityManager, $params);
+    $logger->info('Venue request params', array('params' => $params));
 
-  $response->setPinfinderData([
-    'count' => count($venues),
-    'venues' => $venues
-  ]);
+    $venues = venue_route_search($entityManager, $params);
 
-  return $response->withStatus(200);
+    $response->setPinfinderData([
+      'count' => count($venues),
+      'venues' => $venues
+    ]);
+
+    return $response;
+
+  });
 
 });
