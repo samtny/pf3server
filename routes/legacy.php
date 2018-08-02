@@ -6,34 +6,37 @@ use PF\Middleware\PinfinderRequestStatsMiddleware;
 
 $app->group('/pf2/pf', function () use ($app, $entityManager, $logger) {
 
-  $app->get('/', function ($request, $response) use ($app, $entityManager, $logger) {
+  $app->get('', function ($request, $response) use ($app, $entityManager, $logger) {
 
     $legacy_request = $request;
 
-    $logger->info('Legacy venue search request', array('params' => $legacy_request->getQueryParams()));
+    $legacy_params = $legacy_request->getQueryParams();
 
-    $legacy_request_proxy = new Legacy\LegacyRequestProxy();
+    $logger->info('Legacy venue search request', array('params' => $legacy_params));
+
+    $params = [];
+
     /*
-    $q = $_GET["q"]; // query
-    $t = $_GET["t"]; // query type (venue, game, gamelist, special)
-    $n = $_GET["n"]; // near
-    $l = $_GET["l"]; // limit
-    $p = $_GET["p"]; // options (minimal)
-    $o = $_GET["o"]; // order
-    $f = $_GET["f"]; // format (xml, json)
+        $q = $_GET["q"]; // query
+        $t = $_GET["t"]; // query type (venue, game, gamelist, special)
+        $n = $_GET["n"]; // near
+        $l = $_GET["l"]; // limit
+        $p = $_GET["p"]; // options (minimal)
+        $o = $_GET["o"]; // order
+        $f = $_GET["f"]; // format (xml, json)
     */
 
-    $legacy_request_proxy->set('n', $legacy_request->getQueryParam('n'));
-    $legacy_request_proxy->set('l', $legacy_request->getQueryParam('l'));
+    $params['n'] = $legacy_params['n'];
+    $params['l'] = $legacy_params['l'];
 
-    if ($legacy_request->getQueryParam('t') === 'special') {
-      switch ($legacy_request->getQueryParam('q')) {
+    if ($legacy_params['t'] === 'special') {
+      switch ($legacy_params['q']) {
         case 'newgame':
-          $legacy_request_proxy->set('x', 'new');
+          $params['x'] = 'new';
 
           break;
         case 'raregame':
-          $legacy_request_proxy->set('x', 'rare');
+          $params['x'] = 'rare';
 
           break;
         case 'recent':
@@ -43,21 +46,21 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $logger) {
         case 'upcomingtournaments':
         case 'mecca':
         default:
-          $legacy_request_proxy->set('x', $legacy_request->getQueryParam('q'));
+          $params['x'] = $legacy_params['q'];
 
           break;
       }
     }
 
-    if ($legacy_request->getQueryParam('t') === 'game' && !empty($legacy_request->getQueryParam('q'))) {
-      $legacy_request_proxy->set('g', $legacy_request->getQueryParam('q'));
+    if ($legacy_params['t'] === 'game' && !empty($legacy_params['q'])) {
+      $params['g'] = $legacy_params['q'];
     }
 
-    if (!empty($legacy_request->getQueryParam('q')) && ($legacy_request->getQueryParam('t') === 'venue' || is_numeric($legacy_request->getQueryParam('q')))) {
-      $legacy_request_proxy->set('q', $legacy_request->getQueryParam('q'));
+    if (!empty($legacy_params['q']) && ($legacy_params['t'] === 'venue' || is_numeric($legacy_params['q']))) {
+      $params['q'] = $legacy_params['q'];
     }
 
-    $venueIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy, Doctrine\ORM\Query::HYDRATE_ARRAY);
+    $venueIterator = $entityManager->getRepository('\PF\Venue')->getVenues($params, Doctrine\ORM\Query::HYDRATE_ARRAY);
 
     $legacy_result = new PF\Legacy\Result();
 
