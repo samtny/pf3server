@@ -4,7 +4,7 @@
   "license": "MIT",
   "require": {
     "doctrine/orm": "^2.5",
-    "slim/slim": "^2.0",
+    "slim/slim": "^3.0",
     "slim/views": "^0.1.0",
     "twig/twig": "^1.0",
     "beberlei/DoctrineExtensions": "^1.0",

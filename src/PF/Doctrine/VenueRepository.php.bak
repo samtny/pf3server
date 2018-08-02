@@ -58,7 +58,7 @@ class VenueRepository extends EntityRepository {
     return $qb->getQuery()->getArrayResult();
   }
 
-  public function getVenues($params, $hydration_mode = Doctrine\ORM\Query::HYDRATE_OBJECT) {
+  public function getVenues($request, $hydration_mode = Doctrine\ORM\Query::HYDRATE_OBJECT) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('v', 'm', 'g', 'c'));
@@ -67,7 +67,7 @@ class VenueRepository extends EntityRepository {
       ->leftJoin('v.machines', 'm')
       ->leftJoin('m.game', 'g');
 
-    $s = !empty($params['s']) ? $params['s'] : 'APPROVED';
+    $s = !empty($request->get('s')) ? $request->get('s') : 'APPROVED';
 
     $qb->andWhere($qb->expr()->eq('v.status', ':status'))
       ->setParameter('status', $s);
@@ -79,8 +79,8 @@ class VenueRepository extends EntityRepository {
       ));
     }
 
-    if (!empty($params['n'])) {
-      $n = $params['n'];
+    if (!empty($request->get('n'))) {
+      $n = $request->get('n');
 
       preg_match('/^([0-9.-]+),([0-9.-]+)$/', $n, $latlon);
 
@@ -119,13 +119,13 @@ class VenueRepository extends EntityRepository {
       $qb->orderBy('v.updated', 'DESC');
     }
 
-    if (!empty($params['q'])) {
-      if (is_numeric($params['q'])) {
-        $id = $params['q'];
+    if (!empty($request->get('q'))) {
+      if (is_numeric($request->get('q'))) {
+        $id = $request->get('q');
 
         $qb->andWhere($qb->expr()->eq('v.id', $id));
       } else {
-        $name = $params['q'];
+        $name = $request->get('q');
 
         $name_clean = StringUtil::cleanName($name);
         $name_dm = StringUtil::dmName($name);
@@ -139,8 +139,8 @@ class VenueRepository extends EntityRepository {
       }
     }
 
-    if (!empty($params['g'])) {
-      $game = $params['g'];
+    if (!empty($request->get('g'))) {
+      $game = $request->get('g');
 
       $game_clean = StringUtil::cleanName($game);
       $game_dm = StringUtil::dmName($game);
@@ -161,8 +161,8 @@ class VenueRepository extends EntityRepository {
         ->setParameter('game_dm', '%' . $game_dm . '%');
     }
 
-    if (!empty($params['x'])) {
-      $x_parts = explode(',', $params['x']);
+    if (!empty($request->get('x'))) {
+      $x_parts = explode(',', $request->get('x'));
 
       foreach ($x_parts as $x_part) {
         switch ($x_part) {
@@ -196,8 +196,8 @@ class VenueRepository extends EntityRepository {
       }
     }
 
-    $p = !empty($params['p']) ? $params['p'] : 0;
-    $l = !empty($params['l']) ? $params['l'] : 70;
+    $p = !empty($request->get('p')) ? $request->get('p') : 0;
+    $l = !empty($request->get('l')) ? $request->get('l') : 70;
 
     $qb->addOrderBy('g.name', 'ASC');
     $qb->addOrderBy('c.created', 'DESC');
