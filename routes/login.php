@@ -1,8 +1,10 @@
 <?php
 
-$app->any('/login', function () use ($app, $entityManager) {
-  $username = $app->request->post('username');
-  $password = $app->request->post('password');
+use Dflydev\FigCookies\FigResponseCookies;
+
+$app->any('/login', function ($request, $response, $args) use ($entityManager) {
+  $username = $request->getParsedBodyParam('username');
+  $password = $request->getParsedBodyParam('password');
 
   $username_addslashes = addslashes($username);
   $password_md5 = md5($password);
@@ -10,7 +12,7 @@ $app->any('/login', function () use ($app, $entityManager) {
   $user = $entityManager->getRepository('\PF\User')->findOneBy(array('username' => $username_addslashes, 'password' => $password_md5));
 
   if (empty($user)) {
-    $app->render('login.html');
+    $response = $response->withStatus(401);
   } else {
     session_start();
 
@@ -27,10 +29,13 @@ $app->any('/login', function () use ($app, $entityManager) {
       $entityManager->flush();
     }
 
-    $app->setCookie('session', $session->getId(), '365 days');
+    $response = FigResponseCookies::set($response, \Dflydev\FigCookies\SetCookie::create('session')
+      ->withValue($session->getId())
+      ->withMaxAge('366 days')
+    );
 
-    if (!$app->request->isAjax()) {
-      $app->redirect('/admin');
-    }
+    $response = $response->withStatus(200);
   }
+
+  return $response;
 });
