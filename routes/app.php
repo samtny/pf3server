@@ -28,14 +28,14 @@ $app->group('/app', function () use ($entityManager, $config, $logger) {
       's' => 'FLAGGED',
     ]);
 
-    $response->setPinfinderData = [
+    $response->setPinfinderData([
       'recent_venues' => $recent_venues,
       'unapproved_venues' => $unapproved_venues,
       'unapproved_comments' => $unapproved_comments,
       'stats' => $stats,
       'notifications' => $notifications,
       'flagged_venues' => $flagged_venues,
-    ];
+    ]);
 
     return $response;
   });
