@@ -132,7 +132,7 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $logger) {
 
   })->add(new PinfinderRequestStatsMiddleware());
 
-  $this->post('/', function ($request, $response, $args) use ($entityManager) {
+  $this->post('', function ($request, $response, $args) use ($entityManager) {
     $xml = $request->getParsedBodyParam('doc');
 
     $legacy_request = new PF\Legacy\Request();

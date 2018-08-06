@@ -1,13 +1,19 @@
 <?php
 
-$app->group('/user', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
-  $app->get('/', function () use ($app, $entityManager) {
+$app->group('/user', function () use ($entityManager) {
+
+  $this->get('', function ($request, $response, $args) use ($entityManager) {
     $session = $entityManager->getRepository('PF\Session')->find($_COOKIE['session']);
 
     if (empty($session)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
     }
 
-    $app->responseData = array('user' => $session->getUser());
+    $response->setPinfinderData([
+      'user' => $session->getUser(),
+    ]);
+
+    return $response;
   });
-});
+
+})->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
