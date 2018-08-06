@@ -22,21 +22,21 @@ class NotificationRepository extends EntityRepository {
     return new Paginator($query);
   }
 
-  public function getNotifications($request) {
+  public function getNotifications($params) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('n'));
     $qb->from('\PF\Notification', 'n');
 
-    $s = !empty($request->get('s')) ? $request->get('s') : 'NEW';
+    $s = !empty($params['s']) ? $params['s'] : 'NEW';
 
     $qb->andWhere($qb->expr()->eq('n.status', ':status'))
       ->setParameter('status', $s);
 
     $qb->orderBy('n.updated', 'DESC');
 
-    $p = !empty($request->get('p')) ? $request->get('p') : 0;
-    $l = !empty($request->get('l')) ? $request->get('l') : 70;
+    $p = !empty($params['p']) ? $params['p'] : 0;
+    $l = !empty($params['l']) ? $params['l'] : 70;
 
     $qb->setFirstResult($p * $l)
       ->setMaxResults($l);
