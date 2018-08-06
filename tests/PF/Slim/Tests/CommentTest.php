@@ -4,7 +4,7 @@ namespace PF\Slim\Tests;
 
 use GuzzleHttp\Client;
 
-class CommentTest extends \PHPUnit_Framework_TestCase
+class CommentTest extends \PHPUnit\Framework\TestCase
 {
   private $bogusCreatedDate;
   private $bogusCreateToken;

@@ -4,7 +4,7 @@ namespace PF\Legacy\Tests;
 
 use GuzzleHttp\Client;
 
-class LegacyTest extends \PHPUnit_Framework_TestCase {
+class LegacyTest extends \PHPUnit\Framework\TestCase {
   public function testLegacyCreateVenue() {
     $client = new Client(array(
       'base_uri' => 'http://localhost:80',

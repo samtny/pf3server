@@ -4,7 +4,7 @@ namespace PF\Slim\Tests;
 
 use GuzzleHttp\Client;
 
-class AdminTest extends \PHPUnit_Framework_TestCase
+class AdminTest extends \PHPUnit\Framework\TestCase
 {
   public function testAdminRouteAnonymous() {
     $client = new Client(array(

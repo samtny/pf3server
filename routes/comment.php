@@ -57,7 +57,7 @@ $app->group('/comment', function () use ($entityManager, $serializer) {
     $response->setPinfinderMessage('Approved Comment with ID ' . $comment->getId());
 
     return $response;
-  });
+  })->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
 
   $this->post('', function ($request, $response, $args) use ($entityManager, $serializer) {
     $json_comment_encoded = $request->getBody();
@@ -104,6 +104,6 @@ $app->group('/comment', function () use ($entityManager, $serializer) {
     }
 
     return $response;
-  });
+  })->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
 
-})->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
+});
