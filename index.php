@@ -11,10 +11,12 @@ $config = Bootstrap::getConfig();
 
 $logger = Bootstrap::getLogger();
 
+$runmode = Bootstrap::getRunmode();
+
 $container = [
   'settings' => [
-    'displayErrorDetails' => true,
-    'debug' => true,
+    'displayErrorDetails' => $runmode === 'development',
+    'debug' => $runmode === 'development',
     'determineRouteBeforeAppMiddleware' => true
   ],
   'response' => function () {
@@ -24,17 +26,13 @@ $container = [
 
 $app = new \Slim\App($container);
 
-$serializer = PinfinderSerializer::create($entityManager, Bootstrap::getRunmode() === 'production');
+$serializer = PinfinderSerializer::create($entityManager, $runmode === 'production');
 
 $app->add(new PinfinderResponseMiddleware($serializer));
 
-/*
-
-if (Bootstrap::getRunmode() === 'profile') {
-  $app->add(new \PF\Middleware\XHProfMiddleware());
+if ($runmode === 'profile') {
+  $app->add(new \PF\Middleware\PinfinderXHProfMiddleware());
 }
-
- */
 
 require 'routes/app.php';
 require 'routes/comment.php';
