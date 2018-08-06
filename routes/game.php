@@ -2,9 +2,10 @@
 
 use JMS\Serializer\DeserializationContext;
 
-$app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManager, $serializer) {
-  $app->get('/search', function () use ($app, $entityManager) {
-    $gamesIterator = $entityManager->getRepository('\PF\Game')->getGames($app->request());
+$app->group('/game', function () use ($entityManager, $serializer) {
+
+  $this->get('/search', function ($request, $response, $args) use ($entityManager) {
+    $gamesIterator = $entityManager->getRepository('\PF\Game')->getGames($request->getQueryParams());
 
     $games = [];
 
@@ -12,33 +13,43 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
       $games[] = $game;
     }
 
-    $app->responseData = array('count' => count($games), 'games' => $games);
+    $response->setPinfinderData([
+      'count' => count($games),
+      'games' => $games,
+    ]);
+
+    return $response;
   });
 
-  $app->get('/:id', function ($id) use ($app, $entityManager) {
-    $game = $entityManager->find('\PF\Game', $id);
+  $this->get('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $game = $entityManager->find('\PF\Game', $args['id']);
 
     if (empty($game)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $response->setPinfinderData([
+        'game' => $game,
+      ]);
     }
 
-    $app->responseData = array('game' => $game);
+    return $response;
   });
 
-  $app->post('/:id/merge/:mergeId', array($adminRouteMiddleware, 'call'), function ($id, $mergeId) use ($app, $entityManager) {
+  $this->post('/{id}/merge/{mergeId}', function ($request, $response, $args) use ($entityManager) {
     /**
      * @var $sourceGame \PF\Game
      * @var $targetGame \PF\Game
      */
-    $sourceGame = $entityManager->find('\PF\Game', $id);
-    $targetGame = $entityManager->find('\PF\Game', $mergeId);
+    $sourceGame = $entityManager->find('\PF\Game', $args['id']);
+    $targetGame = $entityManager->find('\PF\Game', $args['mergeId']);
 
     if (empty($sourceGame) || empty($targetGame)) {
-      $app->status(500);
+      $response = $response->withStatus(500);
 
-      $app->responseMessage = ('Invalid parameters received for merge');
+      $response->setPinfinderMessage('Invalid parameters received for merge');
 
-      return;
+      return $response;
     }
 
     $machinesIterator = $entityManager->getRepository('\PF\Machine')->findBy(array('game' => $sourceGame));
@@ -70,13 +81,15 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
 
     $entityManager->flush();
 
-    $app->status(201);
+    $response = $response->withStatus(201);
 
-    $app->responseMessage = ('Game ' . $id . ' merged to ' . $mergeId . '.  Machines updated: ' . $updates);
+    $response->setPinfinderMessage('Game ' . $args['id'] . ' merged to ' . $args['mergeId'] . '.  Machines updated: ' . $updates);
+
+    return $response;
   });
 
-  $app->post('', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
-    $json_game_encoded = $app->request->getBody();
+  $this->post('', function ($request, $response, $args) use ($entityManager, $serializer) {
+    $json_game_encoded = $request->getBody();
 
     $json_game_decoded = json_decode($json_game_encoded, true);
 
@@ -101,11 +114,14 @@ $app->group('/game', function () use ($adminRouteMiddleware, $app, $entityManage
 
       $entityManager->flush();
 
-      $app->status($is_new_game ? 201 : 200);
+      $response = $response->withStatus($is_new_game ? 201 : 200);
 
-      $app->responseMessage = ($is_new_game ? 'Created Game with ID ' : 'Updated Game with ID ') . $game->getId();
+      $response->setPinfinderMessage(($is_new_game ? 'Created Game with ID ' : 'Updated Game with ID ') . $game->getId());
     } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-      $app->notFound();
+      $response = $response->withStatus(404);
     }
+
+    return $response;
   });
-});
+
+})->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());

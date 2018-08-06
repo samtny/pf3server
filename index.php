@@ -38,6 +38,7 @@ if (Bootstrap::getRunmode() === 'profile') {
 
 require 'routes/app.php';
 require 'routes/comment.php';
+require 'routes/game.php';
 require 'routes/legacy.php';
 require 'routes/stats.php';
 require 'routes/user.php';
@@ -46,10 +47,6 @@ require 'routes/venue.php';
 /*
 
 require 'routes/login.php';
-
-
-require 'routes/game.php';
-
 require 'routes/geocode.php';
 require 'routes/notification.php';
 require 'routes/machine.php';
