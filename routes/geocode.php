@@ -1,13 +1,20 @@
 <?php
 
-$app->group('/geocode', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
-  $app->get('', function () use ($app, $entityManager) {
-    $geocode = $entityManager->getRepository('\PF\Geocode')->findOneBy(array('string' => $app->request()->params('address')));
+$app->group('/geocode', function () use ($app, $entityManager) {
+
+  $this->get('', function ($request, $response, $args) use ($entityManager) {
+    $geocode = $entityManager->getRepository('\PF\Geocode')->findOneBy(array('string' => $request->getQueryParam('address')));
 
     if (empty($geocode)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $response->setPinfinderData([
+        'geocode' => $geocode,
+      ]);
     }
 
-    $app->responseData = array('geocode' => $geocode);
+    return $response;
   });
-});
+
+})->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
