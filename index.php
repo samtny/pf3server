@@ -36,6 +36,7 @@ if (Bootstrap::getRunmode() === 'profile') {
 
  */
 
+require 'routes/app.php';
 require 'routes/legacy.php';
 require 'routes/venue.php';
 
@@ -51,7 +52,7 @@ require 'routes/notification.php';
 require 'routes/machine.php';
 
 require 'routes/user.php';
-require 'routes/app.php';
+
 
 */
 
