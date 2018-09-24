@@ -74,12 +74,12 @@ function scrape_tidy_venue($venue) {
 
   $venueShortAddress = $venue->getStreet() . ', ' . $venue->getCity();
 
-  $places = PlaceUtil::nearbyPlaces($venueShortAddress, $venue->getName(), SCRAPE_TIDY_VENUE_NEARBY_THRESHOLD_METERS);
+  //$places = PlaceUtil::nearbyPlaces($venueShortAddress, $venue->getName(), SCRAPE_TIDY_VENUE_NEARBY_THRESHOLD_METERS);
 
   if (!empty($places)) {
     foreach ($places as $place) {
       if (StringUtil::namesAreSimilar($venue->getName(), $place['name'])) {
-        $placeDetail = PlaceUtil::placeDetail($place['place_id']);
+        //$placeDetail = PlaceUtil::placeDetail($place['place_id']);
 
         if (!empty($placeDetail)) {
           $venue = scrape_tidy_venue_merge_place($venue, $placeDetail);
