@@ -71,8 +71,10 @@ function stats_route($entityManager) {
   return $stats;
 }
 
-$app->get('/stats', function () use ($app, $entityManager) {
+$app->get('/stats', function ($request, $response, $args) use ($entityManager) {
   $stats = stats_route($entityManager);
 
-  $app->responseData = array('stats' => $stats);
+  $response->setPinfinderData([
+    'stats' => $stats,
+  ]);
 });

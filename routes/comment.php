@@ -2,8 +2,8 @@
 
 use JMS\Serializer\DeserializationContext;
 
-function comment_route_search($entityManager, $request) {
-  $commentsIterator = $entityManager->getRepository('\PF\Comment')->getComments($request);
+function comment_route_search($entityManager, $params) {
+  $commentsIterator = $entityManager->getRepository('\PF\Comment')->getComments($params);
 
   $comments = [];
 
@@ -14,30 +14,39 @@ function comment_route_search($entityManager, $request) {
   return $comments;
 }
 
-$app->group('/comment', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
-  $app->get('/search', function () use ($app, $entityManager) {
-    $request = $app->request();
+$app->group('/comment', function () use ($entityManager, $serializer) {
 
-    $comments = comment_route_search($entityManager, $request);
+  $this->get('/search', function ($request, $response, $args) use ($entityManager) {
+    $comments = comment_route_search($entityManager, $request->getQueryParams());
 
-    $app->responseData = array('count' => count($comments), 'comments' => $comments);
+    $response->setPinfinderData([
+      'count' => count($comments),
+      'comments' => $comments,
+    ]);
+
+    return $response;
   });
 
-  $app->get('/:id', function ($id) use ($app, $entityManager) {
-    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
+  $this->get('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $comment = $entityManager->getRepository('\PF\Comment')->find($args['id']);
 
     if (empty($comment)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $response->setPinfinderData([
+        'comment' => $comment,
+      ]);
     }
 
-    $app->responseData = array('comment' => $comment);
+    return $response;
   });
 
-  $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
-    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
+  $this->post('/{id}/approve', function ($request, $response, $args) use ($entityManager) {
+    $comment = $entityManager->getRepository('\PF\Comment')->find($args['id']);
 
     if (empty($comment)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
     }
 
     $comment->approve();
@@ -45,11 +54,13 @@ $app->group('/comment', function () use ($app, $entityManager, $serializer, $adm
     $entityManager->persist($comment);
     $entityManager->flush();
 
-    $app->responseMessage = 'Approved Comment with ID ' . $comment->getId();
-  });
+    $response->setPinfinderMessage('Approved Comment with ID ' . $comment->getId());
 
-  $app->post('', function () use ($app, $entityManager, $serializer) {
-    $json_comment_encoded = $app->request->getBody();
+    return $response;
+  })->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
+
+  $this->post('', function ($request, $response, $args) use ($entityManager, $serializer) {
+    $json_comment_encoded = $request->getBody();
 
     $json_comment_decoded = json_decode($json_comment_encoded, true);
 
@@ -65,29 +76,34 @@ $app->group('/comment', function () use ($app, $entityManager, $serializer, $adm
 
       $entityManager->flush();
 
-      $app->status($is_new_comment ? 201 : 200);
+      $response = $response->withStatus($is_new_comment ? 201 : 200);
 
-      $app->responseMessage = ($is_new_comment ? 'Created Comment with ID ' : 'Updated Comment with ID ') . $comment->getId();
+      $response->setPinfinderMessage(($is_new_comment ? 'Created Comment with ID ' : 'Updated Comment with ID ') . $comment->getId());
     } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-      $app->notFound();
+      $response = $response->withStatus(404);
     }
+
+    return $response;
   });
 
-  $app->delete('/:id', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
-    $comment = $entityManager->getRepository('\PF\Comment')->find($id);
+  $this->delete('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $comment = $entityManager->getRepository('\PF\Comment')->find($args['id']);
 
     if (empty($comment)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $comment->touch();
+      $comment->delete();
+
+      $entityManager->persist($comment);
+
+      $entityManager->flush();
+
+      $response->setPinfinderMessage('Deleted Comment with ID ' . $comment->getId());
     }
 
-    $comment->touch();
+    return $response;
+  })->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
 
-    $comment->delete();
-
-    $entityManager->persist($comment);
-
-    $entityManager->flush();
-
-    $app->responseMessage = 'Deleted Comment with ID ' . $comment->getId();
-  });
 });

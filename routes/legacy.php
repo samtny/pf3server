@@ -1,35 +1,42 @@
 <?php
 
 use PF\Legacy;
+use PF\Middleware\PinfinderAdminRouteMiddleware;
+use PF\Middleware\PinfinderRequestStatsMiddleware;
 
-$app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddleware, $requestStatsMiddleware, $logger) {
-  $app->get('/', array($requestStatsMiddleware, 'call'),  function () use ($app, $entityManager, $logger) {
-    $legacy_request = $app->request();
+$app->group('/pf2/pf', function () use ($app, $entityManager, $logger) {
 
-    $logger->info('Legacy venue search request', array('params' => $legacy_request->params()));
+  $this->get('', function ($request, $response) use ($entityManager, $logger) {
 
-    $legacy_request_proxy = new Legacy\LegacyRequestProxy();
+    $legacy_request = $request;
+
+    $legacy_params = $legacy_request->getQueryParams();
+
+    $logger->info('Legacy venue search request', array('params' => $legacy_params));
+
+    $params = [];
+
     /*
-    $q = $_GET["q"]; // query
-    $t = $_GET["t"]; // query type (venue, game, gamelist, special)
-    $n = $_GET["n"]; // near
-    $l = $_GET["l"]; // limit
-    $p = $_GET["p"]; // options (minimal)
-    $o = $_GET["o"]; // order
-    $f = $_GET["f"]; // format (xml, json)
+        $q = $_GET["q"]; // query
+        $t = $_GET["t"]; // query type (venue, game, gamelist, special)
+        $n = $_GET["n"]; // near
+        $l = $_GET["l"]; // limit
+        $p = $_GET["p"]; // options (minimal)
+        $o = $_GET["o"]; // order
+        $f = $_GET["f"]; // format (xml, json)
     */
 
-    $legacy_request_proxy->set('n', $legacy_request->get('n'));
-    $legacy_request_proxy->set('l', $legacy_request->get('l'));
+    $params['n'] = $legacy_params['n'];
+    $params['l'] = $legacy_params['l'];
 
-    if ($legacy_request->get('t') === 'special') {
-      switch ($legacy_request->get('q')) {
+    if ($legacy_params['t'] === 'special') {
+      switch ($legacy_params['q']) {
         case 'newgame':
-          $legacy_request_proxy->set('x', 'new');
+          $params['x'] = 'new';
 
           break;
         case 'raregame':
-          $legacy_request_proxy->set('x', 'rare');
+          $params['x'] = 'rare';
 
           break;
         case 'recent':
@@ -39,21 +46,21 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
         case 'upcomingtournaments':
         case 'mecca':
         default:
-          $legacy_request_proxy->set('x', $legacy_request->get('q'));
+          $params['x'] = $legacy_params['q'];
 
           break;
       }
     }
 
-    if ($legacy_request->get('t') === 'game' && !empty($legacy_request->get('q'))) {
-      $legacy_request_proxy->set('g', $legacy_request->get('q'));
+    if ($legacy_params['t'] === 'game' && !empty($legacy_params['q'])) {
+      $params['g'] = $legacy_params['q'];
     }
 
-    if (!empty($legacy_request->get('q')) && ($legacy_request->get('t') === 'venue' || is_numeric($legacy_request->get('q')))) {
-      $legacy_request_proxy->set('q', $legacy_request->get('q'));
+    if (!empty($legacy_params['q']) && ($legacy_params['t'] === 'venue' || is_numeric($legacy_params['q']))) {
+      $params['q'] = $legacy_params['q'];
     }
 
-    $venueIterator = $entityManager->getRepository('\PF\Venue')->getVenues($legacy_request_proxy, Doctrine\ORM\Query::HYDRATE_ARRAY);
+    $venueIterator = $entityManager->getRepository('\PF\Venue')->getVenues($params, Doctrine\ORM\Query::HYDRATE_ARRAY);
 
     $legacy_result = new PF\Legacy\Result();
 
@@ -117,15 +124,16 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
 
     header('Cache-Control: no-cache, must-revalidate');
     header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-
-    $app->response->headers->set('Content-Type', 'application/xml');
     header('Content-type: application/xml');
 
     echo $legacy_result->saveXML();
-  });
 
-  $app->post('/', function () use ($app, $entityManager) {
-    $xml = $app->request->post('doc');
+    return $response->withHeader('Content-Type', 'application/xml');
+
+  })->add(new PinfinderRequestStatsMiddleware());
+
+  $this->post('', function ($request, $response, $args) use ($entityManager) {
+    $xml = $request->getParsedBodyParam('doc');
 
     $legacy_request = new PF\Legacy\Request();
 
@@ -152,7 +160,7 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
             case 'apnsfree2':
               $tokenApp = 'apnsfree';
 
-                break;
+              break;
             default:
               $tokenApp = 'apnspro';
 
@@ -269,14 +277,17 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
     header('Content-Type: application/xml;type=result;charset="utf-8"');
 
     echo $legacy_result_xml;
+
+    return $response->withStatus(200);
   });
 
-  $app->post('/gamedict/refresh', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager) {
-    $requestProxy = new Legacy\LegacyRequestProxy();
+  $this->post('/gamedict/refresh', function ($request, $response, $next) use ($entityManager) {
 
-    $requestProxy->set('l', 999999);
+    $params = [
+      'l' => 999999,
+    ];
 
-    $gamesIterator = $entityManager->getRepository('\PF\Game')->getGames($requestProxy, $hydration_mode = Doctrine\ORM\Query::HYDRATE_ARRAY, 'name');
+    $gamesIterator = $entityManager->getRepository('\PF\Game')->getGames($params, $hydration_mode = Doctrine\ORM\Query::HYDRATE_ARRAY, 'name');
 
     $gameDict = "";
 
@@ -292,6 +303,12 @@ $app->group('/pf2/pf', function () use ($app, $entityManager, $adminRouteMiddlew
 
     file_put_contents(\Bootstrap::getConfig()['pf3server_gamedict_path'], $gameDict);
 
-    $app->responseMessage = 'Game dictionary refreshed';
-  });
+    $response = $next($request, $response);
+
+    $response->setPinfinderMessage('Game dictionary refreshed');
+
+    return $response;
+
+  })->add(new PinfinderAdminRouteMiddleware());
+
 });

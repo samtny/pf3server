@@ -2,8 +2,8 @@
 
 use JMS\Serializer\DeserializationContext;
 
-function notification_route_search($entityManager, $request) {
-  $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getNotifications($request);
+function notification_route_search($entityManager, $params) {
+  $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getNotifications($params);
 
   $notifications = [];
 
@@ -14,26 +14,35 @@ function notification_route_search($entityManager, $request) {
   return $notifications;
 }
 
-$app->group('/notification', array($adminRouteMiddleware, 'call'), function () use ($app, $entityManager, $serializer) {
-  $app->get('/search', function () use ($app, $entityManager) {
-    $request = $app->request();
+$app->group('/notification', function () use ($entityManager, $serializer) {
 
-    $notifications = notification_route_search($entityManager, $request);
+  $this->get('/search', function ($request, $response, $args) use ($entityManager) {
+    $notifications = notification_route_search($entityManager, $request->getQueryParams());
 
-    $app->responseData = array('count' => count($notifications), 'notifications' => $notifications);
+    $response->setPinfinderData([
+      'count' => count($notifications),
+      'notifications' => $notifications,
+    ]);
+
+    return $response;
   });
 
-  $app->get('/:id', function ($id) use ($app, $entityManager) {
-    $notification = $entityManager->getRepository('\PF\Notification')->find($id);
+  $this->get('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $notification = $entityManager->getRepository('\PF\Notification')->find($args['id']);
 
     if (empty($notification)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $response->setPinfinderData([
+        'notification' => $notification,
+      ]);
     }
 
-    $app->responseData = array('notification' => $notification);
+    return $response;
   });
 
-  $app->post('/all/send', function () use ($app, $entityManager) {
+  $this->post('/all/send', function ($request, $response, $args) use ($entityManager) {
     $notificationsIterator = $entityManager->getRepository('\PF\Notification')->getPendingNotifications();
 
     $count = 0;
@@ -50,42 +59,50 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
       $entityManager->persist($notification);
     }
 
-    $app->responseMessage = 'Sent ' . $count . ' Notification(s)';
-
     $entityManager->flush();
+
+    $response->setPinfinderMessage('Sent ' . $count . ' Notification(s)');
+
+    return $response;
   });
 
-  $app->post('/:id/send', function ($id) use ($app, $entityManager) {
-    $notification = $entityManager->getRepository('\PF\Notification')->find($id);
+  $this->post('/{id}/send', function ($request, $response, $args) use ($entityManager) {
+    $notification = $entityManager->getRepository('\PF\Notification')->find($args['id']);
 
     if (empty($notification)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
     }
+    else {
+      $client = new PF\Notifications\NotificationClient($entityManager);
 
-    $client = new PF\Notifications\NotificationClient($entityManager);
+      $client->sendNotification($notification);
 
-    $client->sendNotification($notification);
+      $notification->archive();
+      $entityManager->persist($notification);
 
-    $app->responseMessage = 'Sent Notification with ID ' . $notification->getId();
+      $entityManager->flush();
 
-    $notification->archive();
+      $response->setPinfinderMessage('Sent Notification with ID ' . $notification->getId());
+   }
 
-    $entityManager->persist($notification);
-
-    $entityManager->flush();
+    return $response;
   });
 
-  $app->post('/feedback', function () use ($app, $entityManager) {
+  $this->post('/feedback', function ($request, $response, $args) use ($entityManager) {
     $client = new PF\Notifications\NotificationClient($entityManager);
 
     $flagged = $client->processFeedback();
 
-    $app->responseMessage = (count($flagged) > 0) ? 'Flagged ' . count($flagged) . ' tokens' : 'No tokens were flagged';
-    $app->responseData = array('tokens' => $flagged);
+    $response->setPinfinderMessage((count($flagged) > 0) ? 'Flagged ' . count($flagged) . ' tokens' : 'No tokens were flagged');
+    $response->setPinfinderData([
+      'tokens' => $flagged,
+    ]);
+
+    return $response;
   });
 
-  $app->post('', function () use ($app, $entityManager, $serializer) {
-    $json_notification_encoded = $app->request->getBody();
+  $this->post('', function ($request, $response, $args) use ($entityManager, $serializer) {
+    $json_notification_encoded = $request->getBody();
 
     $json_notification_decoded = json_decode($json_notification_encoded, true);
 
@@ -107,25 +124,31 @@ $app->group('/notification', array($adminRouteMiddleware, 'call'), function () u
 
       $entityManager->flush();
 
-      $app->status($is_new_notification ? 201 : 200);
+      $response = $response->withStatus($is_new_notification ? 201 : 200);
 
-      $app->responseMessage = ($is_new_notification ? 'Created Notification with ID ' : 'Updated Notification with ID ') . $notification->getId();
+      $response->setPinfinderMessage(($is_new_notification ? 'Created Notification with ID ' : 'Updated Notification with ID ') . $notification->getId());
     } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-      $app->notFound();
+      $response = $response->withStatus(404);
     }
+
+    return $response;
   });
 
-  $app->delete('/:id', function ($id) use ($app, $entityManager) {
-    $notification = $entityManager->getRepository('\PF\Notification')->find($id);
+  $this->delete('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $notification = $entityManager->getRepository('\PF\Notification')->find($args['id']);
 
     if (empty($notification)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $entityManager->remove($notification);
+
+      $entityManager->flush();
+
+      $response->setPinfinderMessage('Deleted Notification with ID ' . $notification->getId());
     }
 
-    $entityManager->remove($notification);
-
-    $entityManager->flush();
-
-    $app->responseMessage = 'Deleted Notification with ID ' . $notification->getId();
+    return $response;
   });
-});
+
+})->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());

@@ -2,19 +2,25 @@
 
 use JMS\Serializer\DeserializationContext;
 
-$app->group('/machine', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware) {
-  $app->get('/:id', function ($id) use ($app, $entityManager) {
-    $machine = $entityManager->getRepository('\PF\Machine')->find($id);
+$app->group('/machine', function () use ($entityManager, $serializer) {
+
+  $this->get('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $machine = $entityManager->getRepository('\PF\Machine')->find($args['id']);
 
     if (empty($machine)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $response->setPinfinderData([
+        'machine' => $machine,
+      ]);
     }
 
-    $app->responseData = array('machine' => $machine);
+    return $response;
   });
 
-  $app->post('', function () use ($app, $entityManager, $serializer) {
-    $json_machine_encoded = $app->request->getBody();
+  $this->post('', function ($request, $response, $args) use ($entityManager, $serializer) {
+    $json_machine_encoded = $request->getBody();
 
     $json_machine_decoded = json_decode($json_machine_encoded, true);
 
@@ -48,29 +54,35 @@ $app->group('/machine', function () use ($app, $entityManager, $serializer, $adm
 
       $entityManager->flush();
 
-      $app->status($is_new_machine ? 201 : 200);
+      $response = $response->withStatus($is_new_machine ? 201 : 200);
 
-      $app->responseMessage = ($is_new_machine ? 'Created Machine with ID ' : 'Updated Machine with ID ') . $machine->getId();
+      $response->setPinfinderMessage(($is_new_machine ? 'Created Machine with ID ' : 'Updated Machine with ID ') . $machine->getId());
     } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-      $app->notFound();
+      $response = $response->withStatus(404);
     }
+
+    return $response;
   });
 
-  $app->delete('/:id', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
-    $machine = $entityManager->getRepository('\PF\Machine')->find($id);
+  $this->delete('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $machine = $entityManager->getRepository('\PF\Machine')->find($args['id']);
 
     if (empty($machine)) {
-      $app->notFound();
+      $response = $response->withStatus(404);
+    }
+    else {
+      $machine->touch();
+
+      $machine->delete();
+
+      $entityManager->persist($machine);
+
+      $entityManager->flush();
+
+      $response->setPinfinderMessage('Deleted Machine with ID ' . $machine->getId());
     }
 
-    $machine->touch();
+    return $response;
+  })->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
 
-    $machine->delete();
-
-    $entityManager->persist($machine);
-
-    $entityManager->flush();
-
-    $app->responseMessage = 'Deleted Machine with ID ' . $machine->getId();
-  });
 });

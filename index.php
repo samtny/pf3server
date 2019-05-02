@@ -2,9 +2,8 @@
 
 require_once 'bootstrap.php';
 
+use PF\Middleware\PinfinderResponseMiddleware;
 use PF\Serializer\PinfinderSerializer;
-use PF\Slim\PinfinderApp;
-use Slim\Views\Twig;
 
 $entityManager = Bootstrap::getEntityManager();
 
@@ -12,58 +11,39 @@ $config = Bootstrap::getConfig();
 
 $logger = Bootstrap::getLogger();
 
-$app = new PinfinderApp(
-  array(
-    'mode' => Bootstrap::getRunmode(),
-    'view' => new Twig(),
-  )
-);
+$runmode = Bootstrap::getRunmode();
 
-$app->configureMode('development', function () use ($app) {
-  $app->config(array(
-    'cookies.lifetime' => 'Never',
-    'debug' => true,
-  ));
-});
+$container = [
+  'settings' => [
+    'displayErrorDetails' => $runmode === 'development',
+    'debug' => $runmode === 'development',
+    'determineRouteBeforeAppMiddleware' => true
+  ],
+  'response' => function () {
+    return new \PF\Slim\PinfinderResponse();
+  }
+];
 
-$app->configureMode('production', function () use ($app) {
-  $app->config(array(
-    'cookies.lifetime' => '2 Hours',
-    'debug' => false,
-  ));
-});
+$app = new \Slim\App($container);
 
-$app->view()->parserOptions = array(
-  'autoescape' => false,
-);
+$serializer = PinfinderSerializer::create($entityManager, $runmode === 'production');
 
-$app->notFound(function () use ($app) {
-  $app->status(401);
-  $app->render('404.html');
-});
+$app->add(new PinfinderResponseMiddleware($serializer));
 
-$serializer = PinfinderSerializer::create($entityManager, Bootstrap::getRunmode() === 'production');
-
-if (Bootstrap::getRunmode() === 'profile') {
-  $app->add(new \PF\Middleware\XHProfMiddleware());
+if ($runmode === 'profile') {
+  $app->add(new \PF\Middleware\PinfinderXHProfMiddleware());
 }
 
-$app->add(new \PF\Middleware\ResponseMiddleware($serializer));
-
-$adminRouteMiddleware = new \PF\Middleware\AdminRouteMiddleware();
-
-$requestStatsMiddleware = new \PF\Middleware\RequestStatsMiddleware();
-
-require 'routes/login.php';
-require 'routes/venue.php';
+require 'routes/app.php';
 require 'routes/comment.php';
 require 'routes/game.php';
-require 'routes/stats.php';
 require 'routes/geocode.php';
-require 'routes/notification.php';
-require 'routes/machine.php';
 require 'routes/legacy.php';
+require 'routes/login.php';
+require 'routes/machine.php';
+require 'routes/notification.php';
+require 'routes/stats.php';
 require 'routes/user.php';
-require 'routes/app.php';
+require 'routes/venue.php';
 
 $app->run();

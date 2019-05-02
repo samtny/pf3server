@@ -19,21 +19,21 @@ class CommentRepository extends EntityRepository {
     return $comment;
   }
 
-  public function getComments($request) {
+  public function getComments($params) {
     $qb = $this->getEntityManager()->createQueryBuilder();
 
     $qb->select(array('c'));
     $qb->from('\PF\Comment', 'c');
 
-    $s = !empty($request->get('s')) ? $request->get('s') : 'APPROVED';
+    $s = !empty($params['s']) ? $params['s'] : 'APPROVED';
 
     $qb->andWhere($qb->expr()->eq('c.status', ':status'))
       ->setParameter('status', $s);
 
     $qb->orderBy('c.updated', 'DESC');
 
-    $p = !empty($request->get('p')) ? $request->get('p') : 0;
-    $l = !empty($request->get('l')) ? $request->get('l') : 70;
+    $p = !empty($params['p']) ? $params['p'] : 0;
+    $l = !empty($params['l']) ? $params['l'] : 70;
 
     $qb->setFirstResult($p * $l)
       ->setMaxResults($l);

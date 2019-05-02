@@ -2,8 +2,9 @@
 
 use JMS\Serializer\DeserializationContext;
 
-function venue_route_search($entityManager, $request) {
-  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($request);
+function venue_route_search($entityManager, $params) {
+
+  $venuesIterator = $entityManager->getRepository('\PF\Venue')->getVenues($params);
 
   $venues = [];
 
@@ -12,190 +13,218 @@ function venue_route_search($entityManager, $request) {
   }
 
   return $venues;
+
 }
 
-$app->group('/venue', function () use ($app, $entityManager, $serializer, $adminRouteMiddleware, $requestStatsMiddleware, $logger) {
-    $app->get('/search', array($requestStatsMiddleware, 'call'), function () use ($app, $entityManager, $logger) {
-        $request = $app->request();
+$app->group('/venue', function () use ($entityManager, $logger, $serializer) {
 
-        $logger->info('Venue search request', array('params' => $request->params()));
+  $this->get('/search', function ($request, $response) use ($entityManager, $logger) {
 
-        $venues = venue_route_search($entityManager, $request);
+    $params = $request->getQueryParams();
 
-        $app->responseData = array('count' => count($venues), 'venues' => $venues);
-    });
+    $logger->info('Venue request params', array('params' => $params));
 
-    $app->post('/:id/approve', array($adminRouteMiddleware, 'call'), function ($id) use ($app, $entityManager) {
-        $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+    $venues = venue_route_search($entityManager, $params);
 
-        if (empty($venue)) {
-            $app->notFound();
-        }
+    $response->setPinfinderData([
+      'count' => count($venues),
+      'venues' => $venues,
+    ]);
 
-        $venue->approve();
-        $entityManager->persist($venue);
+    return $response;
 
-        if (!empty($venue->getCreatedUser())) {
-          $notification = new \PF\Notification();
+  });
 
-          $notification->setUser($venue->getCreatedUser());
-          $notification->setMessage('The venue \'' . $venue->getName() . '\' you added was approved!  Thank you!  -The Pinfinder Team');
-          $notification->setQueryParams('q=' . $venue->getId());
+  $this->get('/{id}', function ($request, $response, $args) use ($entityManager) {
 
-          $entityManager->persist($notification);
-        }
+    $venue = $entityManager->getRepository('\PF\Venue')->find($args['id']);
 
-        $entityManager->flush();
+    if (empty($venue)) {
+      $response = $response->withStatus(404);
+    }
+    else {
+      $response->setPinfinderData([
+        'venue' => $venue,
+      ]);
+    }
 
-        $app->responseMessage = 'Approved Venue with ID ' . $venue->getId();
-    });
+    return $response;
 
-    $app->post('/:id/confirm', function ($id) use ($app, $entityManager, $logger) {
-      $logger->info('Venue confirm request', array('id' => $id));
+  });
 
-      /**
-       * @var $venue \PF\Venue
-       */
-      $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+  $this->post('/{id}/approve', function ($request, $response, $args) use ($entityManager) {
+    $venue = $entityManager->getRepository('\PF\Venue')->find($args['id']);
 
-      if (empty($venue)) {
-        $app->notFound();
+    if (empty($venue)) {
+      $response = $response->withStatus(404);
+    }
+    else {
+      $venue->approve();
+      $entityManager->persist($venue);
+
+      if (!empty($venue->getCreatedUser())) {
+        $notification = new \PF\Notification();
+
+        $notification->setUser($venue->getCreatedUser());
+        $notification->setMessage('The venue \'' . $venue->getName() . '\' you added was approved!  Thank you!  -The Pinfinder Team');
+        $notification->setQueryParams('q=' . $venue->getId());
+
+        $entityManager->persist($notification);
       }
 
+      $entityManager->flush();
+
+      $response->setPinfinderMessage('Approved Venue with ID ' . $venue->getId());
+    }
+
+    return $response;
+
+  })->add(new \PF\Middleware\PinfinderAdminRouteMiddleware());
+
+  $this->post('/{id}/confirm', function ($request, $response, $args) use ($entityManager, $logger) {
+    $logger->info('Venue confirm request', array('id' => $args['id']));
+
+    /**
+     * @var $venue \PF\Venue
+     */
+    $venue = $entityManager->getRepository('\PF\Venue')->find($args['id']);
+
+    if (empty($venue)) {
+      $response = $response->withStatus(404);
+    }
+    else {
       $venue->touch();
       $entityManager->persist($venue);
 
       $entityManager->flush();
 
-      $app->responseMessage = 'Confirmed Venue with ID ' . $venue->getId();
-    });
+      $response->setPinfinderMessage('Confirmed Venue with ID ' . $venue->getId());
+    }
 
-    $app->post('/:id/flag', function ($id) use ($app, $entityManager) {
-      $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+    return $response;
+  });
 
-      if (empty($venue)) {
-        $app->notFound();
+  $this->post('/{id}/flag', function ($request, $response, $args) use ($entityManager) {
+    $venue = $entityManager->getRepository('\PF\Venue')->find($args['id']);
+
+    if (empty($venue)) {
+      $response = $response->withStatus(404);
+    }
+    else {
+      $venue->flag();
+      $entityManager->persist($venue);
+
+      $entityManager->flush();
+
+      $response->setPinfinderMessage('Flagged Venue with ID ' . $venue->getId());
+    }
+
+    return $response;
+  });
+
+  $this->delete('/{id}', function ($request, $response, $args) use ($entityManager) {
+    $venue = $entityManager->getRepository('\PF\Venue')->find($args['id']);
+
+    if (empty($venue)) {
+      $response = $response->withStatus(404);
+    }
+    else {
+      foreach ($venue->getMachines() as $machine) {
+        $machine->touch();
+        $machine->delete();
+
+        $entityManager->persist($machine);
       }
 
-      $venue->flag();
+      foreach ($venue->getComments() as $comment) {
+        $comment->touch();
+        $comment->delete();
+
+        $entityManager->persist($comment);
+      }
+
+      $venue->touch();
+      $venue->delete();
 
       $entityManager->persist($venue);
 
       $entityManager->flush();
 
-      $app->responseMessage = 'Flagged Venue with ID ' . $venue->getId();
-    });
+      $response->setPinfinderMessage('Deleted Venue with ID ' . $venue->getId());
+    }
 
-    $app->get('/:id', function ($id) use ($app, $entityManager) {
-        $venue = $entityManager->getRepository('\PF\Venue')->find($id);
+    return $response;
+  });
 
-        if (empty($venue)) {
-            $app->notFound();
+  $this->post('', function ($request, $response, $args) use ($entityManager, $serializer) {
+    $json_venue_encoded = $request->getBody();
+
+    $json_venue_decoded = json_decode($json_venue_encoded, true);
+
+    $is_new_venue = empty($json_venue_decoded['id']);
+
+    $venue_deserialization_context = DeserializationContext::create();
+    $venue_deserialization_context->setGroups($is_new_venue ? array('create') : array('update'));
+
+    $venue = $serializer->deserialize($json_venue_encoded, 'PF\Venue', 'json', $venue_deserialization_context);
+
+    if (!$is_new_venue) {
+      $venue->touch();
+    }
+
+    if (!empty($json_venue_decoded['machines'])) {
+      foreach ($json_venue_decoded['machines'] as $json_machine_decoded) {
+        $json_machine_encoded = json_encode($json_machine_decoded);
+
+        $is_new_machine = empty($json_machine_decoded['id']);
+
+        $machine_deserialization_context = DeserializationContext::create();
+        $machine_deserialization_context->setGroups($is_new_machine ? array('create') : array('update'));
+
+        $machine = $serializer->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
+
+        $game = NULL;
+
+        if (!empty($json_machine_decoded['ipdb'])) {
+          $game = $entityManager->getRepository('\PF\Game')->find($json_machine_decoded['ipdb']);
+        } else {
+          $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $json_machine_decoded['name']));
         }
 
-        $app->responseData = array('venue' => $venue);
-    });
+        $machine->setGame($game);
 
-    $app->post('', function () use ($app, $entityManager, $serializer) {
-        $json_venue_encoded = $app->request->getBody();
+        $venue->addMachine($machine);
+      }
+    }
 
-        $json_venue_decoded = json_decode($json_venue_encoded, true);
+    if (!empty($json_venue_decoded['comments'])) {
+      foreach ($json_venue_decoded['comments'] as $json_comment_decoded) {
+        $json_comment_encoded = json_encode($json_comment_decoded);
 
-        $is_new_venue = empty($json_venue_decoded['id']);
+        $is_new_comment = empty($json_comment_decoded['id']);
 
-        $venue_deserialization_context = DeserializationContext::create();
-        $venue_deserialization_context->setGroups($is_new_venue ? array('create') : array('update'));
+        $comment_deserialization_context = DeserializationContext::create();
+        $comment_deserialization_context->setGroups($is_new_comment ? array('create') : array('update'));
 
-        $venue = $serializer->deserialize($json_venue_encoded, 'PF\Venue', 'json', $venue_deserialization_context);
+        $comment = $serializer->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_deserialization_context);
 
-        if (!$is_new_venue) {
-          $venue->touch();
-        }
+        $venue->addComment($comment);
+      }
+    }
 
-        if (!empty($json_venue_decoded['machines'])) {
-            foreach ($json_venue_decoded['machines'] as $json_machine_decoded) {
-                $json_machine_encoded = json_encode($json_machine_decoded);
+    try {
+      $entityManager->persist($venue);
 
-                $is_new_machine = empty($json_machine_decoded['id']);
+      $entityManager->flush();
 
-                $machine_deserialization_context = DeserializationContext::create();
-                $machine_deserialization_context->setGroups($is_new_machine ? array('create') : array('update'));
+      $response = $response->withStatus($is_new_venue ? 201 : 200);
 
-                $machine = $serializer->deserialize($json_machine_encoded, 'PF\Machine', 'json', $machine_deserialization_context);
+      $response->setPinfinderMessage(($is_new_venue ? 'Created Venue with ID ' : 'Updated Venue with ID ') . $venue->getId());
+    } catch (\Doctrine\ORM\EntityNotFoundException $e) {
+      $response = $response->withStatus(404);
+    }
 
-                $game = NULL;
+    return $response;
+  });
 
-                if (!empty($json_machine_decoded['ipdb'])) {
-                  $game = $entityManager->getRepository('\PF\Game')->find($json_machine_decoded['ipdb']);
-                } else {
-                  $game = $entityManager->getRepository('\PF\Game')->findOneBy(array('name' => $json_machine_decoded['name']));
-                }
-
-                $machine->setGame($game);
-
-                $venue->addMachine($machine);
-            }
-        }
-
-        if (!empty($json_venue_decoded['comments'])) {
-            foreach ($json_venue_decoded['comments'] as $json_comment_decoded) {
-                $json_comment_encoded = json_encode($json_comment_decoded);
-
-                $is_new_comment = empty($json_comment_decoded['id']);
-
-                $comment_deserialization_context = DeserializationContext::create();
-                $comment_deserialization_context->setGroups($is_new_comment ? array('create') : array('update'));
-
-                $comment = $serializer->deserialize($json_comment_encoded, 'PF\Comment', 'json', $comment_deserialization_context);
-
-                $venue->addComment($comment);
-            }
-        }
-
-        try {
-            $entityManager->persist($venue);
-
-            $entityManager->flush();
-
-            $app->status($is_new_venue ? 201 : 200);
-
-            $app->responseMessage = ($is_new_venue ? 'Created Venue with ID ' : 'Updated Venue with ID ') . $venue->getId();
-        } catch (\Doctrine\ORM\EntityNotFoundException $e) {
-            $app->notFound();
-        }
-    });
-
-    $app->delete('/:id', function ($id) use ($app, $entityManager) {
-        $venue = $entityManager->getRepository('\PF\Venue')->find($id);
-
-        if (empty($venue)) {
-            $app->notFound();
-        }
-
-        foreach ($venue->getMachines() as $machine) {
-          $machine->touch();
-
-          $machine->delete();
-
-          $entityManager->persist($machine);
-        }
-
-        foreach ($venue->getComments() as $comment) {
-          $comment->touch();
-
-          $comment->delete();
-
-          $entityManager->persist($comment);
-        }
-
-        $venue->touch();
-
-        $venue->delete();
-
-        $entityManager->persist($venue);
-
-        $entityManager->flush();
-
-        $app->responseMessage = 'Deleted Venue with ID ' . $venue->getId();
-    });
 });
