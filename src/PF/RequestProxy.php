@@ -3,17 +3,21 @@
 namespace PF;
 
 class RequestProxy {
-  private $vars;
+  private $queryParams;
 
-  public function __construct($vars = array()) {
-    $this->vars = $vars;
+  public function __construct($queryParams = array()) {
+    $this->queryParams = $queryParams;
   }
 
   public function set ($key, $value) {
-    $this->vars[$key] = $value;
+    $this->queryParams[$key] = $value;
   }
 
   public function get ($key) {
-    return !empty($this->vars[$key]) ? $this->vars[$key] : NULL;
+    return !empty($this->queryParams[$key]) ? $this->queryParams[$key] : NULL;
+  }
+
+  public function getQueryParams() {
+    return $this->queryParams;
   }
 }
