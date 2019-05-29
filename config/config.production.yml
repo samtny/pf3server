@@ -2,31 +2,12 @@
 
 pf3server_url: pinballfinder.org
 pf3server_runmode: production
-pf3server_docroot: /usr/home/samtny/public_html/pinballfinder.org/pf3
-pf3server_ssl: /usr/home/samtny/certificates/pf3server
-pf3server_gamedict_path: /usr/home/samtny/public_html/pinballfinder.org/gamedict.txt
-pf3server_log_directory: /usr/home/samtny/pinfinder_logs/pf3
+pf3server_docroot: /var/www/pf3
+pf3server_ssl: /home/ubuntu/ssl/pf3/apns
+pf3server_gamedict_path: /var/www/pinballfinder.org/gamedict.txt
+pf3server_log_directory: /home/ubuntu/logs
 
-pf3server_deploy_host: samtny.pairserver.com
-pf3server_deploy_user: samtny
+pf3server_deploy_host: web-prod-lamp
+pf3server_deploy_user: ubuntu
 
-pf3server_db_name: samtny_pf3
-
-php_pm_max_children: 2
-php_pm_start_servers: 1
-php_pm_min_spare_servers: 1
-php_pm_max_spare_servers: 2
-
-php_fpm_user: vagrant
-php_fpm_group: vagrant
-php_memory_limit: 16M
-php_upload_max_filesize: 2M
-php_post_max_size: 8M
-php_cgi_fix_pathinfo: 0
-php_realpath_cache_size: 96k
-php_opcache_enable: 1
-php_opcache_memory_consumption: 64
-php_opcache_interned_strings_buffer: 16
-php_opcache_max_accelerated_files: 16228
-php_opcache_validate_timestamps: 1
-
+pf3server_db_name: pf3_server
