@@ -170,9 +170,10 @@ function scrape_import_new_venue($scrape_venue, $trust_games = FALSE, $auto_appr
  * @param bool $soft_approve
  * @param bool $tidy
  * @param bool $dry_run
+ * @param bool $update_existing
  * @return bool
  */
-function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve = FALSE, $soft_approve = FALSE, $tidy = FALSE, $dry_run = FALSE) {
+function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve = FALSE, $soft_approve = FALSE, $tidy = FALSE, $dry_run = FALSE, $update_existing = FALSE) {
   $imported = FALSE;
 
   $logger = Bootstrap::getLogger('pf3_scrape');
@@ -185,7 +186,12 @@ function scrape_import_venue($scrape_venue, $trust_games = FALSE, $auto_approve 
     if (!empty($venue)) {
       $logger->debug("Found matching venue: " . $venue->getId());
 
-      $imported = scrape_import_update_venue($scrape_venue, $venue, $trust_games, $tidy, $dry_run);
+      if ($update_existing) {
+        $imported = scrape_import_update_venue($scrape_venue, $venue, $trust_games, $tidy, $dry_run);
+      }
+      else {
+        $logger->info("Declining to update existing venue", array('scrape_venue', $scrape_venue));
+      }
     } else {
       if (scrape_venue_validate_has_games($scrape_venue)) {
         $logger->debug("Did not find matching venue");

@@ -25,6 +25,7 @@ $longopts = array(
   'soft-approve',
   'tidy',
   'resume-region:',
+  'update-existing',
 );
 
 $options = getopt($opts, $longopts);
@@ -35,6 +36,7 @@ $auto_approve = isset($options['auto-approve']);
 $soft_approve = isset($options['soft-approve']);
 $tidy = isset($options['tidy']);
 $resume_region = !empty($options['resume-region']) ? $options['resume-region'] : NULL;
+$update_existing = isset($options['update-existing']);
 
 $logger = Bootstrap::getLogger('pf3_scrape');
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
@@ -156,7 +158,7 @@ if (count($pm_regions) >= SCRAPE_PINBALLMAP_REGION_COUNT_SANITY_CHECK || !empty(
 
             $venue->setUpdated(new DateTime($pm_location['updated_at']));
 
-            $scrape_import_venue_result = scrape_import_venue($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $auto_approve, $soft_approve, $tidy, $dry_run);
+            $scrape_import_venue_result = scrape_import_venue($venue, SCRAPE_PINBALLMAP_TRUST_GAMES, $auto_approve, $soft_approve, $tidy, $dry_run, $update_existing);
 
             if ($scrape_import_venue_result) {
               $imported++;

@@ -30,6 +30,7 @@ $longopts = array(
   'tidy',
   'limit:',
   'resume-page:',
+  'update-existing',
 );
 
 $options = getopt($opts, $longopts);
@@ -41,6 +42,7 @@ $soft_approve = isset($options['soft-approve']);
 $tidy = isset($options['tidy']);
 $limit = !empty($options['limit']) ? $options['limit'] : SCRAPE_PINSIDE_LOCATION_DEFAULT_LIMIT;
 $resume_page = !empty($options['resume-page']) ? $options['resume-page'] : NULL;
+$update_existing = isset($options['update-existing']);
 
 $logger = Bootstrap::getLogger('pf3_scrape');
 $logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, $verbose ? Logger::DEBUG : Logger::INFO));
@@ -128,7 +130,7 @@ while ($iterated < $limit) {
 
           $venue->setUpdated(DateTime::createFromFormat(SCRAPE_PINSIDE_DATE_FORMAT, $ps_location['location_edit_date'], $ps_timezone));
 
-          $scrape_import_venue_result = scrape_import_venue($venue, SCRAPE_PINSIDE_TRUST_GAMES, $auto_approve, $soft_approve, $tidy, $dry_run);
+          $scrape_import_venue_result = scrape_import_venue($venue, SCRAPE_PINSIDE_TRUST_GAMES, $auto_approve, $soft_approve, $tidy, $dry_run, $update_existing);
 
           if ($scrape_import_venue_result) {
             $imported++;
